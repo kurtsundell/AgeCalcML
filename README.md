@@ -1,7 +1,7 @@
 # AgeCalcML
-Arizona LaserChron Center U-Pb Data Reduction Software
+Arizona LaserChron Center Data Reduction Software
 
-AgeCalcML requires the free MATLAB Runtime Compiler version 9.5. There are separate compilers for Mac and Windows. Runtime is accessed by the programs completely behind the scenes, very similar to Java. Like Java, this will need to be updated with new deployments of the program. We anticipate this will happen about once a year.
+AgeCalcML requires the free MATLAB Runtime Compiler 2018b version 9.5. There are separate compilers for Mac and Windows.
 
 Here are the links! (click to start download). Follow all of the default settings. 
 
