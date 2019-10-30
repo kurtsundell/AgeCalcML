@@ -7,7 +7,7 @@ To run AgeCalcML in MATLAB open the AgeCalcML.m file and run the file directly f
 ### Run without MATLAB
 AgeCalcML can be run in MATLAB or as a standalone .exe file (Windows) or .app file (macOS) that can be used without having a copy MATLAB. The file can be run from your computer's Desktop, or wherever you choose to keep it. 
 
-To run as a standalone program AgeCalcML requires the free MATLAB Runtime Compiler 2018b version 9.5. There are separate compilers for Mac and Windows.
+To run as a standalone program AgeCalcML requires the free MATLAB Runtime Compiler 2018b version 9.5. There are separate compilers for macOS and Windows.
 
 Here are the links! (click to start download). Follow all of the default settings. 
 
