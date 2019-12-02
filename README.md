@@ -2,14 +2,14 @@
 Arizona LaserChron Center Data Reduction Software
 
 ### Run in MATLAB
-To run AgeCalcML in MATLAB open the AgeCalcML.m file and run the file directly from the code.
+To run AgeCalcML in MATLAB open the AgeCalcM_1_3L.m file and run the file directly from the code.
 
 ### Run without MATLAB
 AgeCalcML can be run in MATLAB or as a standalone .exe file (Windows) or .app file (macOS) that can be used without having a copy MATLAB. The file can be run from your computer's Desktop, or wherever you choose to keep it. 
 
-To run as a standalone program AgeCalcML requires the free MATLAB Runtime Compiler 2018b version 9.5. There are separate compilers for macOS and Windows.
+To run as a standalone program AgeCalcML requires the free MATLAB Runtime Compiler 2018b version 9.5. There are separate compilers for macOS and Windows. Install the compiler first, then run the .exe (Windows) or .app (macOS). 
 
-Here are the links! (click to start download). Follow all of the default settings. 
+Here are the links for the compilers (click to start download). Follow all of the default settings to install. Nothing will happen following installation -- there is no need to open the compiler -- AgeCalcML will access it automatically. 
 
 Windows:
 
