@@ -1,8 +1,8 @@
 # AgeCalcML
-Arizona LaserChron Center Data Reduction Software
+The University of Arizona LaserChron Center data reduction software
 
 ### Run in MATLAB
-To run AgeCalcML in MATLAB open the AgeCalcML_1_3.m file and run the file directly from the code. AgeCalcML_1_3 is the most stable; AgeCalcML_1_4 is currently under development and has some new features and some patches.
+To run AgeCalcML in MATLAB open the AgeCalcML_1_3.m file and run the file directly from the code. AgeCalcML_1_3 is the most stable; AgeCalcML_1_4 is currently under development and has some new features and bug fixes from the original. The main page and features have been completely reorganized, hence the completely new version.
 
 ### Run without MATLAB
 AgeCalcML can be run in MATLAB or as a standalone .exe file (Windows) or .app file (macOS) that can be used without having a copy MATLAB. The file can be run from your computer's Desktop, or wherever you choose to keep it. 
@@ -15,8 +15,8 @@ Windows:
 
 http://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/win64/MCR_R2018b_win64_installer.exe
 
-Mac:
+macOS:
 
 http://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/maci64/MCR_R2018b_maci64_installer.dmg.zip
 
-Contact Kurt at kurtsundell@gmail.com for software questions or George at ggehrels@gmail.com for general info about the University of Arizona LaserChron Center. 
+Contact Kurt at kurtsundell@gmail.com for software questions. Visit our website at www.laserchron.org or contact George at ggehrels@gmail.com for general info about the University of Arizona LaserChron Center. 
