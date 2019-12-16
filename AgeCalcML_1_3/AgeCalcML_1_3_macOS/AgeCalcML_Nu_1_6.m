@@ -277,6 +277,8 @@ elseif get(H.primary, 'Value') == 2
 	STD1 = 'BLS';
 elseif get(H.primary, 'Value') == 3
 	STD1 = 'WSM';
+elseif get(H.primary, 'Value') == 5
+	STD1 = 'FC';
 end
 
 if get(H.secondary, 'Value') == 1
@@ -376,6 +378,29 @@ if get(H.primary, 'Value') == 3
 	STD1_Uppm = 424;
 	STD1_Thppm = 118;
 end
+
+if get(H.primary, 'Value') == 5
+	STD1 = 'FC';
+	STD1_68 = 0.18588;
+	STD1_67  = 13.132;
+	STD1_82  = 0.05588;
+	STD1_64c = 16.882;
+	STD1_67c = 15.463;
+	STD1_68c = 36.533;
+	STD1_Uppm = 457;
+	STD1_Thppm = 271;
+end
+
+
+
+
+
+
+
+
+
+
+
 
 %{
 BLS	0.1769	13.4560	0.0533	16.971	15.472	36.629	1050
@@ -1377,6 +1402,10 @@ end
 
 if get(H.primary, 'Value') == 3
 	age_label2 = {'? Ma'};
+end
+
+if get(H.primary, 'Value') == 5
+	age_label2 = {'1099.0 Ma'};
 end
 
 plot(xc,yc,'k','LineWidth',1.4)
@@ -13342,6 +13371,10 @@ age_label2_y = STD1_68;
 
 if get(H.primary, 'Value') == 1
 	age_label2 = {'564 Ma'};
+end
+
+if get(H.primary, 'Value') == 5
+	age_label2 = {'1099.0 Ma'};
 end
 
 plot(xc,yc,'k','LineWidth',1.4)
