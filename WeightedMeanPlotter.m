@@ -1,6 +1,6 @@
-function varargout = WeightedMeanPlotter_1_0(varargin)
+function varargout = WeightedMeanPlotter(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',       mfilename, 'gui_Singleton',  gui_Singleton, 'gui_OpeningFcn', @WeightedMeanPlotter_1_0_OpeningFcn, 'gui_OutputFcn',  @WeightedMeanPlotter_1_0_OutputFcn, ...
+gui_State = struct('gui_Name',       mfilename, 'gui_Singleton',  gui_Singleton, 'gui_OpeningFcn', @WeightedMeanPlotter_OpeningFcn, 'gui_OutputFcn',  @WeightedMeanPlotter_OutputFcn, ...
 	'gui_LayoutFcn',  [], 'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
@@ -12,12 +12,12 @@ else
     gui_mainfcn(gui_State, varargin{:});
 end
 
-function WeightedMeanPlotter_1_0_OpeningFcn(hObject, eventdata, H, varargin)
+function WeightedMeanPlotter_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 guidata(hObject, H);
 
 
-function varargout = WeightedMeanPlotter_1_0_OutputFcn(hObject, eventdata, H) 
+function varargout = WeightedMeanPlotter_OutputFcn(hObject, eventdata, H) 
 varargout{1} = H.output;
 %plot_Callback(hObject, eventdata, H)
 

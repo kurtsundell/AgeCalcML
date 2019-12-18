@@ -1,9 +1,9 @@
-%% STACKEDCONCORDIAPLOTTER_1_0 MATLAB code for StackedConcordiaPlotter_1_0.fig %%
+%% STACKEDCONCORDIAPLOTTER MATLAB code for StackedConcordiaPlotter.fig %%
 
 %% SET DEFAULT COMMAND LINE AND HANDLE STRUCTURE %%
-function varargout = StackedConcordiaPlotter_1_0(varargin)
+function varargout = StackedConcordiaPlotter(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@StackedConcordiaPlotter_1_0_OpeningFcn,'gui_OutputFcn',@StackedConcordiaPlotter_1_0_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@StackedConcordiaPlotter_OpeningFcn,'gui_OutputFcn',@StackedConcordiaPlotter_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
 gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -12,10 +12,10 @@ if nargout
 else
 gui_mainfcn(gui_State, varargin{:});
 end
-function StackedConcordiaPlotter_1_0_OpeningFcn(hObject, eventdata, H, varargin)
+function StackedConcordiaPlotter_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 guidata(hObject, H);
-function varargout = StackedConcordiaPlotter_1_0_OutputFcn(hObject, eventdata, H) 
+function varargout = StackedConcordiaPlotter_OutputFcn(hObject, eventdata, H) 
 varargout{1} = H.output;
 set(H.conc1s,'Value', 1)
 H.export_comp = 0;
