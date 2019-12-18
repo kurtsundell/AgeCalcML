@@ -1,9 +1,9 @@
-%% CONCORDIAPLOTTER_1_0 MATLAB code for ConcordiaPlotter_1_0.fig %%
+%% CONCORDIAPLOTTER MATLAB code for ConcordiaPlotter.fig %%
 
 %% SET DEFAULT COMMAND LINE AND HANDLE STRUCTURE %%
-function varargout = ConcordiaPlotter_1_0(varargin)
+function varargout = ConcordiaPlotter(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@ConcordiaPlotter_1_0_OpeningFcn,'gui_OutputFcn',@ConcordiaPlotter_1_0_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@ConcordiaPlotter_OpeningFcn,'gui_OutputFcn',@ConcordiaPlotter_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 
 if nargin && ischar(varargin{1})
 	gui_State.gui_Callback = str2func(varargin{1});
@@ -15,11 +15,11 @@ else
 	gui_mainfcn(gui_State, varargin{:});
 end
 
-function ConcordiaPlotter_1_0_OpeningFcn(hObject, eventdata, H, varargin)
+function ConcordiaPlotter_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 guidata(hObject, H);
 
-function varargout = ConcordiaPlotter_1_0_OutputFcn(hObject, eventdata, H) 
+function varargout = ConcordiaPlotter_OutputFcn(hObject, eventdata, H) 
 varargout{1} = H.output;
 set(H.conc1s,'Value', 1)
 H.export_comp = 0;
