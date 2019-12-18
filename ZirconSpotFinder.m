@@ -1,6 +1,6 @@
-function varargout = ZirconSpotFinder_1_4(varargin)
+function varargout = ZirconSpotFinder(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@ZirconSpotFinder_1_4_OpeningFcn,'gui_OutputFcn',@ZirconSpotFinder_1_4_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@ZirconSpotFinder_OpeningFcn,'gui_OutputFcn',@ZirconSpotFinder_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -11,13 +11,13 @@ else
     gui_mainfcn(gui_State, varargin{:});
 end
 
-function ZirconSpotFinder_1_4_OpeningFcn(hObject, eventdata, H, varargin)
+function ZirconSpotFinder_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 H.run = 0;
 H.findspots = 0;
 guidata(hObject, H);
 
-function varargout = ZirconSpotFinder_1_4_OutputFcn(hObject, eventdata, H) 
+function varargout = ZirconSpotFinder_OutputFcn(hObject, eventdata, H) 
 circles = 0;
 H.circles = circles;
 guidata(hObject,H);
