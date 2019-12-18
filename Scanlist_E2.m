@@ -1,6 +1,6 @@
-function varargout = Scanlist_E2_1_0(varargin)
+function varargout = Scanlist_E2(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn', @Scanlist_E2_1_0_OpeningFcn,'gui_OutputFcn',@Scanlist_E2_1_0_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn', @Scanlist_E2_OpeningFcn,'gui_OutputFcn',@Scanlist_E2_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -10,12 +10,12 @@ else
     gui_mainfcn(gui_State, varargin{:});
 end
 
-function Scanlist_E2_1_0_OpeningFcn(hObject, eventdata, H, varargin)
+function Scanlist_E2_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 H.run = 0;
 guidata(hObject, H);
 
-function varargout = Scanlist_E2_1_0_OutputFcn(hObject, eventdata, H) 
+function varargout = Scanlist_E2_OutputFcn(hObject, eventdata, H) 
 varargout{1} = H.output;
 
 function loadscancsv_Callback(hObject, eventdata, H)
