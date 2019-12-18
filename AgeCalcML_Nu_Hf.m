@@ -1,10 +1,10 @@
-function varargout = AgeCalcML_Nu_Hf_1_5(varargin)
+function varargout = AgeCalcML_Nu_Hf(varargin)
 
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @AgeCalcML_Nu_Hf_1_5_OpeningFcn, ...
-                   'gui_OutputFcn',  @AgeCalcML_Nu_Hf_1_5_OutputFcn, ...
+                   'gui_OpeningFcn', @AgeCalcML_Nu_Hf_OpeningFcn, ...
+                   'gui_OutputFcn',  @AgeCalcML_Nu_Hf_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -17,12 +17,12 @@ else
     gui_mainfcn(gui_State, varargin{:});
 end
 
-function AgeCalcML_Nu_Hf_1_5_OpeningFcn(hObject, eventdata, H, varargin)
+function AgeCalcML_Nu_Hf_OpeningFcn(hObject, eventdata, H, varargin)
 %imshow('splash.png', 'Parent', H.axes7);
 H.output = hObject;
 guidata(hObject, H);
 
-function varargout = AgeCalcML_Nu_Hf_1_5_OutputFcn(hObject, eventdata, H) 
+function varargout = AgeCalcML_Nu_Hf_OutputFcn(hObject, eventdata, H) 
 H.reduced = 0;
 guidata(hObject,H);
 varargout{1} = H.output;
