@@ -1,7 +1,7 @@
-%% AGECALCML_NU_TRA_1_23 MATLAB code for AgeCalcML_Nu_TRA_1_23.fig %%
-function varargout = AgeCalcML_Nu_TRA_1_23(varargin)
+%% AGECALCML_NU_TRA MATLAB code for AgeCalcML_Nu_TRA.fig %%
+function varargout = AgeCalcML_Nu_TRA(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn', @AgeCalcML_Nu_TRA_1_23_OpeningFcn,'gui_OutputFcn',@AgeCalcML_Nu_TRA_1_23_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn', @AgeCalcML_Nu_TRA_OpeningFcn,'gui_OutputFcn',@AgeCalcML_Nu_TRA_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
 	gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -10,11 +10,11 @@ if nargout
 else
 	gui_mainfcn(gui_State, varargin{:});
 end
-function AgeCalcML_Nu_TRA_1_23_OpeningFcn(hObject, eventdata, H, varargin)
+function AgeCalcML_Nu_TRA_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 set(H.WM_STD2,'Visible','off')
 guidata(hObject, H);
-function varargout = AgeCalcML_Nu_TRA_1_23_OutputFcn(hObject, eventdata, H) 
+function varargout = AgeCalcML_Nu_TRA_OutputFcn(hObject, eventdata, H) 
 %imshow('splashs_eQh_icon.ico', 'Parent', H.axes50);
 reduced = 0;
 set(H.reject_no,'Value',1)
