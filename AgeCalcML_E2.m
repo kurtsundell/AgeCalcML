@@ -1,9 +1,9 @@
-%% AGECALCML_E2_1_15 MATLAB code for AgeCalcML_E2_1_15.fig %%
+%% AGECALCML_E2 MATLAB code for AgeCalcML_E2.fig %%
 
 %% SET DEFAULT COMMAND LINE AND HANDLE STRUCTURE %%
-function varargout = AgeCalcML_E2_1_15(varargin)
+function varargout = AgeCalcML_E2(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@AgeCalcML_E2_1_15_OpeningFcn,'gui_OutputFcn',@AgeCalcML_E2_1_15_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@AgeCalcML_E2_OpeningFcn,'gui_OutputFcn',@AgeCalcML_E2_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
 gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -13,11 +13,11 @@ else
 gui_mainfcn(gui_State, varargin{:});
 end
 
-function AgeCalcML_E2_1_15_OpeningFcn(hObject, eventdata, H, varargin)
+function AgeCalcML_E2_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 guidata(hObject, H);
 
-function varargout = AgeCalcML_E2_1_15_OutputFcn(hObject, eventdata, H) 
+function varargout = AgeCalcML_E2_OutputFcn(hObject, eventdata, H) 
 varargout{1} = H.output;
 %set(H.FC_conc,'Value', 1)
 %set(H.conc3D,'Value', 1)
