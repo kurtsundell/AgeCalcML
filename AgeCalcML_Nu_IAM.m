@@ -1,10 +1,10 @@
-%% AGECALCML_NU_1_6 MATLAB code for AgeCalcML_Nu_1_6.fig %%
-function varargout = AgeCalcML_Nu_1_6(varargin)
+%% AGECALCML_NU_IAM MATLAB code for AgeCalcML_Nu_IAM.fig %%
+function varargout = AgeCalcML_Nu_IAM(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @AgeCalcML_Nu_1_6_OpeningFcn, ...
-                   'gui_OutputFcn',  @AgeCalcML_Nu_1_6_OutputFcn, ...
+                   'gui_OpeningFcn', @AgeCalcML_Nu_IAM_OpeningFcn, ...
+                   'gui_OutputFcn',  @AgeCalcML_Nu_IAM_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 
@@ -19,12 +19,12 @@ end
 
 
 %% SET DEFAULT COMMAND LINE AND HANDLE STRUCTURE %%
-function AgeCalcML_Nu_1_6_OpeningFcn(hObject, eventdata, H, varargin)
+function AgeCalcML_Nu_IAM_OpeningFcn(hObject, eventdata, H, varargin)
 
 H.output = hObject;
 guidata(hObject, H);
 
-function varargout = AgeCalcML_Nu_1_6_OutputFcn(hObject, eventdata, H) 
+function varargout = AgeCalcML_Nu_IAM_OutputFcn(hObject, eventdata, H) 
 imshow('splashs_eQh_icon.ico', 'Parent', H.axes50);
 reduced = 0;
 H.reduced = reduced;
