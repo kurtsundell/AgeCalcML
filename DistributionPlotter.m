@@ -1,9 +1,9 @@
-%% DISTRIBUTIONPLOTTER_1_0 MATLAB code for DistributionPlotter_1_0.fig %%
+%% DISTRIBUTIONPLOTTER MATLAB code for DistributionPlotter.fig %%
 
 %% SET DEFAULT COMMAND LINE AND HANDLE STRUCTURE %%
-function varargout = DistributionPlotter_1_0(varargin)
+function varargout = DistributionPlotter(varargin)
 gui_Singleton = 1;
-gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@DistributionPlotter_1_0_OpeningFcn,'gui_OutputFcn',@DistributionPlotter_1_0_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@DistributionPlotter_OpeningFcn,'gui_OutputFcn',@DistributionPlotter_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
 gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -12,10 +12,10 @@ if nargout
 else
 gui_mainfcn(gui_State, varargin{:});
 end
-function DistributionPlotter_1_0_OpeningFcn(hObject, eventdata, H, varargin)
+function DistributionPlotter_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 guidata(hObject, H);
-function varargout = DistributionPlotter_1_0_OutputFcn(hObject, eventdata, H) 
+function varargout = DistributionPlotter_OutputFcn(hObject, eventdata, H) 
 varargout{1} = H.output;
 set(H.input1s,'Value',1)
 H.export_dist = 0;
