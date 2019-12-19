@@ -269,9 +269,9 @@ diff_ch =  median(diff_idx) < diff_idx - 5;
 if length(t0_238) > data_count
 	clear t0_238 t0_idx diff_idx diff_ch
 	for i = 2:length(Data(73:end,1))-2
-		if thresh238(i,1) == 1 && thresh238(i-1) == 0 && values_tmp(i+1,1) > -.004 && values_tmp(i+2,1) > -.004 && values_tmp(i+3,1) > -.004 && values_tmp(i+4,1) > -.004 && ...
-				values_tmp(i-1,1) < -.004 && values_tmp(i-2,1) < -.004 && values_tmp(i-3,1) < -.004 && values_tmp(i-4,1) < -.004  && ...
-				values_tmp(i-5,1) < -.004 && values_tmp(i-6,1) < -.004 && values_tmp(i-7,1) < -.004 && values_tmp(i-8,1) < -.004
+		if thresh238(i,1) == 1 && thresh238(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
+				values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh  && ...
+				values_tmp(i-5,1) < thresh && values_tmp(i-6,1) < thresh && values_tmp(i-7,1) < thresh && values_tmp(i-8,1) < thresh
 			t0_238(i,1) = values_tmp(i,11);
 			t0_idx(i,1) = values_tmp(i,10);
 		else
@@ -285,6 +285,37 @@ if length(t0_238) > data_count
 end
 
 waitbar(3/waitnum,h,'Calculating. Please wait...');
+
+if mean(diff(t0_idx)) > 140 && mean(diff(t0_idx)) < 160
+	set(H.method,'Value',1)
+%	set(H.intg,'String','15 s')
+elseif mean(diff(t0_idx)) > 50 && mean(diff(t0_idx)) < 70
+	set(H.method,'Value',2)
+%	set(H.intg,'String','12 s')
+	set(H.downhole,'Value',0)
+elseif mean(diff(t0_idx)) > 25 && mean(diff(t0_idx)) < 40
+	set(H.method,'Value',3)
+%	set(H.intg,'String','6 s')
+	set(H.downhole,'Value',0)
+elseif mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
+	set(H.method,'Value',4)
+%	set(H.intg,'String','3 s')
+	set(H.downhole,'Value',0)
+end
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
 
 %{
 figure
@@ -336,71 +367,135 @@ end
 %}
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%T Zero Find by Medians
 % Missing t0s (singles)
-
-if data_count > length(t0_idx) && sum(diff_ch) > 0
-    for i = 1:length(diff_ch) 
-		if mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
-			adjstr = 1.5;
-		else
-			adjstr = 1.3;
-		end
-        if diff_ch(i,1) == 1 && diff_idx(i,1) > adjstr*median(diff_idx)
-            t0_adj = t0_idx(1:i,1);
-            t0_adj(i+1,1) = 0;
-            t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-			t0_idx_bf = t0_adj(i,1);
-	        t0_idx_af = t0_adj(i+2,1);
-            t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);		
-			t0_idx = t0_adj;
-			diff_idx = diff(nonzeros(t0_adj));
-			diff_ch =  median(diff_idx) < diff_idx - 5;
-			clear t0_adj
-        end
-	end
-	for i = 1:length(t0_idx)
-		t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-		t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
-	end 	
-else
-	t0 = t0_238;
-end
-
-
-% Missing t0s (multiples)
-if data_count > length(t0_idx) && sum(diff_ch) > 0
-    for i = 1:length(diff_ch) 
-        if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
-			t0_adj = t0_idx(1:i,1);
-			t0_div = round(diff_idx(i,1)/median(diff_idx),0);
-			t0_adj(i+1:i+t0_div-1,1) = 0;
-            t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-			t0_idx_bf = t0_adj(i,1);
-			t0_idx_af = t0_adj(i+t0_div,1);
-			t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);	
-			for j = 1:t0_div - 1
-				t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
+if get(H.tzero_method,'Value') == 1
+	if data_count > length(t0_idx) && sum(diff_ch) > 0
+		for i = 1:length(diff_ch) 
+			if mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
+				adjstr = 1.5;
+			else
+				adjstr = 1.3;
 			end
-			t0_idx = t0_adj;
-			diff_idx = diff(nonzeros(t0_adj));
-			diff_ch =  median(diff_idx) < diff_idx - 5;
-			clear t0_adj
-        end
+			if diff_ch(i,1) == 1 && diff_idx(i,1) > adjstr*median(diff_idx)
+				t0_adj = t0_idx(1:i,1);
+				t0_adj(i+1,1) = 0;
+				t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+2,1);
+				t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);		
+				t0_idx = t0_adj;
+				diff_idx = diff(nonzeros(t0_adj));
+				diff_ch =  median(diff_idx) < diff_idx - 5;
+				clear t0_adj
+			end
+		end
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end 	
+	else
+		t0 = t0_238;
 	end
-	for i = 1:length(t0_idx)
-		t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-		t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
-	end 	
-else
-	t0 = t0_238;
+
+	% Missing t0s (multiples)
+	if data_count > length(t0_idx) && sum(diff_ch) > 0
+		for i = 1:length(diff_ch) 
+			if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
+				t0_adj = t0_idx(1:i,1);
+				t0_div = round(diff_idx(i,1)/median(diff_idx),0);
+				t0_adj(i+1:i+t0_div-1,1) = 0;
+				t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+t0_div,1);
+				t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);	
+				for j = 1:t0_div - 1
+					t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
+				end
+				t0_idx = t0_adj;
+				diff_idx = diff(nonzeros(t0_adj));
+				diff_ch =  median(diff_idx) < diff_idx - 5;
+				clear t0_adj
+			end
+		end
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end 	
+	else
+		t0 = t0_238;
+	end
 end
 
-%{
+% T Zero Find by fractions
+if get(H.tzero_method,'Value') == 2
+	if data_count > length(t0_idx) 
+		if get(H.method,'Value') == 1 % 120/hour
+			diff_idx_r = round(diff_idx/150)-1;
+		elseif get(H.method,'Value') == 2 % 300/hour
+			diff_idx_r = round(diff_idx/60)-1;
+		elseif get(H.method,'Value') == 3 % 600/hour
+			diff_idx_r = round(diff_idx/30)-1;
+		elseif get(H.method,'Value') == 4 % 1200/hour
+			diff_idx_r = round(diff_idx/15)-1;
+		end
+		for i = 1:data_count-1
+			if diff_idx_r(i,1) > 0
+				t0_adj = t0_idx(1:i,1);
+				t0_adj(i+(diff_idx_r(i,1)+1):i+diff_idx_r(i,1)+length(t0_idx(i+1:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+(diff_idx_r(i,1)+1),1);
+				t0_idx_rnd = round((t0_idx_af - t0_idx_bf)/(diff_idx_r(i,1)+1));
+				for j = 1:diff_idx_r(i,1)
+					t0_adj(i+j,1) = t0_adj(i,1) + t0_idx_rnd*j;
+				end
+				t0_idx = t0_adj;
+				clear t0_adj diff_idx_r diff_idx
+				diff_idx = diff(t0_idx);
+				if get(H.method,'Value') == 1 % 120/hour
+					diff_idx_r = round(diff_idx/150)-1;
+				elseif get(H.method,'Value') == 2 % 300/hour
+					diff_idx_r = round(diff_idx/60)-1;
+				elseif get(H.method,'Value') == 3 % 600/hour
+					diff_idx_r = round(diff_idx/30)-1;
+				elseif get(H.method,'Value') == 4 % 1200/hour
+					diff_idx_r = round(diff_idx/15)-1;
+				end
+			end
+		end
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end
+	else
+		t0 = t0_238;
+	end
+end
+
+
+
+
+
 if data_count ~= length(t0_idx)
 	close(h)
 	f = errordlg('T zero identification failed! Have a quick look at the U238 time series....','File Error');
-
-	
 if IC == 0
 figure
 	hold on
@@ -438,24 +533,12 @@ end
 
 
 end
-%}
 
-if mean(diff(t0_idx)) > 140 && mean(diff(t0_idx)) < 160
-	set(H.method,'Value',1)
-%	set(H.intg,'String','15 s')
-elseif mean(diff(t0_idx)) > 50 && mean(diff(t0_idx)) < 70
-	set(H.method,'Value',2)
-%	set(H.intg,'String','12 s')
-	set(H.downhole,'Value',0)
-elseif mean(diff(t0_idx)) > 20 && mean(diff(t0_idx)) < 40
-	set(H.method,'Value',3)
-%	set(H.intg,'String','6 s')
-	set(H.downhole,'Value',0)
-elseif mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
-	set(H.method,'Value',4)
-%	set(H.intg,'String','3 s')
-	set(H.downhole,'Value',0)
-end
+
+
+
+
+
 
 %%% Indexes
 if get(H.method,'Value') == 1 % 120/hour
@@ -536,7 +619,6 @@ elseif get(H.method,'Value') == 4 % 1200/hour
 		integration(1:5,1:cols,i) = values_all(6:10,1:cols,i);
 	end
 end
-
 
 waitbar(4/waitnum,h,'Calculating. Please wait...');
 
@@ -2764,65 +2846,149 @@ if length(t0_238) > data_count
 end
 
 
-%{
-figure
-hold on
-plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
-scatter(t0_idx,zeros(length(t0_idx),1),'filled')
-hold off
-%}
 
+if mean(diff(t0_idx)) > 140 && mean(diff(t0_idx)) < 160
+	set(H.method,'Value',1)
+%	set(H.intg,'String','15 s')
+elseif mean(diff(t0_idx)) > 50 && mean(diff(t0_idx)) < 70
+	set(H.method,'Value',2)
+%	set(H.intg,'String','12 s')
+	set(H.downhole,'Value',0)
+elseif mean(diff(t0_idx)) > 25 && mean(diff(t0_idx)) < 40
+	set(H.method,'Value',3)
+%	set(H.intg,'String','6 s')
+	set(H.downhole,'Value',0)
+elseif mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
+	set(H.method,'Value',4)
+%	set(H.intg,'String','3 s')
+	set(H.downhole,'Value',0)
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%T Zero Find by Medians
 % Missing t0s (singles)
-if data_count > length(t0_idx) && sum(diff_ch) > 0
-    for i = 1:length(diff_ch) 
-        if diff_ch(i,1) == 1 && diff_idx(i,1) > 1.3*median(diff_idx)
-            t0_adj = t0_idx(1:i,1);
-            t0_adj(i+1,1) = 0;
-            t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-			t0_idx_bf = t0_adj(i,1);
-	        t0_idx_af = t0_adj(i+2,1);
-            t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);		
-			t0_idx = t0_adj;
-			diff_idx = diff(nonzeros(t0_adj));
-			diff_ch =  median(diff_idx) < diff_idx - 5;
-			clear t0_adj
-        end
-	end
-	for i = 1:length(t0_idx)
-		t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-		t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
-	end 	
-else
-	t0 = t0_238;
-end	
-
-% Missing t0s (multiples)
-if data_count > length(t0_idx) && sum(diff_ch) > 0
-    for i = 1:length(diff_ch) 
-        if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
-			t0_adj = t0_idx(1:i,1);
-			t0_div = round(diff_idx(i,1)/median(diff_idx),0);
-			t0_adj(i+1:i+t0_div-1,1) = 0;
-            t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-			t0_idx_bf = t0_adj(i,1);
-			t0_idx_af = t0_adj(i+t0_div,1);
-			t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);	
-			for j = 1:t0_div - 1
-				t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
+if get(H.tzero_method,'Value') == 1
+	if data_count > length(t0_idx) && sum(diff_ch) > 0
+		for i = 1:length(diff_ch) 
+			if mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
+				adjstr = 1.5;
+			else
+				adjstr = 1.3;
 			end
-			t0_idx = t0_adj;
-			diff_idx = diff(nonzeros(t0_adj));
-			diff_ch =  median(diff_idx) < diff_idx - 5;
-			clear t0_adj
-        end
+			if diff_ch(i,1) == 1 && diff_idx(i,1) > adjstr*median(diff_idx)
+				t0_adj = t0_idx(1:i,1);
+				t0_adj(i+1,1) = 0;
+				t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+2,1);
+				t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);		
+				t0_idx = t0_adj;
+				diff_idx = diff(nonzeros(t0_adj));
+				diff_ch =  median(diff_idx) < diff_idx - 5;
+				clear t0_adj
+			end
+		end
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end 	
+	else
+		t0 = t0_238;
 	end
-	for i = 1:length(t0_idx)
-		t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-		t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
-	end 	
-else
-	t0 = t0_238;
-end	
+
+	% Missing t0s (multiples)
+	if data_count > length(t0_idx) && sum(diff_ch) > 0
+		for i = 1:length(diff_ch) 
+			if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
+				t0_adj = t0_idx(1:i,1);
+				t0_div = round(diff_idx(i,1)/median(diff_idx),0);
+				t0_adj(i+1:i+t0_div-1,1) = 0;
+				t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+t0_div,1);
+				t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);	
+				for j = 1:t0_div - 1
+					t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
+				end
+				t0_idx = t0_adj;
+				diff_idx = diff(nonzeros(t0_adj));
+				diff_ch =  median(diff_idx) < diff_idx - 5;
+				clear t0_adj
+			end
+		end
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end 	
+	else
+		t0 = t0_238;
+	end
+end
+
+% T Zero Find by fractions
+if get(H.tzero_method,'Value') == 2
+	if data_count > length(t0_idx) 
+		if get(H.method,'Value') == 1 % 120/hour
+			diff_idx_r = round(diff_idx/150)-1;
+		elseif get(H.method,'Value') == 2 % 300/hour
+			diff_idx_r = round(diff_idx/60)-1;
+		elseif get(H.method,'Value') == 3 % 600/hour
+			diff_idx_r = round(diff_idx/30)-1;
+		elseif get(H.method,'Value') == 4 % 1200/hour
+			diff_idx_r = round(diff_idx/15)-1;
+		end
+		for i = 1:data_count-1
+			if diff_idx_r(i,1) > 0
+				t0_adj = t0_idx(1:i,1);
+				t0_adj(i+(diff_idx_r(i,1)+1):i+diff_idx_r(i,1)+length(t0_idx(i+1:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+(diff_idx_r(i,1)+1),1);
+				t0_idx_rnd = round((t0_idx_af - t0_idx_bf)/(diff_idx_r(i,1)+1));
+				for j = 1:diff_idx_r(i,1)
+					t0_adj(i+j,1) = t0_adj(i,1) + t0_idx_rnd*j;
+				end
+				t0_idx = t0_adj;
+				clear t0_adj diff_idx_r diff_idx
+				diff_idx = diff(t0_idx);
+				if get(H.method,'Value') == 1 % 120/hour
+					diff_idx_r = round(diff_idx/150)-1;
+				elseif get(H.method,'Value') == 2 % 300/hour
+					diff_idx_r = round(diff_idx/60)-1;
+				elseif get(H.method,'Value') == 3 % 600/hour
+					diff_idx_r = round(diff_idx/30)-1;
+				elseif get(H.method,'Value') == 4 % 1200/hour
+					diff_idx_r = round(diff_idx/15)-1;
+				end
+			end
+		end
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end
+	else
+		t0 = t0_238;
+	end
+end
+
+
+
 
 figure
 hold on
@@ -2831,10 +2997,21 @@ scatter(values_tmp(:,11),80000000.*values_tmp(:,1),10,'filled','MarkerFaceColor'
 scatter(t0_238,zeros(length(t0_238),1),'filled','MarkerFaceColor','r')
 xlabel('Time (seconds)')
 ylabel('238U Counts per Second (CPS)')
+dim = [.2 .5 .3 .3];
+str = strcat('sample n = ', {' '}, mat2str(data_count), {'   '}, 't zeros = ',{' '}, mat2str(length(t0_idx)))
+annotation('textbox',dim,'String',str,'FitBoxToText','on');
 
-
-
-labelpoints (t0_238,zeros(length(t0_238),1), sample);
+if data_count == length(t0_idx)
+	labelpoints (t0_238,zeros(length(t0_238),1), sample);
+else
+	labelpoints (t0_238,zeros(length(t0_238),1), [1:1:length(t0_238)]);
+end
+	
+	
+	
+	
+	
+	
 %{
 figure
 hold on
@@ -5807,25 +5984,6 @@ copyobj(H.axes_distribution,f4);
 
 function batches_Callback(hObject, eventdata, H)
 
+function batch_num_Callback(hObject, eventdata, H)
 
-
-function batch_num_Callback(hObject, eventdata, handles)
-% hObject    handle to batch_num (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of batch_num as text
-%        str2double(get(hObject,'String')) returns contents of batch_num as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function batch_num_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to batch_num (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+function tzero_method_Callback(hObject, eventdata, H)
