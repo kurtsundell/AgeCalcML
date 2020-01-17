@@ -41,7 +41,11 @@ set(H.exporttree,'Visible','off')
 set(H.tree,'Visible','off')
 set(H.n_plotted,'String','?')
 
-global use_avg_ACF use_235 use_FC_68 use_FC_67 use_SL_68 use_SL_67 use_R33_68 deadtime lowint_238 lin_238 lowint_206 lin_206 lin_232 
+%global use_avg_ACF use_235 use_FC_68 use_FC_67 use_SL_68 use_SL_67 use_R33_68 deadtime lowint_238 lin_238 lowint_206 lin_206 lin_232 
+global use_avg_ACF use_235 use_FC_68 use_FC_67 use_SL_68 use_SL_67 use_R33_68 deadtime lowint_238 lin_238 lowint_206 lin_206 lin_232 numbers data sample2 factor64 rejectFC rejectSL rejectR33 ...
+	odf68 bestage_cutoff filter_cutoff filter_err68 filter_err67 filter_disc filter_disc_rev filter_64 values_all data_count STD1a_idx STD1b_idx STD2_idx sample_idx UPBdata UPB_pre
+
+
 use_avg_ACF = 1;
 use_235 = 0; 
 use_FC_68 = 1; 
@@ -145,7 +149,7 @@ cla(H.TREEcalib,'reset');
 cla(H.TREEnorm,'reset');
 
 global use_avg_ACF use_235 use_FC_68 use_FC_67 use_SL_68 use_SL_67 use_R33_68 deadtime lowint_238 lin_238 lowint_206 lin_206 lin_232 numbers data sample2 factor64 rejectFC rejectSL rejectR33 ...
-	odf68 bestage_cutoff filter_cutoff filter_err68 filter_err67 filter_disc filter_disc_rev filter_64  data_count STD1a_idx STD1b_idx STD2_idx sample_idx UPBdata UPB_pre
+	odf68 bestage_cutoff filter_cutoff filter_err68 filter_err67 filter_disc filter_disc_rev filter_64 values_all data_count STD1a_idx STD1b_idx STD2_idx sample_idx UPBdata UPB_pre
 
 waitnum = 10;
 h = waitbar(0,'Parsing the data. Please wait...');
