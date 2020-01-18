@@ -32,7 +32,7 @@ function e2_upb_Callback(hObject, eventdata, H)
 AgeCalcML_E2
 
 function e2_tree_Callback(hObject, eventdata, H)
-AgeCalcML_E2_TREE
+AgeCalcML_E2
 
 function scanlistnu_Callback(hObject, eventdata, H)
 Scanlist_Nu
