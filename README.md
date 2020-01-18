@@ -1,7 +1,7 @@
 # AgeCalcML
 The University of Arizona LaserChron Center data reduction software
 
-### Run in MATLAB
+### Run with MATLAB
 To run AgeCalcML in MATLAB open the AgeCalcML.m file and run the file directly from the code. 
 
 ### Run without MATLAB
