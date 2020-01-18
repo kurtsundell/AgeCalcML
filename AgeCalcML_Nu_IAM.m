@@ -25,12 +25,12 @@ H.output = hObject;
 guidata(hObject, H);
 
 function varargout = AgeCalcML_Nu_IAM_OutputFcn(hObject, eventdata, H) 
-imshow('splashs_eQh_icon.ico', 'Parent', H.axes50);
+%imshow('splashs_eQh_icon.ico', 'Parent', H.axes50);
 reduced = 0;
 H.reduced = reduced;
 
-set(H.pc_1, 'Enable', 'off'); set(H.pc_2, 'Enable', 'off'); set(H.pc_3, 'Enable', 'off'); set(H.pc_4, 'Enable', 'off'); set(H.pc_5, 'Enable', 'off'); set(H.pc_6, 'Enable', 'off'); 
-set(H.pc_7, 'Enable', 'off'); set(H.reject68, 'Enable', 'off'); set(H.reject67, 'Enable', 'off'); set(H.reject82, 'Enable', 'off'); set(H.standards_rejected, 'Enable', 'off');
+%set(H.pc_1, 'Enable', 'off'); set(H.pc_2, 'Enable', 'off'); set(H.pc_3, 'Enable', 'off'); set(H.pc_4, 'Enable', 'off'); set(H.pc_5, 'Enable', 'off'); set(H.pc_6, 'Enable', 'off'); 
+%set(H.pc_7, 'Enable', 'off'); set(H.reject68, 'Enable', 'off'); set(H.reject67, 'Enable', 'off'); set(H.reject82, 'Enable', 'off'); set(H.standards_rejected, 'Enable', 'off');
 
 %set(H.summary, 'Enable', 'off'); 
 
@@ -201,19 +201,19 @@ for i = 1:length(filename)
 	if dd(1,1) == 32
 		Ablate = [(1:1:9)'];
 		INT = 9;
-		set(H.intg, 'String', '9 s')
+		%set(H.intg, 'String', '9 s')
 	elseif dd(1,1) == 35
 		Ablate = [(1:1:12)'];
 		INT = 12;
-		set(H.intg, 'String', '12 s')
+		%set(H.intg, 'String', '12 s')
 	elseif dd(1,1) == 38
 		Ablate = [(1:1:15)'];
 		INT = 15;
-		set(H.intg, 'String', '15 s')
+		%set(H.intg, 'String', '15 s')
 	elseif dd(1,1) == 43
 		Ablate = [(1:1:20)'];
 		INT = 20;
-		set(H.intg, 'String', '20 s')
+		%set(H.intg, 'String', '20 s')
 	end
 
 	s = strfind(Data(1,1), 'FAR');
@@ -221,13 +221,13 @@ for i = 1:length(filename)
 	if isempty(s(cellfun('isempty',s(1,1)))) == 1
 		FAR = 1;
 		IC = 0;
-		set(H.mode, 'String', 'Faraday Acquisition')
+		%set(H.mode, 'String', 'Faraday Acquisition')
 	end
 
 	if isempty(s(cellfun('isempty',s(1,1)))) == 0
 		FAR = 0;
 		IC = 1;
-		set(H.mode, 'String', 'Ion Counter Acquisition')
+		%set(H.mode, 'String', 'Ion Counter Acquisition')
 	end
 		
 	for j = 1:length(data_parse(:,1))
@@ -296,9 +296,9 @@ STD1_idx = abs(cellfun(@isempty,STD1_idx)-1);
 STD2_idx = abs(cellfun(@isempty,STD2_idx)-1);
 sample_idx = abs((STD1_idx + STD2_idx) - 1);
 
-set(H.STD1g_num, 'String', sum(STD1_idx));
-set(H.STD2g_num, 'String', sum(STD2_idx));
-set(H.unkg_num, 'String', sum(sample_idx));
+%set(H.STD1g_num, 'String', sum(STD1_idx));
+%set(H.STD2g_num, 'String', sum(STD2_idx));
+%set(H.unkg_num, 'String', sum(sample_idx));
 
 
 %% RESET AND READ IN USER SETTINGS %%
@@ -14181,7 +14181,7 @@ function pushbutton128_Callback(hObject, eventdata, handles)
 
 
 
-function uipanel_reject_SelectionChangedFcn(hObject, eventdata, H)
+function SSB_SelectionChangedFcn(hObject, eventdata, H)
 
 rad_on=get(H.uipanel_reject,'selectedobject');
 switch rad_on
