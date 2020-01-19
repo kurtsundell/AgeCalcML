@@ -28,7 +28,7 @@ function load_Callback(hObject, eventdata, H)
 data = readtable(char(strcat(pathname, filename)));
 data = table2array(data);
 
-if iscell(data) == 0
+if iscell(data) == 0 
 	data = num2cell(data);
 end
 
