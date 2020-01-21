@@ -3442,8 +3442,8 @@ set(H.WM_STD2,'Visible','off')
 
 Macro_1_2_Output = H.Macro_1_2_Output;
 
-for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
+for i = 1:length(H.sample_idx)
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i,1) == 0
             uconc(i,1) = cell2num(Macro_1_2_Output(i,51));
             bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
 	end
@@ -3484,8 +3484,8 @@ set(H.WM_STD2,'Visible','off')
 
 Macro_1_2_Output = H.Macro_1_2_Output;
 
-for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
+for i = 1:length(H.sample_idx)
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i,1) == 0
 		u(i,1) = cell2num(Macro_1_2_Output(i,51));
 		th(i,1) = cell2num(Macro_1_2_Output(i,52));
 		bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
@@ -3533,8 +3533,8 @@ set(H.age_concodance, 'Value', 0)
 
 Macro_1_2_Output = H.Macro_1_2_Output;
 
-for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
+for i = 1:length(H.sample_idx)
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i,1) == 0
 		uth(i,1) = cell2num(Macro_1_2_Output(i,55));
 		bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
 	end
@@ -3575,8 +3575,8 @@ set(H.WM_STD2,'Visible','off')
 
 Macro_1_2_Output = H.Macro_1_2_Output;
 
-for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
+for i = 1:length(H.sample_idx)
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i,1) == 0
 		age68(i,1) = cell2num(Macro_1_2_Output(i,33));
 		age67(i,1) = cell2num(Macro_1_2_Output(i,35));
 		bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
