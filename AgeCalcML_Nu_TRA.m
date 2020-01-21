@@ -1436,12 +1436,15 @@ for i = 1:data_count
     if BLS_64_corr(i,1) < filter_204/10
         comment6(i,1) = {'low 206/204  '};
     end
+    if ppm238(i,1) > str2num(get(H.Ufilt,'String'))
+        comment7(i,1) = {'high U!!!  '};
+    end
     
 end
 
 waitbar(10/waitnum,h,'Calculating. Please wait...');
 
-comment = strcat(comment1, comment2, comment3, comment4, comment5, comment6);
+comment = strcat(comment1, comment2, comment3, comment4, comment5, comment6, comment7);
 
 % CONCATENATE DATA FOR EXPORT AND PLOTTING %%
 
@@ -3440,9 +3443,9 @@ set(H.WM_STD2,'Visible','off')
 Macro_1_2_Output = H.Macro_1_2_Output;
 
 for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 
-		uconc(i,1) = cell2num(Macro_1_2_Output(i,51));
-		bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
+            uconc(i,1) = cell2num(Macro_1_2_Output(i,51));
+            bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
 	end
 end
 
@@ -3482,7 +3485,7 @@ set(H.WM_STD2,'Visible','off')
 Macro_1_2_Output = H.Macro_1_2_Output;
 
 for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
 		u(i,1) = cell2num(Macro_1_2_Output(i,51));
 		th(i,1) = cell2num(Macro_1_2_Output(i,52));
 		bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
@@ -3531,7 +3534,7 @@ set(H.age_concodance, 'Value', 0)
 Macro_1_2_Output = H.Macro_1_2_Output;
 
 for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
 		uth(i,1) = cell2num(Macro_1_2_Output(i,55));
 		bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
 	end
@@ -3573,7 +3576,7 @@ set(H.WM_STD2,'Visible','off')
 Macro_1_2_Output = H.Macro_1_2_Output;
 
 for i = 1:length(Macro_1_2_Output(:,1))
-	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 
+	if sum(size(cell2mat(Macro_1_2_Output(i,37)))) > 0 && H.sample_idx(i+1,1) == 0
 		age68(i,1) = cell2num(Macro_1_2_Output(i,33));
 		age67(i,1) = cell2num(Macro_1_2_Output(i,35));
 		bestage(i,1) = cell2num(Macro_1_2_Output(i,37));
@@ -5768,3 +5771,26 @@ function batches_Callback(hObject, eventdata, H)
 function batch_num_Callback(hObject, eventdata, H)
 
 function tzero_method_Callback(hObject, eventdata, H)
+
+
+
+function Ufilt_Callback(hObject, eventdata, handles)
+% hObject    handle to Ufilt (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of Ufilt as text
+%        str2double(get(hObject,'String')) returns contents of Ufilt as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function Ufilt_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Ufilt (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
