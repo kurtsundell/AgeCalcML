@@ -3021,12 +3021,15 @@ numsigma = length(sigmarule);
 elpt_STD2 = repmat(elpt_STD2,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
 elpt_STD2_out(:,:,i) = elpt_STD2 + repmat(center_STD2(i,1:2),numpoints,numsigma);
 if WM_Data(i,1) < WM_Data_hi && WM_Data(i,1) > WM_Data_lo
-plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'b','LineWidth',1.2);
+	plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'b','LineWidth',1.2);
 else
-plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'r','LineWidth',1.2);
+	plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'r','LineWidth',1.2);
+	WM_Data(i,:) = [0,0];
 end
 hold on
 end
+
+WM_Data( ~any(WM_Data,2), : ) = [];  %rows
 
 if get(H.secondary,'Value') == 1
 	age_label3_x = 0.511;
