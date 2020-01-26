@@ -29,6 +29,7 @@ H.export_fract = 0;
 H.export_comp = 0;
 H.export_dist = 0;
 H.point = 0;
+set(H.stoichSi,'Visible','off')
 set(H.TREEcalib,'Visible','off')
 set(H.TREEnorm,'Visible','off')
 set(H.t91500,'Visible','off')
@@ -331,6 +332,7 @@ if TREE == 1
 
 	cla(H.TREEcalib,'reset');
 	cla(H.TREEnorm,'reset');
+	set(H.stoichSi,'Visible','on')
 	set(H.exporttree,'Visible','on')
 	set(H.tree,'Visible','on')
 	perc_MAD559 = get(H.calibslider,'Value');
@@ -697,7 +699,8 @@ if TREE == 1
 	for i = 1:data_count
 		M_Parsed(1:73,:,i) = M_All(73*(i-1)+1:73*i,:);
 	end
-
+	
+	% background subtract
 	for i = 1:59
 		for j = 1:32
 			for k = 1:data_count
@@ -705,20 +708,45 @@ if TREE == 1
 			end
 		end
 	end
-
+	
+	%avg cps of 20 rows
 	for j = 1:32
 		for k = 1:data_count
 			M_BS(60,j,k) = abs(mean(M_BS(3:22,j,k)));
 		end
 	end
 	
-	% Si normalization 
-	for j = 1:32 
-		for k = 1:data_count
-			if NIST612_idx(k,1) == 1
-				M_BS(61,j,k) = M_BS(60,j,k)/(M_BS(60,2,k)/16069);
+	
+	% Si normalization (ppm)
+	if get(H.stoichSi,'Value') == 1 % yes normalize to stoichiometric Si
+		for j = 1:32 
+			for k = 1:data_count
+				if NIST612_idx(k,1) == 1
+					M_BS(61,j,k) = M_BS(60,j,k)/(M_BS(60,2,k)/16069);
+				else
+					M_BS(61,j,k) = M_BS(60,j,k)/(M_BS(60,2,k)/7178.6);
+				end
+			end
+		end	
+	end
+	if get(H.stoichSi,'Value') == 0 % no do not normalize to stoichiometric Si, but rather average Si from 91500
+		for m = 1:data_count
+			if s91500_idx(m,1) == 1
+				Si91500(m,1) = M_BS(60,2,k);
 			else
-				M_BS(61,j,k) = M_BS(60,j,k)/(M_BS(60,2,k)/7178.6);
+				Si91500(m,1) = 0;
+			end
+		end
+		Si91500m = mean(nonzeros(Si91500));
+		for j = 1:32 
+			for k = 1:data_count
+				if NIST612_idx(k,1) == 1
+					M_BS(61,j,k) = M_BS(60,j,k)/(M_BS(60,2,k)/16069);
+				else
+					M_BS(61,j,k) = M_BS(60,j,k)/(M_BS(60,2,k)*(Si91500m/M_BS(60,2,k))/7178.6);
+					
+					%=IF(AC79="NIST612",AF145/16069,AF145*($BG$1/AF145)/7178.6)
+				end
 			end
 		end
 	end
@@ -4932,6 +4960,8 @@ conc_out = Macro_1_2_Output(:,32:36);
 conc_out( all(cellfun(@isempty,conc_out),2), : ) = [];
 
 %% T/REE OPTIONS %%
+function stoichSi_Callback(hObject, eventdata, H)
+
 function calibslider_Callback(hObject, eventdata, H)
 perc_MAD559 = get(H.calibslider,'Value');
 perc_91500 = 1 - get(H.calibslider,'Value');
@@ -5044,3 +5074,4 @@ Results_OUT2(2:end,8:end) = SampleData;
 
 [file,path] = uiputfile('*.xls','Save file');
 writetable(table(Results_OUT2),[path file], 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+
