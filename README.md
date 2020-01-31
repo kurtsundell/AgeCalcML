@@ -24,3 +24,4 @@ macOS:
 http://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/installers/maci64/MCR_R2018b_maci64_installer.dmg.zip
 
 Contact Kurt at kurtsundell@gmail.com for software questions. Visit our website at www.laserchron.org or contact George at ggehrels@gmail.com for general info about the University of Arizona LaserChron Center. 
+   
