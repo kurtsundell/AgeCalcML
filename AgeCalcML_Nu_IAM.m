@@ -281,6 +281,8 @@ end
 
 if get(H.secondary, 'Value') == 1
 	STD2 = 'R33';
+elseif get(H.secondary, 'Value') == 9
+	STD2 = '554';
 end
 
 STD1_idx = strfind(sample, STD1);
@@ -393,6 +395,18 @@ MAD	0.07818	17.595	0.02429	17.961	15.562	37.728	485
 
 if get(H.secondary, 'Value') == 1
 	STD2 = 'R33';
+	STD2_68 = 0.0671;
+	STD2_67 = 0.05522;
+	STD2_75 = 0.511;
+	STD2_82 = 0.0557219220349821; % NOT CORRECT! THIS IS THE RATIO FOR PLESOVICE
+	STD2_Pb206_U238_known_err = 1;
+	STD2_Pb207_Pb206_known_err = 1;
+	STD2_Pb207_U235_known_err = 1;
+	STD2_Pb208_Th232_known_err = 1; % NOT CORRECT! THIS IS THE UNC FOR PLESOVICE
+end
+
+if get(H.secondary, 'Value') == 9
+	STD2 = '554';
 	STD2_68 = 0.0671;
 	STD2_67 = 0.05522;
 	STD2_75 = 0.511;
