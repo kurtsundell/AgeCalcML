@@ -597,15 +597,6 @@ end
 
 
 
-H.SAMPLES_idx = SAMPLES_idx;
-
-guidata(hObject,H);
-
-
-
-
-
-stds_PLOT_Callback(hObject, eventdata, H)
 
 
 
@@ -625,10 +616,11 @@ stds_PLOT_Callback(hObject, eventdata, H)
 
 
 
-%{
+
+
 
 if sum(SAMPLES_idx) > 0
-	if get(H.DataPlot, 'Value') == 1
+	if get(H.results_data, 'Value') == 1
 		cla(H.Results_plot,'reset');
 		axes(H.Results_plot);
 		scatter(Yb_Lu_Hf_UNKNOWN_mean, Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
@@ -639,7 +631,7 @@ if sum(SAMPLES_idx) > 0
 	end
 end
 
-if get(H.EvolutionPlot, 'Value') == 1
+if get(H.results_evolution, 'Value') == 1
 	cla(H.Results_plot,'reset');
 	axes(H.Results_plot);
 	hold on
@@ -659,7 +651,7 @@ if get(H.EvolutionPlot, 'Value') == 1
 	hold off
 end
 
-if get(H.EpsilonPlot, 'Value') == 1
+if get(H.results_epsilon, 'Value') == 1
 	cla(H.Results_plot,'reset');
 	axes(H.Results_plot);
 	
@@ -675,7 +667,7 @@ if get(H.EpsilonPlot, 'Value') == 1
 	plot([0 DM_Slider],[Y0_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
 	plot([0 DM_Slider],[Y0_l_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
     
-    idx = match2(get(H.listbox1,'Value'),1);
+    idx = match2(get(H.ind_listbox1,'Value'),1);
     if idx ~= 0
         s1 = scatter(Ages_ascribed(idx,1), eHf_UNKNOWNS(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
         %legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
@@ -698,7 +690,7 @@ name_idx = length(sample); %automatically plot final sample run
 axes(H.SingleAnalysis_plot);
 hold on
 x = 1:1:60;
-if get(H.checkbox_176_177,'Value') == 1
+if get(H.ind_176_177,'Value') == 1
 	for i = 1:60
 		if BLS_176_177_corr(i,length(sample)) ~= 0
 			scatter(x(1,i), BLS_176_177_corr(i,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
@@ -710,7 +702,7 @@ if get(H.checkbox_176_177,'Value') == 1
 	xlabel('Time (s)')
 	ylabel('176/177 Corrected')
 end
-if get(H.checkbox_180,'Value') == 1
+if get(H.ind_180,'Value') == 1
 	hold on
 	scatter(x, BLS_180(:,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
 	legend(sample(length(sample),1))
@@ -722,13 +714,9 @@ axis([0, 60, min(nonzeros(BLS_176_177_corr(:,name_idx))), max(BLS_176_177_corr(:
 
 
 
-set(H.intw_xmin,'String',{'0'})
-set(H.intw_xmax,'String',{'60'})
-set(H.intw_ymin,'String',round(min(nonzeros(BLS_176_177_corr(:,name_idx))),6))
-set(H.intw_ymax,'String',round(max(BLS_176_177_corr(:,length(sample))),6))
 
 
-set(H.status,'String',{'Accepted'},'ForegroundColor','blue');
+%set(H.status,'String',{'Accepted'},'ForegroundColor','blue');
 
 
 
@@ -774,9 +762,17 @@ end
 if get(H.auto_reduce,'Value') == 0
 	guidata(hObject,H);
 end
-%}
 
 
+H.SAMPLES_idx = SAMPLES_idx;
+
+guidata(hObject,H);
+
+
+
+
+
+stds_PLOT_Callback(hObject, eventdata, H)
 
 
 
@@ -891,12 +887,12 @@ Ages_ascribed = H.Ages_ascribed;
 eHf_UNKNOWNS = H.eHf_UNKNOWNS;
 s1 = H.s1;
 
-name_idx = get(H.listbox1,'Value');
+name_idx = get(H.ind_listbox1,'Value');
 
 axes(H.SingleAnalysis_plot);
 x = 1:1:60;
 
-if get(H.checkbox_176_177,'Value') == 1
+if get(H.ind_176_177,'Value') == 1
 	for i = 1:60
 	hold on
 		if H.BLS_176_177_corr(i,name_idx) ~= 0
@@ -911,7 +907,7 @@ if get(H.checkbox_176_177,'Value') == 1
 end
 
 
-if get(H.checkbox_180,'Value') == 1
+if get(H.ind_180,'Value') == 1
 
 	scatter(x, H.BLS_180(:,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
 	legend(sample(name_idx,1))
@@ -922,7 +918,7 @@ end
 
 
 axes(H.Results_plot);
-idx = match2(get(H.listbox1,'Value'),1);
+idx = match2(get(H.ind_listbox1,'Value'),1);
 if idx ~= 0
     set(s1,'Visible','off')
 	clear s1
@@ -935,13 +931,13 @@ end
 H.s1 = s1;
 guidata(hObject,H);
 function ind_180_Callback(hObject, eventdata, H)
-set(H.checkbox_180,'Value', 1)
-set(H.checkbox_176_177,'Value', 0) 
+set(H.ind_180,'Value', 1)
+set(H.ind_176_177,'Value', 0) 
 cla(H.SingleAnalysis_plot,'reset');
 sample = H.sample;
 BLS_180 = H.BLS_180;
 x = 1:1:60;
-if get(H.checkbox_180,'Value') == 1
+if get(H.ind_180,'Value') == 1
 	hold on
 	scatter(x, BLS_180(:,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
 	legend(sample(length(sample),1))
@@ -950,8 +946,8 @@ if get(H.checkbox_180,'Value') == 1
 	hold off
 end
 function ind_176_177_Callback(hObject, eventdata, H)
-set(H.checkbox_180,'Value', 0)
-set(H.checkbox_176_177,'Value', 1) 
+set(H.ind_180,'Value', 0)
+set(H.ind_176_177,'Value', 1) 
 cla(H.SingleAnalysis_plot,'reset');
 sample = H.sample;
 BLS_176 = H.BLS_176;
@@ -962,7 +958,7 @@ name_idx = get(H.listbox1,'Value');
 axes(H.SingleAnalysis_plot);
 x = 1:1:60;
 
-if get(H.checkbox_176_177,'Value') == 1
+if get(H.ind_176_177,'Value') == 1
 	for i = 1:60
 	hold on
 		if H.BLS_176_177_corr(i,name_idx) ~= 0
