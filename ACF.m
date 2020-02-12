@@ -2617,12 +2617,13 @@ end
 % --- Executes on button press in saveandclose.
 function saveandclose_Callback(hObject, eventdata, H2)
 	
-global lowint_238 lin_238 lowint_206 lin_206
+global lowint_238 use_235 lin_238 lowint_206 lin_206
 
 lowint_238 = str2num(get(H2.lowint_val_238,'String'));
 lin_238 = str2num(get(H2.lin_val_238,'String'));
 lowint_206 = str2num(get(H2.lowint_val_206,'String'));
 lin_206 = str2num(get(H2.lin_val_206,'String'));
+use_235 = get(H2.Use_235,'Value');
 
 close(ACF)
 
