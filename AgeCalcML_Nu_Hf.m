@@ -1,16 +1,9 @@
 function varargout = AgeCalcML_Nu_Hf(varargin)
-
 gui_Singleton = 1;
-gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @AgeCalcML_Nu_Hf_OpeningFcn, ...
-                   'gui_OutputFcn',  @AgeCalcML_Nu_Hf_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@AgeCalcML_Nu_Hf_OpeningFcn,'gui_OutputFcn',@AgeCalcML_Nu_Hf_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
-
 if nargout
     [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
 else
@@ -18,7 +11,6 @@ else
 end
 
 function AgeCalcML_Nu_Hf_OpeningFcn(hObject, eventdata, H, varargin)
-%imshow('splash.png', 'Parent', H.axes7);
 H.output = hObject;
 guidata(hObject, H);
 
@@ -27,7 +19,6 @@ H.reduced = 0;
 guidata(hObject,H);
 varargout{1} = H.output;
 
-%% Set Directory Button %%
 function browser_Callback(hObject, eventdata, H)
 cla(H.STDS_plot,'reset'); 
 cla(H.SingleAnalysis_plot,'reset'); 
@@ -40,28 +31,6 @@ set(H.text1, 'String', folder_name); %show path name
 H.folder_name = folder_name;
 guidata(hObject,H);
 
-%% CHECKBOX Auto Reduce %%
-function auto_reduce_Callback(hObject, eventdata, H)
-	
-if get(H.auto_reduce,'Value') == 1
-	set(H.reduce_data,'Enable','off')
-	t = timer;
-	set(t, 'ExecutionMode', 'fixedrate');
-	set(t, 'Period', str2num(get(H.seconds,'String')));
-	t.TimerFcn = @(~,~) reduce_data_Callback(hObject, eventdata, H);
-	start(t)
-end
-
-if get(H.auto_reduce,'Value') == 0
-	set(H.reduce_data,'Enable','on');
-	t = H.t;
-	delete(t)
-end
-
-H.t = t;
-guidata(hObject,H);
-
-%% Reduce Data %%
 function reduce_data_Callback(hObject, eventdata, H)
 folder_name = H.folder_name;
 
@@ -83,12 +52,6 @@ for i = 1:size(filenames,1)
 end
 
 filenames(all(cellfun('isempty',filenames),2),:) = [];
-%filedates(all(cellfun('isempty',filedates),2),:) = [];
-
-%DateNumber = datenum(filedates);
-
-%[DateNumber_sorted, DateNumber_order] = sort(DateNumber);
-%filenames_sorted = filenames(DateNumber_order,:);
 filenames_sorted = filenames;
 
 Agefile = 0;
@@ -184,14 +147,14 @@ end
 cla(H.SingleAnalysis_plot,'reset'); 
 cla(H.Results_plot,'reset'); 
 
-Hf_cutoff = str2num(get(H.Hfcutoff,'String'));
-Yb_cutoff = str2num(get(H.Ybcutoff,'String'));
-Hf_bias = str2num(get(H.Hfbias,'String'))*0.000028;
-Yb_bias = str2num(get(H.Ybbias,'String'));
+Hf_cutoff = str2num(get(H.stdopt_Hfcutoff,'String'));
+Yb_cutoff = str2num(get(H.stdopt_Ybcutoff,'String'));
+Hf_bias = str2num(get(H.stdopt_Hfbias,'String'))*0.000028;
+Yb_bias = str2num(get(H.stdopt_Ybbias,'String'));
 
-INT_cutoff_stds = str2num(get(H.intensity_cutoff_stds,'String'))/100;
-INT_cutoff_unknowns = str2num(get(H.intensity_cutoff_unknowns,'String'))/100;
-DM_Slider = get(H.DMslider,'Value')*4500;
+INT_cutoff_stds = str2num(get(H.stdopt_intcutoff,'String'))/100;
+INT_cutoff_unknowns = str2num(get(H.results_intcutoff,'String'))/100;
+DM_Slider = get(H.results_dmt,'Value')*4500;
 
 Hf_LBL = 0;
 Hf_AVG = 1;
@@ -416,54 +379,45 @@ for j = 1:length(sample)
 	end
 end
 
-
-
-
-
-
-
-
-
-
-Ratio_STD_176_177_MT_mean = nonzeros(Ratio_STD_176_177_MT_mean);
+H.Ratio_STD_176_177_MT_mean = nonzeros(Ratio_STD_176_177_MT_mean);
 Ratio_STD_176_177_MT_SE = nonzeros(Ratio_STD_176_177_MT_SE);
-Yb_Lu_Hf_MT_mean = nonzeros(Yb_Lu_Hf_MT_mean);
+H.Yb_Lu_Hf_MT_mean = nonzeros(Yb_Lu_Hf_MT_mean);
 v180_MT = nonzeros(v180_MT);
 
-Ratio_STD_176_177_R33_mean = nonzeros(Ratio_STD_176_177_R33_mean);
+H.Ratio_STD_176_177_R33_mean = nonzeros(Ratio_STD_176_177_R33_mean);
 Ratio_STD_176_177_R33_SE = nonzeros(Ratio_STD_176_177_R33_SE);
-Yb_Lu_Hf_R33_mean = nonzeros(Yb_Lu_Hf_R33_mean);
+H.Yb_Lu_Hf_R33_mean = nonzeros(Yb_Lu_Hf_R33_mean);
 v180_R33 = nonzeros(v180_R33);
 
-Ratio_STD_176_177_PLES_mean = nonzeros(Ratio_STD_176_177_PLES_mean);
+H.Ratio_STD_176_177_PLES_mean = nonzeros(Ratio_STD_176_177_PLES_mean);
 Ratio_STD_176_177_PLES_SE = nonzeros(Ratio_STD_176_177_PLES_SE);
-Yb_Lu_Hf_PLES_mean = nonzeros(Yb_Lu_Hf_PLES_mean);
+H.Yb_Lu_Hf_PLES_mean = nonzeros(Yb_Lu_Hf_PLES_mean);
 v180_PLES = nonzeros(v180_PLES);
 
-Ratio_STD_176_177_FC_mean = nonzeros(Ratio_STD_176_177_FC_mean);
+H.Ratio_STD_176_177_FC_mean = nonzeros(Ratio_STD_176_177_FC_mean);
 Ratio_STD_176_177_FC_SE = nonzeros(Ratio_STD_176_177_FC_SE);
-Yb_Lu_Hf_FC_mean = nonzeros(Yb_Lu_Hf_FC_mean);
+H.Yb_Lu_Hf_FC_mean = nonzeros(Yb_Lu_Hf_FC_mean);
 v180_FC = nonzeros(v180_FC);
 
-Ratio_STD_176_177_TEM_mean = nonzeros(Ratio_STD_176_177_TEM_mean);
+H.Ratio_STD_176_177_TEM_mean = nonzeros(Ratio_STD_176_177_TEM_mean);
 Ratio_STD_176_177_TEM_SE = nonzeros(Ratio_STD_176_177_TEM_SE);
-Yb_Lu_Hf_TEM_mean = nonzeros(Yb_Lu_Hf_TEM_mean);
+H.Yb_Lu_Hf_TEM_mean = nonzeros(Yb_Lu_Hf_TEM_mean);
 v180_TEM = nonzeros(v180_TEM);
 
-Ratio_STD_176_177_91500_mean = nonzeros(Ratio_STD_176_177_91500_mean);
+H.Ratio_STD_176_177_91500_mean = nonzeros(Ratio_STD_176_177_91500_mean);
 Ratio_STD_176_177_91500_SE = nonzeros(Ratio_STD_176_177_91500_SE);
-Yb_Lu_Hf_91500_mean = nonzeros(Yb_Lu_Hf_91500_mean);
+H.Yb_Lu_Hf_91500_mean = nonzeros(Yb_Lu_Hf_91500_mean);
 v180_91500 = nonzeros(v180_91500);
 
-Ratio_STD_176_177_SL_mean = nonzeros(Ratio_STD_176_177_SL_mean);
+H.Ratio_STD_176_177_SL_mean = nonzeros(Ratio_STD_176_177_SL_mean);
 Ratio_STD_176_177_SL_SE = nonzeros(Ratio_STD_176_177_SL_SE);
-Yb_Lu_Hf_SL_mean = nonzeros(Yb_Lu_Hf_SL_mean);
+H.Yb_Lu_Hf_SL_mean = nonzeros(Yb_Lu_Hf_SL_mean);
 v180_SL = nonzeros(v180_SL);
 
 if sum(SAMPLES_idx) > 0
-	Ratio_UNKNOWN_176_177_mean = nonzeros(Ratio_UNKNOWN_176_177_mean);
+	H.Ratio_UNKNOWN_176_177_mean = nonzeros(Ratio_UNKNOWN_176_177_mean);
 	Ratio_UNKNOWN_176_177_SE = nonzeros(Ratio_UNKNOWN_176_177_SE);
-	Yb_Lu_Hf_UNKNOWN_mean = nonzeros(Yb_Lu_Hf_UNKNOWN_mean);
+	H.Yb_Lu_Hf_UNKNOWN_mean = nonzeros(Yb_Lu_Hf_UNKNOWN_mean);
 	v180_UNKNOWN = nonzeros(v180_UNKNOWN);
 	sample_UNKNOWN_name = sample_UNKNOWN_name(~cellfun('isempty', sample_UNKNOWN_name'));
 end
@@ -556,35 +510,36 @@ Y0_l_Epsi_DM_176Lu_177Hf = 10000*((Y0_l_Evol_DM_176Lu_177Hf/BSE_176Hf_177Hf)-1);
 Ys_Epsi_DM_176Lu_177Hf = DMpoint_Epsi_y;
 
 STD_offset = [];
-if get(H.check_MT,'Value') == 1
+if get(H.stds_MT,'Value') == 1
 	STD_offset(end+1,1) = mean(Ratio_STD_176_177_MT_mean) - 0.282507;
 end
-if get(H.check_R33,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_R33_mean) - 0.282764; % R33 STD should end in 1 to be consistent
-end
-if get(H.check_PLES,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_PLES_mean) - 0.282484;
-end
-if get(H.check_FC,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_FC_mean) - 0.282183;
-end
-if get(H.check_TEM,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_TEM_mean) - 0.282686;
-end
-if get(H.check_91500,'Value') == 1
+if get(H.stds_91500,'Value') == 1
 	STD_offset(end+1,1) = mean(Ratio_STD_176_177_91500_mean) - 0.282313;
 end
-if get(H.check_SL,'Value') == 1
+if get(H.stds_TEM,'Value') == 1
+	STD_offset(end+1,1) = mean(Ratio_STD_176_177_TEM_mean) - 0.282686;
+end
+if get(H.stds_PLES,'Value') == 1
+	STD_offset(end+1,1) = mean(Ratio_STD_176_177_PLES_mean) - 0.282484;
+end
+if get(H.stds_FC,'Value') == 1
+	STD_offset(end+1,1) = mean(Ratio_STD_176_177_FC_mean) - 0.282183;
+end
+if get(H.stds_SL,'Value') == 1
 	STD_offset(end+1,1) = mean(Ratio_STD_176_177_SL_mean) - 0.282163;
 end
+if get(H.stds_R33,'Value') == 1
+	STD_offset(end+1,1) = mean(Ratio_STD_176_177_R33_mean) - 0.282764; % R33 STD should end in 1 to be consistent
+end
+
 STD_offset_avg = mean(STD_offset);
-set(H.STDoffset,'String',sprintf('%f',STD_offset_avg))
+set(H.stdopt_STDoffset,'String',sprintf('%f',STD_offset_avg))
 
 STD_SE_avg = mean([Ratio_STD_176_177_MT_SE; Ratio_STD_176_177_R33_SE; Ratio_STD_176_177_PLES_SE; Ratio_STD_176_177_FC_SE; Ratio_STD_176_177_TEM_SE; ...
 	Ratio_STD_176_177_91500_SE; Ratio_STD_176_177_SL_SE]);
-set(H.STDSE,'String',sprintf('%f',STD_SE_avg));
+set(H.stdopt_STDSE,'String',sprintf('%f',STD_SE_avg));
 if sum(SAMPLES_idx) > 0
-	set(H.mean_uncertainty,'String',sprintf('%f',mean(Ratio_UNKNOWN_176_177_SE)));
+	set(H.unks_munc,'String',sprintf('%f',mean(Ratio_UNKNOWN_176_177_SE)));
 end
 
 % Calculate % data retained
@@ -607,9 +562,8 @@ end
 retained_stds_p = sum(retained_stds)/sum(STD_idx)*100;
 retained_unknowns_p = sum(retained_unknowns)/sum(SAMPLES_idx)*100;
 
-set(H.ret_std,'String',round(retained_stds_p,1))
-set(H.ret_unk,'String',round(retained_unknowns_p,1))
-
+set(H.stdopt_percret,'String',round(retained_stds_p,1))
+set(H.unks_percret,'String',round(retained_unknowns_p,1))
 
 reduced = 1;
 
@@ -619,8 +573,8 @@ for i=1:length(sample)
 	name_char(i,1)=(sample(i,1));
 end
 
-set(H.listbox1, 'String', name_char);
-set(H.listbox1,'Value',length(sample));
+set(H.ind_listbox1, 'String', name_char);
+set(H.ind_listbox1,'Value',length(sample));
 
 t = 1;
 match = [1:1:length(sample)]';
@@ -632,41 +586,46 @@ for i=1:length(sample)
         match2(i,1) = 0;
     end
 end
-%match2(match2==0) = [];
 
 
-axes(H.STDS_plot);
-hold on
-plot([-10, 90], [0.282761, 0.282761],'--','LineWidth',2,'Color',[0.58 0.58 0.58]) %R33 Bahlburg et al. 2010
-plot([-10, 60], [0.282686, 0.282686],'--','LineWidth',2,'Color',[.6 .2 .4]) %TEM Woodhead and Hergt 2005
-plot([-10, 10], [0.282507, 0.282507],'--','LineWidth',2,'Color',[.12 .71 .07]) %MT Woodhead and Hergt 2005
-plot([-10, 10], [0.282484, 0.282484],'--','LineWidth',2,'Color',[.8 .6 1]) %PLES Slama et al. (2008)
-plot([-10, 10], [0.282313, 0.282313],'--','LineWidth',2,'Color',[.2 .4 .4]) %91500 Fisher et al. 2014
-plot([-10, 90], [0.282183, 0.282183],'--','LineWidth',2,'Color',[.2 .4 1]) %FC Fisher et al. 2014
-plot([-10, 10], [0.28163, 0.28163],'--','LineWidth',2,'Color',[0.56 0.44 0.23]) %SL Woodhead and Hergt 2005
-plot([-10, 10], [0.281697, 0.281697],'--','LineWidth',2,'Color',[0.56 0.44 0.23]) %SL Ping et al. (2004)-laser
-plot([-10, 10], [0.281703, 0.281703],'--','LineWidth',2,'Color',[0.56 0.44 0.23]) %SL Kemp et al. (2006)-laser
-plot([-10, 10], [0.281729, 0.281729],'--','LineWidth',2,'Color',[0.56 0.44 0.23]) %SL Wu et al. (2006)-laser
 
-if sum(SAMPLES_idx) > 0
-	h0 = scatter(Yb_Lu_Hf_UNKNOWN_mean, Ratio_UNKNOWN_176_177_mean, 20, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','w');
-end
-h1 = scatter(Yb_Lu_Hf_R33_mean, Ratio_STD_176_177_R33_mean, 40, 'MarkerEdgeColor','k', 'MarkerFaceColor',[0.58 0.58 0.58]);
-h2 = scatter(Yb_Lu_Hf_TEM_mean, Ratio_STD_176_177_TEM_mean, 40, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.6 .2 .4]);
-h3 = scatter(Yb_Lu_Hf_MT_mean, Ratio_STD_176_177_MT_mean, 40, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.12 .71 .07]);
-h4 = scatter(Yb_Lu_Hf_PLES_mean, Ratio_STD_176_177_PLES_mean, 40, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.8 .6 1]);
-h5 = scatter(Yb_Lu_Hf_91500_mean, Ratio_STD_176_177_91500_mean, 40, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.2 .4 .4]);
-h6 = scatter(Yb_Lu_Hf_FC_mean, Ratio_STD_176_177_FC_mean, 40, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.2 .4 1]);
-h7 = scatter(Yb_Lu_Hf_SL_mean, Ratio_STD_176_177_SL_mean, 40, 'MarkerEdgeColor','k', 'MarkerFaceColor',[0.56 0.44 0.23]);
-if sum(SAMPLES_idx) > 0
-	legend([h0,h1,h2,h3,h4,h5,h6,h7],{'Unknowns','R33','Temora','Mud Tank','Plesovice','91500','FC','Sri Lanka'}, 'Location', 'southeast')
-else
-legend([h1,h2,h3,h4,h5,h6,h7],{'R33','Temora','Mud Tank','Plesovice','91500','FC','Sri Lanka'}, 'Location', 'southeast')
-end
-xlabel('176(Yb+Lu) / 176Hf (%)')
-ylabel('176Hf/177Hf')
-axis([-10 80 0.2813 0.2831])
-hold off
+
+
+
+
+
+
+
+
+H.SAMPLES_idx = SAMPLES_idx;
+
+guidata(hObject,H);
+
+
+
+
+
+stds_PLOT_Callback(hObject, eventdata, H)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%{
 
 if sum(SAMPLES_idx) > 0
 	if get(H.DataPlot, 'Value') == 1
@@ -815,6 +774,66 @@ end
 if get(H.auto_reduce,'Value') == 0
 	guidata(hObject,H);
 end
+%}
+
+
+
+
+
+
+function auto_reduce_Callback(hObject, eventdata, H)
+	
+if get(H.auto_reduce,'Value') == 1
+	set(H.reduce_data,'Enable','off')
+	t = timer;
+	set(t, 'ExecutionMode', 'fixedrate');
+	set(t, 'Period', str2num(get(H.seconds,'String')));
+	t.TimerFcn = @(~,~) reduce_data_Callback(hObject, eventdata, H);
+	start(t)
+end
+
+if get(H.auto_reduce,'Value') == 0
+	set(H.reduce_data,'Enable','on');
+	t = H.t;
+	delete(t)
+end
+
+H.t = t;
+guidata(hObject,H);
+
+function stds_PLOT_Callback(hObject, eventdata, H)
+axes(H.STDS_plot);
+hold on
+plot([-10, 90], [0.282761, 0.282761],'--','LineWidth',3,'Color',[0.58 0.58 0.58]) %R33 Bahlburg et al. 2010
+plot([-10, 60], [0.282686, 0.282686],'--','LineWidth',3,'Color',[.6 .2 .4]) %TEM Woodhead and Hergt 2005
+plot([-10, 10], [0.282507, 0.282507],'--','LineWidth',3,'Color',[.12 .71 .07]) %MT Woodhead and Hergt 2005
+plot([-10, 10], [0.282484, 0.282484],'--','LineWidth',3,'Color',[.8 .6 1]) %PLES Slama et al. (2008)
+plot([-10, 10], [0.282313, 0.282313],'--','LineWidth',3,'Color',[.2 .4 .4]) %91500 Fisher et al. 2014
+plot([-10, 90], [0.282183, 0.282183],'--','LineWidth',3,'Color',[.2 .4 1]) %FC Fisher et al. 2014
+plot([-10, 10], [0.28163, 0.28163],'--','LineWidth',3,'Color',[0.56 0.44 0.23]) %SL Woodhead and Hergt 2005
+plot([-10, 10], [0.281697, 0.281697],'--','LineWidth',3,'Color',[0.56 0.44 0.23]) %SL Ping et al. (2004)-laser
+plot([-10, 10], [0.281703, 0.281703],'--','LineWidth',3,'Color',[0.56 0.44 0.23]) %SL Kemp et al. (2006)-laser
+plot([-10, 10], [0.281729, 0.281729],'--','LineWidth',3,'Color',[0.56 0.44 0.23]) %SL Wu et al. (2006)-laser
+
+if sum(H.SAMPLES_idx) > 0
+	h0 = scatter(H.Yb_Lu_Hf_UNKNOWN_mean, H.Ratio_UNKNOWN_176_177_mean, 50, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','w');
+end
+h1 = scatter(H.Yb_Lu_Hf_R33_mean, H.Ratio_STD_176_177_R33_mean, 150, 'MarkerEdgeColor','k', 'MarkerFaceColor',[0.58 0.58 0.58]);
+h2 = scatter(H.Yb_Lu_Hf_TEM_mean, H.Ratio_STD_176_177_TEM_mean, 150, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.6 .2 .4]);
+h3 = scatter(H.Yb_Lu_Hf_MT_mean, H.Ratio_STD_176_177_MT_mean, 150, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.12 .71 .07]);
+h4 = scatter(H.Yb_Lu_Hf_PLES_mean, H.Ratio_STD_176_177_PLES_mean, 150, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.8 .6 1]);
+h5 = scatter(H.Yb_Lu_Hf_91500_mean, H.Ratio_STD_176_177_91500_mean, 150, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.2 .4 .4]);
+h6 = scatter(H.Yb_Lu_Hf_FC_mean, H.Ratio_STD_176_177_FC_mean, 150, 'MarkerEdgeColor','k', 'MarkerFaceColor',[.2 .4 1]);
+h7 = scatter(H.Yb_Lu_Hf_SL_mean, H.Ratio_STD_176_177_SL_mean, 150, 'MarkerEdgeColor','k', 'MarkerFaceColor',[0.56 0.44 0.23]);
+if sum(H.SAMPLES_idx) > 0
+	legend([h0,h1,h2,h3,h4,h5,h6,h7],{'Unknowns','R33','Temora','Mud Tank','Plesovice','91500','FC','Sri Lanka'}, 'Location', 'southeast')
+else
+legend([h1,h2,h3,h4,h5,h6,h7],{'R33','Temora','Mud Tank','Plesovice','91500','FC','Sri Lanka'}, 'Location', 'southeast')
+end
+xlabel('176(Yb+Lu) / 176Hf (%)')
+ylabel('176Hf/177Hf')
+axis([-10 80 0.2813 0.2831])
+hold off
 
 
 
@@ -823,20 +842,44 @@ end
 
 
 
+function stds_MT_Callback(hObject, eventdata, H)
+stds_PLOT_Callback(hObject, eventdata, H)
+function stds_91500_Callback(hObject, eventdata, H)
+stds_PLOT_Callback(hObject, eventdata, H)
+function stds_TEM_Callback(hObject, eventdata, H)
+stds_PLOT_Callback(hObject, eventdata, H)
+function stds_PLES_Callback(hObject, eventdata, H)
+stds_PLOT_Callback(hObject, eventdata, H)
+function stds_FC_Callback(hObject, eventdata, H)
+stds_PLOT_Callback(hObject, eventdata, H)
+function stds_SL_Callback(hObject, eventdata, H)
+stds_PLOT_Callback(hObject, eventdata, H)
+function stds_R33_Callback(hObject, eventdata, H)
+stds_PLOT_Callback(hObject, eventdata, H)
 
 
 
+function stds_setscale_Callback(hObject, eventdata, H)
+function stds_xmin_Callback(hObject, eventdata, H)
+function stds_xmax_Callback(hObject, eventdata, H)
+function stds_ymin_Callback(hObject, eventdata, H)
+function stds_ymax_Callback(hObject, eventdata, H)
+function stds_autoscale_Callback(hObject, eventdata, H)
+function stds_accepted_Callback(hObject, eventdata, H)
+function stds_unknowns_Callback(hObject, eventdata, H)
+function stds_legend_Callback(hObject, eventdata, H)
 
+function stdopt_AVG_Callback(hObject, eventdata, H)
+function stdopt_LBL_Callback(hObject, eventdata, H)
+function stdopt_SW_Callback(hObject, eventdata, H)
+function stdopt_Hfbias_Callback(hObject, eventdata, H)
+function stdopt_Ybbias_Callback(hObject, eventdata, H)
+function stdopt_Hfcutoff_Callback(hObject, eventdata, H)
+function stdopt_Ybcutoff_Callback(hObject, eventdata, H)
+function stdopt_percrej_Callback(hObject, eventdata, H)
+function stdopt_intcutoff_Callback(hObject, eventdata, H)
 
-
-%% Update Reductio button %%
-function reduce_Callback(hObject, eventdata, H)
-
-
-
-
-
-function listbox1_Callback(hObject, eventdata, H)
+function ind_listbox1_Callback(hObject, eventdata, H)
 cla(H.SingleAnalysis_plot,'reset');
 
 sample = H.sample;
@@ -891,10 +934,52 @@ end
 
 H.s1 = s1;
 guidata(hObject,H);
+function ind_180_Callback(hObject, eventdata, H)
+set(H.checkbox_180,'Value', 1)
+set(H.checkbox_176_177,'Value', 0) 
+cla(H.SingleAnalysis_plot,'reset');
+sample = H.sample;
+BLS_180 = H.BLS_180;
+x = 1:1:60;
+if get(H.checkbox_180,'Value') == 1
+	hold on
+	scatter(x, BLS_180(:,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+	legend(sample(length(sample),1))
+	xlabel('Time (s)')
+	ylabel('Baseline subtracted 177/176')
+	hold off
+end
+function ind_176_177_Callback(hObject, eventdata, H)
+set(H.checkbox_180,'Value', 0)
+set(H.checkbox_176_177,'Value', 1) 
+cla(H.SingleAnalysis_plot,'reset');
+sample = H.sample;
+BLS_176 = H.BLS_176;
+BLS_177 = H.BLS_177;
 
+name_idx = get(H.listbox1,'Value');
 
-%% Results Plot Checkboxes %%
-function DataPlot_Callback(hObject, eventdata, H)
+axes(H.SingleAnalysis_plot);
+x = 1:1:60;
+
+if get(H.checkbox_176_177,'Value') == 1
+	for i = 1:60
+	hold on
+		if H.BLS_176_177_corr(i,name_idx) ~= 0
+			scatter(x(1,i), H.BLS_176_177_corr(i,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+		end
+	hold off
+	end
+
+	legend(sample(name_idx,1))
+	xlabel('Time (s)')
+	ylabel('Baseline subtracted 177/176')
+end
+function ind_SE_Callback(hObject, eventdata, H)
+function AccRej_Callback(hObject, eventdata, H)
+function EditSampleName_Callback(hObject, eventdata, H)
+
+function results_data_Callback(hObject, eventdata, H)
 set(H.EvolutionPlot, 'Value', 0);
 set(H.EpsilonPlot, 'Value', 0);
 set(H.DataPlot, 'Value', 1);
@@ -909,8 +994,7 @@ if H.reduced == 1
 	ylabel('176Hf/177Hf')
 	title('Unknowns')
 end
-
-function EvolutionPlot_Callback(hObject, eventdata, H)
+function results_evolution_Callback(hObject, eventdata, H)
 set(H.DataPlot, 'Value', 0);
 set(H.EpsilonPlot, 'Value', 0);
 set(H.EvolutionPlot, 'Value', 1);
@@ -942,8 +1026,7 @@ if H.reduced == 1
 	ylabel('176Hf/177Hf(T)')
 	%title('Evolution Plot')
 end
-
-function EpsilonPlot_Callback(hObject, eventdata, H)
+function results_epsilon_Callback(hObject, eventdata, H)
 set(H.DataPlot, 'Value', 0);
 set(H.EvolutionPlot, 'Value', 0);
 set(H.EpsilonPlot, 'Value', 1);
@@ -988,10 +1071,10 @@ if H.reduced == 1
 	xlabel('Age (Ma)')
 	ylabel('Epsilon Hf')
 end
-
-
-
-function DMslider_Callback(hObject, eventdata, H)
+function results_dmt_Callback(hObject, eventdata, H)
+str2num(get(H.DMtext,'String'));
+set(H.DM_Slider, 'Value', str2num(get(H.DMtext,'String'))/4500);
+function results_dms_Callback(hObject, eventdata, H)
 
 DM_Slider = get(H.DMslider,'Value')*4500;
 set(H.DMtext,'String',DM_Slider);
@@ -999,22 +1082,12 @@ set(H.DMtext,'String',DM_Slider);
 if get(H.EvolutionPlot, 'Value') == 1
 	cla(H.Results_plot,'reset');
 
-
-
-
 t_176Hf_177Hf = H.DM_176Hf_177Hf - (H.DM_176Lu_177Hf*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
 
 Y0_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0115*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
 Y0_u_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0193*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
 Y0_l_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0036*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
 Ys_Evol_DM_176Lu_177Hf = t_176Hf_177Hf;
-
-
-
-
-
-
-
 
 	axes(H.Results_plot);
 	hold on
@@ -1071,1424 +1144,18 @@ Ys_Epsi_DM_176Lu_177Hf = DMpoint_Epsi_y;
 	ylabel('Epsilon Hf')
 	%title('Epsilon Plot')
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function DMtext_Callback(hObject, eventdata, H)
-
-str2num(get(H.DMtext,'String'));
-set(H.DM_Slider, 'Value', str2num(get(H.DMtext,'String'))/4500);
-
-
-
-
-
-
-function checkbox_180_Callback(hObject, eventdata, H)
-set(H.checkbox_180,'Value', 1)
-set(H.checkbox_176_177,'Value', 0) 
-cla(H.SingleAnalysis_plot,'reset');
-sample = H.sample;
-BLS_180 = H.BLS_180;
-x = 1:1:60;
-if get(H.checkbox_180,'Value') == 1
-	hold on
-	scatter(x, BLS_180(:,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	legend(sample(length(sample),1))
-	xlabel('Time (s)')
-	ylabel('Baseline subtracted 177/176')
-	hold off
-end
-
-
-function checkbox_176_177_Callback(hObject, eventdata, H)
-set(H.checkbox_180,'Value', 0)
-set(H.checkbox_176_177,'Value', 1) 
-cla(H.SingleAnalysis_plot,'reset');
-sample = H.sample;
-BLS_176 = H.BLS_176;
-BLS_177 = H.BLS_177;
-
-name_idx = get(H.listbox1,'Value');
-
-axes(H.SingleAnalysis_plot);
-x = 1:1:60;
-
-if get(H.checkbox_176_177,'Value') == 1
-	for i = 1:60
-	hold on
-		if H.BLS_176_177_corr(i,name_idx) ~= 0
-			scatter(x(1,i), H.BLS_176_177_corr(i,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-		end
-	hold off
-	end
-
-	legend(sample(name_idx,1))
-	xlabel('Time (s)')
-	ylabel('Baseline subtracted 177/176')
-end
-
-
-
-
-
-
-
-function check_MT_Callback(hObject, eventdata, H)
-
-function check_91500_Callback(hObject, eventdata, H)
-
-function check_TEM_Callback(hObject, eventdata, H)
-
-function check_PLES_Callback(hObject, eventdata, H)
-
-function check_SL_Callback(hObject, eventdata, H)
-
-function check_R33_Callback(hObject, eventdata, H)
-
-function checkbox7_Callback(hObject, eventdata, H)
-
-function slider1_Callback(hObject, eventdata, H)
-
-test = get(H.DM_Slider,'Value')
-
-
-
-
-function slider1_CreateFcn(hObject, eventdata, H)
-
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function slider3_Callback(hObject, eventdata, H)
-
-function slider3_CreateFcn(hObject, eventdata, H)
-
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-function slider4_Callback(hObject, eventdata, H)
-
-function slider4_CreateFcn(hObject, eventdata, H)
-
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-function listbox2_Callback(hObject, eventdata, H)
-
-function listbox2_CreateFcn(hObject, eventdata, H)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-function slider5_Callback(hObject, eventdata, H)
-
-function slider5_CreateFcn(hObject, eventdata, H)
-
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function listbox1_CreateFcn(hObject, eventdata, H)
-
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-% --- Executes on button press in pushbutton4.
-function pushbutton4_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton5.
-function pushbutton5_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton5 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton6.
-function pushbutton6_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on slider movement.
-function slider6_Callback(hObject, eventdata, handles)
-% hObject    handle to slider6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-% --- Executes on slider movement.
-function slider7_Callback(hObject, eventdata, handles)
-% hObject    handle to slider7 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider7_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider7 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-
-
-function DM_Slider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to DM_Slider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-
-
-
-
-% --- Executes on button press in checkbox_179.
-function checkbox_179_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_179 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_179
-
-
-% --- Executes on button press in checkbox_178.
-function checkbox_178_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_178 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_178
-
-
-% --- Executes on button press in checkbox_177.
-function checkbox_177_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_177 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_177
-
-
-% --- Executes on button press in checkbox_176.
-function checkbox_176_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_176 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_176
-
-
-% --- Executes on button press in checkbox_175.
-function checkbox_175_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_175 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_175
-
-
-% --- Executes on button press in checkbox_174.
-function checkbox_174_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_174 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_174
-
-
-% --- Executes on button press in pushbutton7.
-function pushbutton7_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton7 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton8.
-function pushbutton8_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton8 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton9.
-function pushbutton9_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton9 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton11.
-function pushbutton11_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton11 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in checkbox16.
-function checkbox16_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox16 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox16
-
-
-% --- Executes on button press in checkbox17.
-function checkbox17_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox17 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox17
-
-
-% --- Executes on button press in checkbox18.
-function checkbox18_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox18
-
-
-% --- Executes on button press in checkbox19.
-function checkbox19_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox19 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox19
-
-
-
-
-
-function DMtext_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to DMtext (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in checkbox_173.
-function checkbox_173_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_173 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_173
-
-
-% --- Executes on button press in checkbox_172.
-function checkbox_172_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_172 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_172
-
-
-% --- Executes on button press in checkbox_171.
-function checkbox_171_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox_171 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox_171
-
-
-
-
-
-
-
-% --- Executes on slider movement.
-function slider9_Callback(hObject, eventdata, handles)
-% hObject    handle to slider9 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider9_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider9 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function edit4_Callback(hObject, eventdata, handles)
-% hObject    handle to edit4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit4 as text
-%        str2double(get(hObject,'String')) returns contents of edit4 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit4_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit4 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on slider movement.
-function slider10_Callback(hObject, eventdata, handles)
-% hObject    handle to slider10 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider10_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider10 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function edit5_Callback(hObject, eventdata, handles)
-% hObject    handle to edit5 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit5 as text
-%        str2double(get(hObject,'String')) returns contents of edit5 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit5_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit5 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on slider movement.
-function slider11_Callback(hObject, eventdata, handles)
-% hObject    handle to slider11 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider11_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider11 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function edit6_Callback(hObject, eventdata, handles)
-% hObject    handle to edit6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit6 as text
-%        str2double(get(hObject,'String')) returns contents of edit6 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on slider movement.
-function slider12_Callback(hObject, eventdata, handles)
-% hObject    handle to slider12 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider12_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider12 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function edit7_Callback(hObject, eventdata, handles)
-% hObject    handle to edit7 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit7 as text
-%        str2double(get(hObject,'String')) returns contents of edit7 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit7_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit7 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in checkbox28.
-function checkbox28_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox28 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox28
-
-
-% --- Executes on button press in checkbox29.
-function checkbox29_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox29 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox29
-
-
-% --- Executes on button press in checkbox30.
-function checkbox30_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox30 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox30
-
-
-% --- Executes on slider movement.
-function INTslider_Callback(hObject, eventdata, handles)
-% hObject    handle to INTslider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function INTslider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to INTslider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function intensity_cutoff_stds_Callback(hObject, eventdata, handles)
-% hObject    handle to intensity_cutoff_stds (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of intensity_cutoff_stds as text
-%        str2double(get(hObject,'String')) returns contents of intensity_cutoff_stds as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function intensity_cutoff_stds_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to intensity_cutoff_stds (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in checkbox31.
-function checkbox31_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox31 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox31
-
-
-% --- Executes on button press in checkbox32.
-function checkbox32_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox32 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox32
-
-
-% --- Executes on button press in checkbox33.
-function checkbox33_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox33 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox33
-
-
-
-function edit10_Callback(hObject, eventdata, handles)
-% hObject    handle to ret_std (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of ret_std as text
-%        str2double(get(hObject,'String')) returns contents of ret_std as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function ret_std_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to ret_std (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton12.
-function pushbutton12_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton12 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
-function pushbutton13_Callback(hObject, eventdata, handles)
-
-
-
-
-
-
-
-
-
-function DMslider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to DMslider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-
-function seconds_Callback(hObject, eventdata, handles)
-% hObject    handle to seconds (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of seconds as text
-%        str2double(get(hObject,'String')) returns contents of seconds as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function seconds_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to seconds (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in checkbox37.
-function checkbox37_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox37 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox37
-
-
-
-function minx_Callback(hObject, eventdata, handles)
-% hObject    handle to minx (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of minx as text
-%        str2double(get(hObject,'String')) returns contents of minx as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function minx_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to minx (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function maxx_Callback(hObject, eventdata, handles)
-% hObject    handle to maxx (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of maxx as text
-%        str2double(get(hObject,'String')) returns contents of maxx as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function maxx_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to maxx (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function miny_Callback(hObject, eventdata, handles)
-% hObject    handle to miny (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of miny as text
-%        str2double(get(hObject,'String')) returns contents of miny as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function miny_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to miny (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function maxy_Callback(hObject, eventdata, handles)
-% hObject    handle to maxy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of maxy as text
-%        str2double(get(hObject,'String')) returns contents of maxy as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function maxy_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to maxy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in setscale.
-function setscale_Callback(hObject, eventdata, handles)
-% hObject    handle to setscale (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of setscale
-
-
-% --- Executes on button press in autoscale.
-function autoscale_Callback(hObject, eventdata, handles)
-% hObject    handle to autoscale (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of autoscale
-
-
-% --- Executes on button press in autorej.
-function autorej_Callback(hObject, eventdata, handles)
-% hObject    handle to autorej (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of autorej
-
-
-
-function autorej_num_Callback(hObject, eventdata, handles)
-% hObject    handle to autorej_num (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of autorej_num as text
-%        str2double(get(hObject,'String')) returns contents of autorej_num as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function autorej_num_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to autorej_num (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in legend_results.
-function legend_results_Callback(hObject, eventdata, handles)
-% hObject    handle to legend_results (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of legend_results
-
-
-
-function intw_xmax_Callback(hObject, eventdata, handles)
-% hObject    handle to intw_xmax (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of intw_xmax as text
-%        str2double(get(hObject,'String')) returns contents of intw_xmax as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function intw_xmax_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to intw_xmax (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function intw_ymin_Callback(hObject, eventdata, handles)
-% hObject    handle to intw_ymin (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of intw_ymin as text
-%        str2double(get(hObject,'String')) returns contents of intw_ymin as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function intw_ymin_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to intw_ymin (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function intw_ymax_Callback(hObject, eventdata, handles)
-% hObject    handle to intw_ymax (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of intw_ymax as text
-%        str2double(get(hObject,'String')) returns contents of intw_ymax as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function intw_ymax_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to intw_ymax (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function intw_xmin_Callback(hObject, eventdata, handles)
-% hObject    handle to intw_xmin (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of intw_xmin as text
-%        str2double(get(hObject,'String')) returns contents of intw_xmin as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function intw_xmin_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to intw_xmin (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton15.
-function pushbutton15_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton15 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton16.
-function pushbutton16_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton16 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton17.
-function pushbutton17_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton17 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in checkbox42.
-function checkbox42_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox42 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox42
-
-
-% --- Executes on button press in checkbox43.
-function checkbox43_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox43 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox43
-
-
-% --- Executes on button press in checkbox44.
-function checkbox44_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox44 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox44
-
-
-
-function edit23_Callback(hObject, eventdata, handles)
-% hObject    handle to edit23 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit23 as text
-%        str2double(get(hObject,'String')) returns contents of edit23 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit23_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit23 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit24_Callback(hObject, eventdata, handles)
-% hObject    handle to edit24 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit24 as text
-%        str2double(get(hObject,'String')) returns contents of edit24 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit24_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit24 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit25_Callback(hObject, eventdata, handles)
-% hObject    handle to edit25 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit25 as text
-%        str2double(get(hObject,'String')) returns contents of edit25 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit25_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit25 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit26_Callback(hObject, eventdata, handles)
-% hObject    handle to edit26 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit26 as text
-%        str2double(get(hObject,'String')) returns contents of edit26 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit26_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit26 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit27_Callback(hObject, eventdata, handles)
-% hObject    handle to edit27 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit27 as text
-%        str2double(get(hObject,'String')) returns contents of edit27 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit27_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit27 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in checkbox45.
-function checkbox45_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox45 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox45
-
-
-% --- Executes on button press in checkbox46.
-function checkbox46_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox46 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox46
-
-
-
-function intensity_cutoff_unknowns_Callback(hObject, eventdata, handles)
-% hObject    handle to mean_uncertainty (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of mean_uncertainty as text
-%        str2double(get(hObject,'String')) returns contents of mean_uncertainty as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function mean_uncertainty_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to mean_uncertainty (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in pushbutton18.
-function pushbutton18_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton19.
-function pushbutton19_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton19 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in pushbutton20.
-function pushbutton20_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton20 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
-function Hfcutoff_Callback(hObject, eventdata, handles)
-% hObject    handle to Hfcutoff (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Hfcutoff as text
-%        str2double(get(hObject,'String')) returns contents of Hfcutoff as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Hfcutoff_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Hfcutoff (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function Hfbias_Callback(hObject, eventdata, handles)
-% hObject    handle to Hfbias (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Hfbias as text
-%        str2double(get(hObject,'String')) returns contents of Hfbias as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Hfbias_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Hfbias (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function Ybbias_Callback(hObject, eventdata, handles)
-% hObject    handle to Ybbias (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Ybbias as text
-%        str2double(get(hObject,'String')) returns contents of Ybbias as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Ybbias_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Ybbias (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function Ybcutoff_Callback(hObject, eventdata, handles)
-% hObject    handle to Ybcutoff (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Ybcutoff as text
-%        str2double(get(hObject,'String')) returns contents of Ybcutoff as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Ybcutoff_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Ybcutoff (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in checkbox47.
-function checkbox47_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox47 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of checkbox47
-
-
-
-function edit34_Callback(hObject, eventdata, handles)
-% hObject    handle to edit34 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit34 as text
-%        str2double(get(hObject,'String')) returns contents of edit34 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit34_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit34 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function intensity_cutoff_unknowns_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to intensity_cutoff_unknowns (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in check_FC.
-function check_FC_Callback(hObject, eventdata, handles)
-% hObject    handle to check_FC (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of check_FC
-
-
-% --- Executes on button press in pushbutton21.
-function pushbutton21_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton21 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
-function age_set_Callback(hObject, eventdata, handles)
-% hObject    handle to age_set (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of age_set as text
-%        str2double(get(hObject,'String')) returns contents of age_set as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function age_set_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to age_set (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+function results_setscale_Callback(hObject, eventdata, H)
+function results_xmin_Callback(hObject, eventdata, H)
+function results_xmax_Callback(hObject, eventdata, H)
+function results_ymin_Callback(hObject, eventdata, H)
+function results_ymax_Callback(hObject, eventdata, H)
+function results_autorejn_Callback(hObject, eventdata, H)
+function results_legend_Callback(hObject, eventdata, H)
+function results_rej_Callback(hObject, eventdata, H)
+function results_autoscale_Callback(hObject, eventdata, H)
+function results_intcutoff_Callback(hObject, eventdata, H)
+
+function Export_Reduced_Callback(hObject, eventdata, H)
+function Export_Plots_Callback(hObject, eventdata, H)
+function Save_Session_Callback(hObject, eventdata, H)
+function Upload_Session_Callback(hObject, eventdata, H)
