@@ -651,8 +651,8 @@ STD68_hi = STD68_median + (str2num(get(H.reject68,'String')))*.01.*STD68_median;
 STD68_lo = STD68_median - (str2num(get(H.reject68,'String')))*.01.*STD68_median;
 STD67_hi = STD67_median + (str2num(get(H.reject67,'String')))*.01.*STD67_median;
 STD67_lo = STD67_median - (str2num(get(H.reject67,'String')))*.01.*STD67_median;
-STD82_hi = STD82_median + (str2num(get(H.reject82,'String')))*.01.*STD82_median;
-STD82_lo = STD82_median - (str2num(get(H.reject82,'String')))*.01.*STD82_median;
+%STD82_hi = STD82_median + (str2num(get(H.reject82,'String')))*.01.*STD82_median;
+%STD82_lo = STD82_median - (str2num(get(H.reject82,'String')))*.01.*STD82_median;
 
 STD1_idx_orig = sum(STD1_idx);
 
@@ -680,17 +680,17 @@ STD1_idx(i,1) = 0;
 end
 end
 
-for i = 1:data_count
-if STD1_idx(i,1) == 1 && STD82(i,1) > STD82_hi
-STD1_idx(i,1) = 0;
-end
-end
+%for i = 1:data_count
+%if STD1_idx(i,1) == 1 && STD82(i,1) > STD82_hi
+%STD1_idx(i,1) = 0;
+%end
+%end
 
-for i = 1:data_count
-if STD1_idx(i,1) == 1 && STD82(i,1) < STD82_lo
-STD1_idx(i,1) = 0;
-end
-end
+%for i = 1:data_count
+%if STD1_idx(i,1) == 1 && STD82(i,1) < STD82_lo
+%STD1_idx(i,1) = 0;
+%end
+%end
 
 STD1_idx_rej = STD1_idx_orig - sum(STD1_idx);
 set(H.standards_rejected, 'String', STD1_idx_rej);
@@ -2055,9 +2055,16 @@ cla(H.axes_distribution, 'reset');
 axes(H.axes_distribution);
 
 for i = 1:data_count
-	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1 && get(H.thpb, 'Value') == 0
 		dist_data(i+1,1) = cell2num(SAMPLE_CONCORDIA(i+1,10));
 		dist_data(i+1,2) = cell2num(SAMPLE_CONCORDIA(i+1,11));
+	end
+end
+
+for i = 1:data_count
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1 && get(H.thpb, 'Value') == 1
+		dist_data(i+1,1) = cell2num(SAMPLE_CONCORDIA(i+1,12));
+		dist_data(i+1,2) = cell2num(SAMPLE_CONCORDIA(i+1,13));
 	end
 end
 
@@ -2289,6 +2296,7 @@ for i = 1:length(STD1_idx)
 	end
 end
 
+%{
 if length(syst_err_67) >= 126
 	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
 else
@@ -2297,7 +2305,7 @@ end
 
 set(H.SE68,'String',systerr68)
 set(H.SE67,'String',systerr67)
-
+%}
 
 
 
@@ -13191,13 +13199,15 @@ end
 
 
 % --- Executes on selection change in secondary.
-function secondary_Callback(hObject, eventdata, handles)
-% hObject    handle to secondary (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+function secondary_Callback(hObject, eventdata, H)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns secondary contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from secondary
+
+
+
+
+
+
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -14265,3 +14275,8 @@ function commonpbcorr_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of commonpbcorr
+
+
+% --- Executes on button press in thpb.
+function thpb_Callback(hObject, eventdata, H)
+
