@@ -2700,7 +2700,7 @@ if H.rereduce == 0
 	end
 	H.name_idx = length(sample); %automatically plot final sample run
 	for i=1:length(sample)
-		if isempty(comment{i,1}) == 0 
+		if isempty(comment{i,1}) == 0 && sample_idx(i,1) == 1
 			H.name_char(i,1) = strcat('<html><BODY bgcolor="red">',H.name_char(i,1),'</span></html>');
 		end
 	end
@@ -3044,7 +3044,7 @@ set(H.tMAD559,'Visible','off')
 set(H.slider91500,'Visible','off')
 set(H.sliderMAD559,'Visible','off')
 set(H.calibslider,'Visible','off')
-set(H.treeplotter,'Visible','off')
+%set(H.treeplotter,'Visible','off')
 if H.reduced == 1
 	plot_session_fract(hObject, eventdata, H)
 end
@@ -3065,7 +3065,7 @@ set(H.tMAD559,'Visible','off')
 set(H.slider91500,'Visible','off')
 set(H.sliderMAD559,'Visible','off')
 set(H.calibslider,'Visible','off')
-set(H.treeplotter,'Visible','off')
+%set(H.treeplotter,'Visible','off')
 if H.reduced == 1
 	plot_session_fract(hObject, eventdata, H)
 end
@@ -3086,7 +3086,7 @@ set(H.tMAD559,'Visible','off')
 set(H.slider91500,'Visible','off')
 set(H.sliderMAD559,'Visible','off')
 set(H.calibslider,'Visible','off')
-set(H.treeplotter,'Visible','off')
+%set(H.treeplotter,'Visible','off')
 if H.reduced == 1
 	plot_session_fract(hObject, eventdata, H)
 end
@@ -3106,7 +3106,7 @@ set(H.tMAD559,'Visible','on')
 set(H.slider91500,'Visible','on')
 set(H.sliderMAD559,'Visible','on')
 set(H.calibslider,'Visible','on')
-set(H.treeplotter,'Visible','on')
+%set(H.treeplotter,'Visible','on')
 if H.reduced == 1
 	plot_session_fract(hObject, eventdata, H)
 end
@@ -3130,16 +3130,18 @@ if get(H.auto_reduce,'Value') == 0
 end
 
 if H.reduced == 1
-	if H.export_comp == 1
+	if H.export_comp == 1 && get(H.plottype,'Value') ~= 26 && get(H.plottype,'Value') ~= 27
 		figure;
 	end
-	if H.export_comp == 0
+	if H.export_comp == 0 && get(H.plottype,'Value') ~= 26 && get(H.plottype,'Value') ~= 27
 		cla(H.axes_comp,'reset');
 		axes(H.axes_comp);	
 	end
-	H.export_comp = 0;
-	guidata(hObject,H);
-	hold on
+	if get(H.plottype,'Value') ~= 26 && get(H.plottype,'Value') ~= 27
+		H.export_comp = 0;
+		guidata(hObject,H);
+		hold on
+	end
 	
 	
 	sigx_sq_STD1a = H.sigx_sq_STD1a; rho_sigx_sigy_STD1a = H.rho_sigx_sigy_STD1a; sigy_sq_STD1a = H.sigy_sq_STD1a;	
@@ -3646,7 +3648,7 @@ if H.reduced == 1
 		caxis([min(Fnorm(:))-.5*range(Fnorm(:)),max(Fnorm(:))]);
 		colormap(jet)
 		shading interp
-		view(2)
+		view(3)
 
 		timeC = 0:1000000:4500000000;
 		xC = exp(0.00000000098485.*timeC)-1;
@@ -3697,15 +3699,15 @@ if H.reduced == 1
 	
 	if get(H.plottype,'Value') == 22 || get(H.plottype,'Value') == 23 || get(H.plottype,'Value') == 24 || get(H.plottype,'Value') == 25 
 		Macro_1_2_Output = H.Macro_1_2_Output;
-		for i = 1:length(Macro_1_2_Output(:,1))
+		for i = 1:length(sample_idx)
 			if sum(size(cell2mat(Macro_1_2_Output(i,41)))) > 0 
-				if sample_idx(i,1) == 1
-					age68(i,1) = cell2num(Macro_1_2_Output(i,37));
-					age67(i,1) = cell2num(Macro_1_2_Output(i,39));
-					bestage(i,1) = cell2num(Macro_1_2_Output(i,41));
-					u(i,1) = cell2num(Macro_1_2_Output(i,46));
-					th(i,1) = cell2num(Macro_1_2_Output(i,47));
-					uth(i,1) = cell2num(Macro_1_2_Output(i,50));
+				if sample_idx(i,1) == 1 && H.current_status_num(i,1) == 1
+					age68(i,1) = cell2num(Macro_1_2_Output(i+1,37));
+					age67(i,1) = cell2num(Macro_1_2_Output(i+1,39));
+					bestage(i,1) = cell2num(Macro_1_2_Output(i+1,41));
+					u(i,1) = cell2num(Macro_1_2_Output(i+1,46));
+					th(i,1) = cell2num(Macro_1_2_Output(i+1,47));
+					uth(i,1) = cell2num(Macro_1_2_Output(i+1,50));
 				end
 			end
 		end
@@ -3715,8 +3717,6 @@ if H.reduced == 1
 			bestage(~isfinite(bestage))=0;
 			u = nonzeros(u);
 			bestage = nonzeros(bestage);
-			axes(H.axes_comp);
-			cla(H.axes_comp,'reset');
 			s1 = scatter(u, bestage,  100, 'filled', 'b', 'd', 'LineWidth', 1.25, 'MarkerEdgeColor', 'k');
 			xlabel('U ppm')
 			ylabel('Best Age (Ma)')
@@ -3733,8 +3733,6 @@ if H.reduced == 1
 				raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.82)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
 					+6*th(i,1)*(exp(0.0000000000495*bestage(i,1)*1000000)-1);
 			end
-			axes(H.axes_comp);
-			cla(H.axes_comp,'reset');
 			s1 = scatter(raddos, bestage, 100, 'filled', 'b', 'd', 'LineWidth', 1.25, 'MarkerEdgeColor', 'k');
 			xlabel('Radiation Dosage (alpha decays/µg)')
 			ylabel('Best Age (Ma)')
@@ -3745,8 +3743,6 @@ if H.reduced == 1
 			bestage(~isfinite(bestage))=0;
 			uth = nonzeros(uth);
 			bestage = nonzeros(bestage);
-			axes(H.axes_comp);
-			cla(H.axes_comp,'reset');
 			s1 = scatter(uth, bestage,  100, 'filled', 'b', 'd', 'LineWidth', 1.25, 'MarkerEdgeColor', 'k');
 			xlabel('U/Th')
 			ylabel('Best Age (Ma)')
@@ -3770,8 +3766,6 @@ if H.reduced == 1
 			end
 			concordance = nonzeros(concordance);
 			bestage = nonzeros(bestage);
-			axes(H.axes_comp);
-			cla(H.axes_comp,'reset');
 			s1 = scatter(concordance, bestage,  100, 'filled', 'b', 'd', 'LineWidth', 1.25, 'MarkerEdgeColor', 'k');
 			xlabel('Concordance (%)')
 			ylabel('Best Age (Ma)')
@@ -3806,7 +3800,7 @@ if H.reduced == 1
 		
 		if get(H.plottype,'Value') == 28
 			for i = 1:H.data_count
-				if H.sample_idx(i,1) == 1
+				if H.sample_idx(i,1) == 1 && H.current_status_num(i,1) == 1
 					dataW(i,1) = cell2num(Macro_1_2_Output(i+1,68));
 					dataW(i,2) = cell2num(Macro_1_2_Output(i+1,69));
 				else
@@ -3818,7 +3812,7 @@ if H.reduced == 1
 		
 		if get(H.plottype,'Value') == 29
 			for i = 1:H.data_count
-				if H.STD1a_idx(i,1) == 1
+				if H.STD1a_idx(i,1) == 1 && H.current_status_num(i,1) == 1
 					dataW(i,1) = cell2num(Macro_1_2_Output(i+1,68));
 					dataW(i,2) = cell2num(Macro_1_2_Output(i+1,69));
 				else
@@ -3830,7 +3824,7 @@ if H.reduced == 1
 			
 		if get(H.plottype,'Value') == 30
 			for i = 1:H.data_count
-				if H.STD1b_idx(i,1) == 1
+				if H.STD1b_idx(i,1) == 1 && H.current_status_num(i,1) == 1
 					dataW(i,1) = cell2num(Macro_1_2_Output(i+1,68));
 					dataW(i,2) = cell2num(Macro_1_2_Output(i+1,69));
 				else
@@ -3842,7 +3836,7 @@ if H.reduced == 1
 
 		if get(H.plottype,'Value') == 31
 			for i = 1:H.data_count
-				if H.STD2_idx(i,1) == 1
+				if H.STD2_idx(i,1) == 1 && H.current_status_num(i,1) == 1
 					dataW(i,1) = cell2num(Macro_1_2_Output(i+1,68));
 					dataW(i,2) = cell2num(Macro_1_2_Output(i+1,69));
 				else
@@ -3922,10 +3916,6 @@ if H.reduced == 1
 
 		dispersion_perc_1sig = dispersion_1sig/mean(dataW(:,1))*100;
 		dispersion_perc_2sig = dispersion_2sig/mean(dataW(:,1))*100;
-
-		
-		axes(H.axes_comp);
-		hold on % hold the line
 
 		%if get(H.input1s, 'Value') == 1 && get(H.plot1s, 'Value') == 1 
 			plot([x; x], [(dataW(:,1)+dataW(:,2))'; (dataW(:,1)-dataW(:,2))'], '-r', 'Color', [.4 .6 1], 'LineWidth',5) % Error bars, much nicer than the errorbar function
@@ -4308,7 +4298,6 @@ function export_comparison_Callback(hObject, eventdata, H)
 H.export_comp = 1;
 H.point = 0;
 guidata(hObject,H);
-guidata(hObject,H);
 plot_compare(hObject, eventdata, H)
 
 %% PLOT INDIVIDUAL SAMPLES %%
@@ -4606,7 +4595,7 @@ for i=1:length(H.sample)
 end
 
 for i=1:length(H.sample)
-	if H.current_status_num(i,1) == 0 
+	if H.current_status_num(i,1) == 0 && H.sample_idx(i,1) == 1
 		H.name_char(i,1) = strcat('<html><BODY bgcolor="red">',H.name_char(i,1),'</span></html>');
 	end
 end
@@ -5593,7 +5582,7 @@ if isempty(answer) == 0
 
 	H.name_idx = get(H.listbox1,'Value');
 	for i=1:length(H.sample)
-		if isempty(H.comment{i,1}) == 0 
+		if isempty(H.comment{i,1}) == 0 && H.sample_idx(i,1) == 1
 			H.name_char(i,1) = strcat('<html><BODY bgcolor="red">',H.sample(i,1),'</span></html>');
 		end
 	end
@@ -5608,19 +5597,18 @@ if isempty(answer) == 0
 	set(H.listbox1,'Value',H.name_idx);
 
 	if strcmp(answer, "xx") == 1
+		%H.comment(get(H.listbox1,'Value'),1) = strcat({'xx'}, {' '}, {','}, {' '}, H.comment(get(H.listbox1,'Value'),1));
 		if H.STD1a_idx(get(H.listbox1,'Value'),1) == 1 || H.STD1b_idx(get(H.listbox1,'Value'),1) == 1|| H.STD2_idx(get(H.listbox1,'Value'),1) == 1 
 			H.STD1a_idx(get(H.listbox1,'Value'),1) = 0;
 			H.STD1b_idx(get(H.listbox1,'Value'),1) = 0;
 			H.STD2_idx(get(H.listbox1,'Value'),1) = 0;
 			H.current_status_num(get(H.listbox1,'Value'),1) = 0;
+			
 		end
 		guidata(hObject,H);
-		%plot_session_fract(hObject, eventdata, H)
 	end
 
 	reduce_data_Callback(hObject, eventdata, H)
-	
-	
 	
 end
 
@@ -6800,8 +6788,15 @@ hold on
 	z = [0, 0; 30000000, 0];
 
 	if get(H.plottype,'Value') == 26
-		cla(H.axes_comp,'reset');
-		axes(H.axes_comp);
+		if H.export_comp == 1
+			figure;
+		end
+		if H.export_comp == 0
+			cla(H.axes_comp,'reset');
+			axes(H.axes_comp);	
+		end
+		H.export_comp = 0;
+		guidata(hObject,H);
 		hold on
 		plot(dtcut(:,1),dtcut(:,2),'k','LineWidth', 1); 
 		plot(z(:,1),z(:,2),'k','LineWidth', 1); 
@@ -6827,15 +6822,31 @@ hold on
 		%leg.NumColumns = 3;
 		xlabel('U average intensity (cps)')
 		ylabel('Age Offset and Discordance (%)')
-		axis([0 24999999 -15 15])
+		if get(H.defaultaxes,'Value') == 1
+			set(H.setxmin,'String',0)
+			set(H.setxmax,'String',24999999)
+			set(H.setymin,'String',-15)
+			set(H.setymax,'String',15)
+			axis([str2num(get(H.setxmin,'String')) str2num(get(H.setxmax,'String')) str2num(get(H.setymin,'String')) str2num(get(H.setymax,'String'))])
+		end
+		if get(H.setax,'Value') == 1
+			axis([str2num(get(H.setxmin,'String')) str2num(get(H.setxmax,'String')) str2num(get(H.setymin,'String')) str2num(get(H.setymax,'String'))])
+		end
 		ax = gca;
 		ax.XRuler.Exponent = 0;
 		box on
 	end
 		
 	if get(H.plottype,'Value') == 27
-		cla(H.axes_comp,'reset');
-		axes(H.axes_comp);
+		if H.export_comp == 1
+			figure;
+		end
+		if H.export_comp == 0
+			cla(H.axes_comp,'reset');
+			axes(H.axes_comp);	
+		end
+		H.export_comp = 0;
+		guidata(hObject,H);
 		hold on
 		plot(dtcut(:,1),dtcut(:,2),'k','LineWidth', 1); 
 		plot(z(:,1),z(:,2),'k','LineWidth', 1); 
@@ -6849,7 +6860,16 @@ hold on
 		%leg.NumColumns = 3;
 		xlabel('206Pb average intensity (cps)')
 		ylabel('Age Offset and Discordance (%)')
-		axis([0 3999999 -25 25])
+		if get(H.defaultaxes,'Value') == 1
+			set(H.setxmin,'String',0)
+			set(H.setxmax,'String',3999999)
+			set(H.setymin,'String',-25)
+			set(H.setymax,'String',25)
+			axis([str2num(get(H.setxmin,'String')) str2num(get(H.setxmax,'String')) str2num(get(H.setymin,'String')) str2num(get(H.setymax,'String'))])
+		end
+		if get(H.setax,'Value') == 1
+			axis([str2num(get(H.setxmin,'String')) str2num(get(H.setxmax,'String')) str2num(get(H.setymin,'String')) str2num(get(H.setymax,'String'))])
+		end
 		ax = gca;
 		ax.XRuler.Exponent = 0;
 		box on
