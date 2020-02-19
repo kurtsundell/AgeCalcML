@@ -130,39 +130,39 @@ guidata(hObject,H);
 
 %% FILTERS %%
 function bestage_cutoff_Callback(hObject, eventdata, H)
-if H.reduced == 1
-	reduce_data_Callback(hObject, eventdata, H)
-end
+%if H.reduced == 1
+%	reduce_data_Callback(hObject, eventdata, H)
+%end
 
 function filter_err68_Callback(hObject, eventdata, H)
-if H.reduced == 1
-	reduce_data_Callback(hObject, eventdata, H)
-end
+%if H.reduced == 1
+%	reduce_data_Callback(hObject, eventdata, H)
+%end
 
 function filter_err67_Callback(hObject, eventdata, H)
-if H.reduced == 1
-	reduce_data_Callback(hObject, eventdata, H)
-end
+%if H.reduced == 1
+%	reduce_data_Callback(hObject, eventdata, H)
+%end
 
 function filter_cutoff_Callback(hObject, eventdata, H)
-if H.reduced == 1
-	reduce_data_Callback(hObject, eventdata, H)
-end
+%if H.reduced == 1
+%	reduce_data_Callback(hObject, eventdata, H)
+%end
 
 function filter_disc_Callback(hObject, eventdata, H)
-if H.reduced == 1
-	reduce_data_Callback(hObject, eventdata, H)
-end
+%if H.reduced == 1
+%	reduce_data_Callback(hObject, eventdata, H)
+%end
 
 function filter_disc_rev_Callback(hObject, eventdata, H)
-if H.reduced == 1
-	reduce_data_Callback(hObject, eventdata, H)
-end
+%if H.reduced == 1
+%	reduce_data_Callback(hObject, eventdata, H)
+%end
 
 function filter_204_Callback(hObject, eventdata, H)
-if H.reduced == 1
-	reduce_data_Callback(hObject, eventdata, H)
-end
+%if H.reduced == 1
+%	reduce_data_Callback(hObject, eventdata, H)
+%end
 
 function browser_Callback(hObject, eventdata, H)
 folder_name = uigetdir; %prompt browser and select folder
@@ -3636,10 +3636,10 @@ if H.reduced == 1
 			F = mvnpdf([X(:) Y(:)],center_All2(i,1:2),covmat2);
 			F = reshape(F,length(yF),length(xF));
 			zmax = max(max(F));
-			F_out(:,:,i) = F./sum(F,'All');
+			F_out(:,:,i) = F./sum(sum(F));
 		end
 		Fsum = sum(F_out,3);
-		Fnorm = Fsum./sum(Fsum,'All');
+		Fnorm = Fsum./sum(sum(Fsum));
 		Fnormmax = max(max(Fnorm));
 		H.Fnormmax = Fnormmax;
 		F1s = Fnormmax*0.317;
