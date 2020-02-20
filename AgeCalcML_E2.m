@@ -5202,6 +5202,7 @@ waitbar(3/waitnum, h, 'Saving the simplified data table (.xls file). Please wait
 
 writetable(table(geochron_out),path_datatable, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
 
+%figure('visible', 'off');
 waitbar(4/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
 close(h)
 
