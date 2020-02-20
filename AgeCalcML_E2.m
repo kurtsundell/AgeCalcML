@@ -128,42 +128,6 @@ set(H.Use_R33, 'Value',use_R33_68); % checkbox
 
 guidata(hObject,H);
 
-%% FILTERS %%
-function bestage_cutoff_Callback(hObject, eventdata, H)
-%if H.reduced == 1
-%	reduce_data_Callback(hObject, eventdata, H)
-%end
-
-function filter_err68_Callback(hObject, eventdata, H)
-%if H.reduced == 1
-%	reduce_data_Callback(hObject, eventdata, H)
-%end
-
-function filter_err67_Callback(hObject, eventdata, H)
-%if H.reduced == 1
-%	reduce_data_Callback(hObject, eventdata, H)
-%end
-
-function filter_cutoff_Callback(hObject, eventdata, H)
-%if H.reduced == 1
-%	reduce_data_Callback(hObject, eventdata, H)
-%end
-
-function filter_disc_Callback(hObject, eventdata, H)
-%if H.reduced == 1
-%	reduce_data_Callback(hObject, eventdata, H)
-%end
-
-function filter_disc_rev_Callback(hObject, eventdata, H)
-%if H.reduced == 1
-%	reduce_data_Callback(hObject, eventdata, H)
-%end
-
-function filter_204_Callback(hObject, eventdata, H)
-%if H.reduced == 1
-%	reduce_data_Callback(hObject, eventdata, H)
-%end
-
 function browser_Callback(hObject, eventdata, H)
 folder_name = uigetdir; %prompt browser and select folder
 set(H.filepath, 'String', folder_name); %show path name
@@ -262,16 +226,16 @@ end
 
 clear tmp tmp1
 
-if ispc == 1
-    file_copy = strcat(fullpathname_data, '_copy.csv');
-end
-if ismac == 1
-    file_copy = strcat(fullpathname_data, '_copy');
-end
-copyfile(fullpathname_data, file_copy, 'f');
-d1 = [file_copy];
-[numbers text, data] = xlsread(d1);
-delete(d1);
+%if ispc == 1
+%    file_copy = strcat(fullpathname_data, '_copy.csv');
+%end
+%if ismac == 1
+ %   file_copy = strcat(fullpathname_data, '_copy');
+%end
+%copyfile(fullpathname_data, file_copy, 'f');
+%d1 = [file_copy];
+[numbers text, data] = xlsread(fullpathname_data);
+%delete(d1);
 
 
 
@@ -2802,6 +2766,7 @@ H.TREE = TREE;
 H.UPBdata = UPBdata;
 
 
+
 H.data = data;
 H.sample2 = sample2;
 H.UPB_pre = UPB_pre;
@@ -2830,9 +2795,7 @@ if TREE == 1
 	H.Best_Age = Best_Age;
 end
 
-if get(H.auto_reduce,'Value') == 0
-	guidata(hObject,H);
-end
+
 
 
 
@@ -2860,9 +2823,12 @@ set(H.SE6867,'String',strcat(sprintf('%.2f ', systerr68), {'%, '}, sprintf('%.2f
 
 
 
+H.systerr68 = systerr68;
+H.systerr67 = systerr67;
 
-
-
+if get(H.auto_reduce,'Value') == 0
+	guidata(hObject,H);
+end
 
 
 
@@ -5118,6 +5084,120 @@ fullpathname = strcat(pathname, filename);
 load(fullpathname,'H')
 close(AgeCalcML_E2)
 
+
+
+
+
+
+
+function saveall_Callback(hObject, eventdata, H)
+waitnum = 4;
+h = waitbar(0,'Saving the AgeCalcML session (.mat file). Please wait...');
+%set(h, 'Position',[600 1500 300 50]);
+waitbar(1/waitnum, h, 'Saving the AgeCalcML session (.mat file). Please wait...');
+
+
+c = char(H.folder_name);
+if ispc == 1
+	s = strfind(c,'\');
+end
+if ismac == 1
+	s = strfind(c,'/');
+end
+samplename = c(s(end)+1:end);
+
+if ispc == 1
+	path_mat = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_Session'));
+end
+if ismac == 1
+	path_mat = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_Session'));
+end
+
+if ispc == 1
+	path_detailed = char(strcat(H.folder_name, '\', samplename, '_DataTable_Detailed'));
+end
+if ismac == 1
+	path_detailed = char(strcat(H.folder_name, '/', samplename, '_DataTable_Detailed'));
+end
+
+if ispc == 1
+	path_datatable = char(strcat(H.folder_name, '\', samplename, '_DataTable'));
+end
+if ismac == 1
+	path_datatable = char(strcat(H.folder_name, '/', samplename, '_DataTable'));
+end
+
+save(path_mat,'H')
+
+waitbar(2/waitnum, h, 'Saving the Detailed Data Table (.xls file). Please wait...');
+
+writetable(table(H.Macro_1_2_Output),path_detailed, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+
+Macro_1_2_Output = H.Macro_1_2_Output(2:end,:);
+current_status_num = H.current_status_num;
+sample_idx = H.sample_idx;
+data_count = H.data_count;
+ffsw68 = H.ffsw68;
+ffswse68 = H.ffswse68;
+pbcerr68 = H.pbcerr68;
+Age68 = H.Age68;
+ffsw67 = H.ffsw67;
+ffswse67 = H.ffswse67;
+pbcerr67 = H.pbcerr67;
+systerr68 = H.systerr68;
+systerr67 = H.systerr67;
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
+		export_num(i,1) = 1;
+	end
+end
+geochron_out{sum(export_num)+26, 20} = [];
+geochron_out(1:17,1) = [{'Aliquot Name'; 'Stratigraphic Formation Name';'Stratigraphic Age';'Rock Type';'Mineral';'Method';'Latitude';'Longitude';'Internal Uncertainty Level'; ...
+	'External Uncertainty 206/238 (% two sigma)';'External Uncertainty 206/207 (% two sigma)';'Analysis Purpose';'Laboratory Name';'Analyst Name'; ...
+	'Aliquot Reference';'Aliquot Instrumental Method';'Aliquot Instrumental Reference'}];
+geochron_out(5,2) = [{'Zircon'}];
+geochron_out(6,2) = [{'U-Pb'}];
+geochron_out(9,2) = [{'one sigma'}];
+geochron_out(10,2) = num2cell(systerr68);
+geochron_out(11,2) = num2cell(systerr67);
+geochron_out(13,2) = [{'Arizona LaserChron Center'}];
+geochron_out(16,2) = [{'LA-ICPMS'}];
+geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
+	'Gehrels, G. and Pecha, M., 2014, Detrital zircon U-Pb geochronology and Hf isotope geochemistry of Paleozoic and Triassic passive margin strata of western North America: Geosphere, v. 10 (1), p. 49-65.'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
+geochron_out(21,8) = [{'Isotope ratios'}];
+geochron_out(21,14) = [{'Apparent ages (Ma)'}];
+geochron_out_temp{sum(current_status_num), 69} = [];
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
+		geochron_out_temp(i,:) = Macro_1_2_Output(i,:);
+	end
+end
+geochron_out_temp(all(cellfun('isempty',geochron_out_temp),2),:) = [];
+geochron_out(27:end,1) = geochron_out_temp(:,1);
+geochron_out(27:end,2) = geochron_out_temp(:,46);
+geochron_out(27:end,3) = geochron_out_temp(:,48);
+geochron_out(27:end,4) = geochron_out_temp(:,50);
+geochron_out(27:end,5:6) = geochron_out_temp(:,15:16);
+geochron_out(27:end,7:11) = geochron_out_temp(:,32:36);
+geochron_out(27:end,12:17) = geochron_out_temp(:,60:65);
+geochron_out(27:end,18:19) = geochron_out_temp(:,68:69);
+for i = 1:length(geochron_out_temp(:,1))
+	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,21))/cell2num(geochron_out_temp(i,23)))*100};
+end
+
+waitbar(3/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
+
+writetable(table(geochron_out),path_datatable, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+
+waitbar(4/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
+close(h)
+
+
+
+
+
 function export_results_Callback(hObject, eventdata, H)
 Macro_1_2_Output = H.Macro_1_2_Output;
 %[file,path] = uiputfile('*.xls','Save file');
@@ -5144,7 +5224,8 @@ Age68 = H.Age68;
 ffsw67 = H.ffsw67;
 ffswse67 = H.ffswse67;
 pbcerr67 = H.pbcerr67;
-
+systerr68 = H.systerr68;
+systerr67 = H.systerr67;
 
 %{
 folder_name = H.folder_name;
