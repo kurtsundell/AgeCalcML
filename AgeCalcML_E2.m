@@ -184,7 +184,7 @@ waitbar(1/waitnum, h, 'Parsing the data. Please wait...');
 
 
 if H.rereduce == 0
-
+%{
 for i = 1:size(files,1)
 	filenames{i,1} = files(i).name;
 end
@@ -223,8 +223,8 @@ for i = 1:length(filenames)
 		end
 	end
 end
-
-clear tmp tmp1
+%}
+%clear tmp tmp1
 
 %if ispc == 1
 %    file_copy = strcat(fullpathname_data, '_copy.csv');
@@ -234,7 +234,7 @@ clear tmp tmp1
 %end
 %copyfile(fullpathname_data, file_copy, 'f');
 %d1 = [file_copy];
-[numbers text, data] = xlsread(fullpathname_data);
+%[numbers text, data] = xlsread(fullpathname_data);
 %delete(d1);
 
 
@@ -263,8 +263,8 @@ data(1,:) = text;
 
 
 
-folder_name = H.folder_name;
-files=dir([folder_name]); %map out the directory to that folder
+
+
 
 for i = 1:size(files,1)
 	filenames{i,1} = files(i).name;
@@ -307,18 +307,18 @@ end
 H.fullpathname_names = fullpathname_names;
 
 clear tmp tmp1
-if ispc == 1
-    file_copy = strcat(fullpathname_data, '_copy.csv');
-end
-if ismac == 1
-    file_copy = strcat(fullpathname_data, '_copy');
-end
-copyfile(fullpathname_data, file_copy, 'f');
+%if ispc == 1
+%    file_copy = strcat(fullpathname_data, '_copy.csv');
+%end
+%if ismac == 1
+%    file_copy = strcat(fullpathname_data, '_copy');
+%end
+%copyfile(fullpathname_data, file_copy, 'f');
 
 
-d1 = [file_copy];
-[numbers text, data] = xlsread(d1);
-delete(d1);
+%d1 = [file_copy];
+[numbers text, data] = xlsread(fullpathname_data);
+%delete(d1);
 
 
 %{
@@ -3903,13 +3903,24 @@ if H.reduced == 1
 	
 	
 	
+	if get(H.logx,'Value') == 1
+		set(gca, 'XScale', 'log')
+	end
 	
-	
+	if get(H.logy,'Value') == 1
+		set(gca, 'YScale', 'log')
+	end	
 	
 	
 	set(gca,'box','on')
 	
 end
+
+function logy_Callback(hObject, eventdata, H)
+plot_compare(hObject, eventdata, H)
+
+function logx_Callback(hObject, eventdata, H)
+plot_compare(hObject, eventdata, H)
 
 function comp_legon_Callback(hObject, eventdata, H)
 H.point = 0;
@@ -5114,17 +5125,17 @@ if ismac == 1
 end
 
 if ispc == 1
-	path_detailed = char(strcat(H.folder_name, '\', samplename, '_DataTable_Detailed'));
+	path_detailed = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DetailedDataTable'));
 end
 if ismac == 1
-	path_detailed = char(strcat(H.folder_name, '/', samplename, '_DataTable_Detailed'));
+	path_detailed = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DetailedDataTable'));
 end
 
 if ispc == 1
-	path_datatable = char(strcat(H.folder_name, '\', samplename, '_DataTable'));
+	path_datatable = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DataTable'));
 end
 if ismac == 1
-	path_datatable = char(strcat(H.folder_name, '/', samplename, '_DataTable'));
+	path_datatable = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DataTable'));
 end
 
 save(path_mat,'H')
@@ -6990,21 +7001,23 @@ R33_ALL_OS_mean = mean(abs([R33_IC_OS;R33_MI_OS;R33_AN_OS]));
 
 function Use_avg_ACF_Callback(hObject, eventdata, H)
 ACF_Corr_Callback(hObject, eventdata, H)
+rereducedata_Callback(hObject, eventdata, H)
 
 function Use_235_Callback(hObject, eventdata, H)
 ACF_Corr_Callback(hObject, eventdata, H)
+rereducedata_Callback(hObject, eventdata, H)
 
 function Use_FC_Callback(hObject, eventdata, H)
 ACF_Corr_Callback(hObject, eventdata, H)
+rereducedata_Callback(hObject, eventdata, H)
 
 function Use_SL_Callback(hObject, eventdata, H)
 ACF_Corr_Callback(hObject, eventdata, H)
+rereducedata_Callback(hObject, eventdata, H)
 
 function Use_R33_Callback(hObject, eventdata, H)
 ACF_Corr_Callback(hObject, eventdata, H)
-
-
-
+rereducedata_Callback(hObject, eventdata, H)
 
 function rereducedata_Callback(hObject, eventdata, H)
 H.currView = get(H.listbox1,'ListBoxTop');
