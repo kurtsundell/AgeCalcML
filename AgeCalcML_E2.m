@@ -5076,14 +5076,6 @@ H.export_dist = 1;
 guidata(hObject,H);
 plot_distribution(hObject, eventdata, H)
 
-%% REJECT STANDARDS AND OVERDISPERSION OPTIONS %%
-function reject_std_Callback(hObject, eventdata, H)
-function reject_no_Callback(hObject, eventdata, H)
-function reject_yes_Callback(hObject, eventdata, H)
-function ODF_68_Callback(hObject, eventdata, H)
-function ODF_67_Callback(hObject, eventdata, H)
-function ODF_82_Callback(hObject, eventdata, H)
-
 %% EXPORT PUSHBUTTONS %%
 function savesession_Callback(hObject, eventdata, H)
 [file,path] = uiputfile('*.mat','Save file');
@@ -5094,12 +5086,6 @@ function loadsession_Callback(hObject, eventdata, H)
 fullpathname = strcat(pathname, filename);
 load(fullpathname,'H')
 close(AgeCalcML_E2)
-
-
-
-
-
-
 
 function saveall_Callback(hObject, eventdata, H)
 waitnum = 4;
@@ -5205,10 +5191,6 @@ writetable(table(geochron_out),path_datatable, 'FileType', 'spreadsheet', 'Write
 %figure('visible', 'off');
 waitbar(4/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
 close(h)
-
-
-
-
 
 function export_results_Callback(hObject, eventdata, H)
 Macro_1_2_Output = H.Macro_1_2_Output;
@@ -5543,15 +5525,12 @@ conc_out = Macro_1_2_Output(:,32:36);
 conc_out( all(cellfun(@isempty,conc_out),2), : ) = [];
 
 %% T/REE OPTIONS %%
-function stoichSi_Callback(hObject, eventdata, H)
-
 function calibslider_Callback(hObject, eventdata, H)
 perc_MAD559 = get(H.calibslider,'Value');
 perc_91500 = 1 - get(H.calibslider,'Value');
 set(H.slider91500,'String',round(perc_91500*100,1))
 set(H.sliderMAD559,'String',round(perc_MAD559*100,1))
 guidata(hObject, H);
-%reducedata_Callback(hObject, eventdata, H)
 
 function slider91500_Callback(hObject, eventdata, H)
 perc_91500 = str2num(get(H.slider91500,'String'))*.01;
@@ -5559,7 +5538,6 @@ perc_MAD559 = 1 - perc_91500;
 set(H.calibslider,'Value',1 - perc_91500)
 set(H.sliderMAD559,'String',round(perc_MAD559*100,1))
 guidata(hObject, H);
-%reducedata_Callback(hObject, eventdata, H)
 
 function sliderMAD559_Callback(hObject, eventdata, H)
 perc_MAD559 = str2num(get(H.sliderMAD559,'String'))*.01;
@@ -5567,7 +5545,6 @@ perc_91500 = 1 - perc_MAD559;
 set(H.calibslider,'Value',perc_MAD559)
 set(H.slider91500,'String',(1 - perc_MAD559)*100)
 guidata(hObject, H);
-%reducedata_Callback(hObject, eventdata, H)
 
 function treeplotter_Callback(hObject, eventdata, H)
 
@@ -5705,7 +5682,6 @@ if isempty(answer) == 0
 	
 end
 
-
 function save_scanlist_Callback(hObject, eventdata, H)
 
 
@@ -5725,18 +5701,6 @@ end
 
 [file,path] = uiputfile('*.scancsv','Save file');
 dlmcell([path,file],Names)
-
-
-
-
-
-
-
-
-
-
-
-
 
 function plottype_Callback(hObject, eventdata, H)
 
@@ -5862,7 +5826,6 @@ end
 if H.reduced == 1
 	plot_compare(hObject, eventdata, H)
 end
-
 
 function dt_Callback(hObject, eventdata, H)
 ACF_Corr_Callback(hObject, eventdata, H)
@@ -6983,23 +6946,6 @@ R33_MI_OS_mean = mean(abs(R33_MI_OS));
 R33_AN_OS_mean = mean(abs(R33_AN_OS));
 R33_ALL_OS_mean = mean(abs([R33_IC_OS;R33_MI_OS;R33_AN_OS]));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function Use_avg_ACF_Callback(hObject, eventdata, H)
 ACF_Corr_Callback(hObject, eventdata, H)
 rereducedata_Callback(hObject, eventdata, H)
@@ -7026,19 +6972,15 @@ H.rereduce = 1;
 guidata(hObject,H);
 reduce_data_Callback(hObject, eventdata, H)
 
-
-
 function slider_lowint_238_Callback(hObject, eventdata, H)
 lowint_238 = get(H.slider_lowint_238,'Value')*100-50; %slider val
 set(H.lowint_val_238, 'String', lowint_238);
 ACF_Corr_Callback(hObject, eventdata, H)
 
-
 function slider_lin_238_Callback(hObject, eventdata, H)
 lin_238 = get(H.slider_lin_238,'Value')*100-50; %slider val
 set(H.lin_val_238, 'String', lin_238);
 ACF_Corr_Callback(hObject, eventdata, H)
-
 
 function lowint_val_238_Callback(hObject, eventdata, H)
 lowint_238 = str2num(get(H.lowint_val_238,'String'));
@@ -7046,15 +6988,11 @@ lowint_val_dec_238 = str2num(get(H.lowint_val_238,'String'))/100+0.5; %slider va
 set(H.slider_lowint_238, 'Value', lowint_val_dec_238);
 ACF_Corr_Callback(hObject, eventdata, H)
 
-
 function lin_val_238_Callback(hObject, eventdata, H)
 lin_238 = str2num(get(H.lin_val_238,'String'));
 lin_val_dec_238 = str2num(get(H.lin_val_238,'String'))/100+0.5; %slider val
 set(H.slider_lin_238, 'Value', lin_val_dec_238);
 ACF_Corr_Callback(hObject, eventdata, H)
-
-
-
 
 function slider_lowint_206_Callback(hObject, eventdata, H)
 lowint_206 = get(H.slider_lowint_206,'Value')*100-50; %slider val
@@ -7077,11 +7015,6 @@ lin_206 = str2num(get(H.lin_val_206,'String'));
 lin_val_dec_206 = str2num(get(H.lin_val_206,'String'))/100+0.5; %slider val
 set(H.slider_lin_206, 'Value', lin_val_dec_206);
 ACF_Corr_Callback(hObject, eventdata, H)
-
-
-
-
-
 
 function calc1_Callback(hObject, eventdata, H)
 factor64 = str2num(get(H.factor64,'String'));
@@ -8122,20 +8055,6 @@ end
 xticks(1:1:n)
 xticklabels(xlab)
 
-function R1min_Callback(hObject, eventdata, H)
-
-function R1max_Callback(hObject, eventdata, H)
-
-function R2min_Callback(hObject, eventdata, H)
-
-function R2max_Callback(hObject, eventdata, H)
-
-
-
-
-
-
-
 function calc2_Callback(hObject, eventdata, H)
 %global factor64 rejectFC rejectSL rejectR33 odf68 bestage_cutoff filter_cutoff filter_err68 filter_err67 filter_disc filter_disc_rev filter_64 UPBdata2
 
@@ -9136,27 +9055,6 @@ end
 
 xticks(1:1:n)
 xticklabels(xlab)
-
-
-
-
-
-
-
-
-
-function R3min_Callback(hObject, eventdata, H)
-
-function R3max_Callback(hObject, eventdata, H)
-
-function R4min_Callback(hObject, eventdata, H)
-
-function R4max_Callback(hObject, eventdata, H)
-
-
-
-
-
 
 function rank_Callback(hObject, eventdata, H)
 plottype_Callback(hObject, eventdata, H)
