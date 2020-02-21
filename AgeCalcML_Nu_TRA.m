@@ -814,7 +814,7 @@ if get(H.primary, 'Value') == 4
 end
 
 if get(H.primary, 'Value') == 5
-	STD1 = 'FC';
+	STD1 = 'FCT';
 	STD1_68 = 0.0044154;
 	STD1_67  = 21.350337692;
 	STD1_82  = 0.0212; %NOT FCT
@@ -1098,6 +1098,28 @@ STD1_238_mean = mean(nonzeros(STD1_238));
 STD1_232_mean = mean(nonzeros(STD1_232));
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if get(H.largenigneous, 'Value') == 0
+
 if length(nonzeros(ff68(:,1))) > 10 && data_count > 30
 	
 for i = 1:5
@@ -1185,6 +1207,8 @@ end
 
 end
 
+
+
 for i = 1:data_count
     if isinf(ffsw68(i,1)) == 1 || isnan(ffsw68(i,1)) == 1
         ffsw68(i,1) = ffsw68(i-1,1);
@@ -1232,6 +1256,98 @@ STD1_num = nonzeros(STD1_num);
 ff68_num = nonzeros(ff68_num);
 ff67_num = nonzeros(ff67_num);
 ff82_num = nonzeros(ff82_num);
+
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+if get(H.largenigneous, 'Value') == 1
+	
+ff68n = ff68;
+ff68n(ff68n == 0) = NaN;
+ffsw68 = movmean(ff68n,str2num(get(H.igrun,'String')),'omitnan');
+ffse68 = movstd(ff68n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(str2num(get(H.igrun,'String')));
+
+ff67n = stdfc67;
+ff67n(ff67n == 0) = NaN;
+stdfcsw67 = movmean(ff67n,str2num(get(H.igrun,'String')),'omitnan');
+stdswse67 = movstd(ff67n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(str2num(get(H.igrun,'String')));
+
+ff82n = stdfc82;
+ff82n(ff82n == 0) = NaN;
+stdfcsw82 = movmean(ff82n,str2num(get(H.igrun,'String')),'omitnan');
+stdswse82 = movstd(ff82n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(str2num(get(H.igrun,'String')));
+
+
+
+% Sliding window uncertainties %% 
+ffse68_hi = ffsw68 + ffse68;
+ffse68_lo = ffsw68 - ffse68;
+
+ffse67_hi = stdfcsw67 + stdswse67;
+ffse67_lo = stdfcsw67 - stdswse67;
+
+ffse82_hi = stdfcsw82 + stdswse82;
+ffse82_lo = stdfcsw82 - stdswse82;
+
+analysis_num = (1:1:data_count)'; % Set analysis numbers
+
+for i = 1:data_count
+if STD1_idx(i,1) == 1
+STD1_num(i,1) = analysis_num(i,1);
+ff68_num(i,1) = ff68(i,1);
+ff67_num(i,1) = stdfc67(i,1);
+ff82_num(i,1) = stdfc82(i,1);
+end
+end
+
+STD1_num = nonzeros(STD1_num);
+ff68_num = nonzeros(ff68_num);
+ff67_num = nonzeros(ff67_num);
+ff82_num = nonzeros(ff82_num);
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 % Start common Pb correction %%
@@ -2419,32 +2535,83 @@ H.name_char_std = name_char_std;
 H.samp_length = samp_length;
 
 % Calculate systematic Uncertainties
+% Original 
 
-for i = 1:length(STD1_idx)
-	if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20 
-		syst_err_68(i,1) = sqrt(100*ffse68(i,1)/ffsw68(i,1)*100*ffse68(i,1)/ffsw68(i,1)+pbcerr68(i,1)*pbcerr68(i,1)+0.053*0.053+0.35*0.35);
+
+	
+	for i = 1:length(STD1_idx)
+		if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20 
+			syst_err_68(i,1) = sqrt(100*ffse68(i,1)/ffsw68(i,1)*100*ffse68(i,1)/ffsw68(i,1)+pbcerr68(i,1)*pbcerr68(i,1)+0.053*0.053+0.033*0.033); %.35 SL(?) --> .33 FC Mattinson (2010)
+		else
+			syst_err_68(i,1) = 0;
+		end
+	end
+
+	if length(syst_err_68) >= 126
+		systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
 	else
-		syst_err_68(i,1) = 0;
+		systerr68 = 2*mean(nonzeros(syst_err_68));
 	end
-end
 
-if length(syst_err_68) >= 126
-	systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
-else
-	systerr68 = 2*mean(nonzeros(syst_err_68));
-end
-
-for i = 1:length(STD1_idx)
-	if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400
-		syst_err_67(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1)+(pbcerr67(i,1))*(pbcerr67(i,1))+0.053*0.053+0.069*0.069+0.35*0.35);
+	for i = 1:length(STD1_idx)
+		if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400
+			syst_err_67(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1)+(pbcerr67(i,1))*(pbcerr67(i,1))+0.053*0.053+0.069*0.069+0.035*0.035);
+		end
 	end
-end
 
-if length(syst_err_67) >= 126
-	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
-else
-	systerr67 = 2*mean(nonzeros(syst_err_67));
-end
+	if length(syst_err_67) >= 126
+		systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
+	else
+		systerr67 = 2*mean(nonzeros(syst_err_67));
+	end
+
+
+
+%New
+
+
+	for i = 1:length(STD1_idx)
+		if STD1_idx(i,1) == 1
+			STD1_data68(i,1) = BLS_68_corr(i,1);
+			STD1_data68(i,2) = BLS_68_err(i,1)*STD1_data68(i,1)/100; %convert to abs unc;
+			STD1_data67(i,1) = BLS_67_corr(i,1);
+			STD1_data67(i,2) = BLS_67_err(i,1);
+			STD1_pbcerr68(i,1) = pbcerr68(i,1);
+			STD1_pbcerr67(i,1) = pbcerr67(i,1);
+			
+			
+			%STD1_data68sw(i,1) = ffsw68(i,1);
+			%STD1_data68sw(i,2) = 100*ffse68(i,1)/ffsw68(i,1);
+
+		end
+		
+		if STD2_idx(i,1) == 1
+			STD2_data68(i,1) = BLS_68_corr(i,1);
+			STD2_data68(i,2) = BLS_68_err(i,1)*STD2_data68(i,1)/100; %convert to abs unc;
+		end
+	end
+	STD1_data68( ~any(STD1_data68,2), : ) = [];  %rows
+	STD1_data67( ~any(STD1_data67,2), : ) = [];  %rows
+	STD1_pbcerr68( ~any(STD1_pbcerr68,2), : ) = [];  %rows
+	STD1_pbcerr67( ~any(STD1_pbcerr67,2), : ) = [];  %rows
+	%STD1_data68sw( ~any(STD1_data68sw,2), : ) = [];  %rows
+	
+	STD2_data68( ~any(STD2_data68,2), : ) = [];  %rows
+
+
+	tt = sum(STD1_data68(:,1)./(STD1_data68(:,2).*STD1_data68(:,2))) / sum(1./(STD1_data68(:,2).*STD1_data68(:,2))); % Weighted Mean
+	data2 = STD1_data68;
+	data2(:,2) = data2(:,2).*2; % double the uncertainty to get the MSWD at 1 sigma.... 
+	s = 1/sqrt(sum(1./(data2(:,2).*data2(:,2)))); % SE
+	s_perc68 = s/tt*100;
+	STD1_data68_MSWD = 1/(length(data2(:,1))-1).*sum(((data2(:,1)- (sum(data2(:,1)./(data2(:,2).^2))/sum(1./(data2(:,2).^2))) ).^2)./((data2(:,2)./2).^2)); %MSWD at 1 sigma matches Isoplot
+
+	syst_err_68 = 2*sqrt(s_perc68^2 + 0.053^2 + 0.33^2); 
+
+
+
+
+
 
 set(H.SE6867,'String',strcat(sprintf('%.2f ', systerr68), {'%, '}, sprintf('%.2f ', systerr67), {'%'}))
 
@@ -3012,21 +3179,21 @@ set(H.axes_session,'box','on')
 %set(H.secondary_reference,'String',STD2);
 
 for i = 1:length(sigx_sq_STD2)
-covmat_STD2=[sigx_sq_STD2(i,1),rho_sigx_sigy_STD2(i,1);rho_sigx_sigy_STD2(i,1),sigy_sq_STD2(i,1)];
-[PD_STD2,PV_STD2]=eig(covmat_STD2);
-PV_STD2 = diag(PV_STD2).^.5;
-theta_STD2 = linspace(0,2.*pi,numpoints)';
-elpt_STD2 = [cos(theta_STD2),sin(theta_STD2)]*diag(PV_STD2)*PD_STD2';
-numsigma = length(sigmarule);
-elpt_STD2 = repmat(elpt_STD2,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
-elpt_STD2_out(:,:,i) = elpt_STD2 + repmat(center_STD2(i,1:2),numpoints,numsigma);
-if WM_Data(i,1) < WM_Data_hi && WM_Data(i,1) > WM_Data_lo
-	plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'b','LineWidth',1.2);
-else
-	plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'r','LineWidth',1.2);
-	WM_Data(i,:) = [0,0];
-end
-hold on
+	covmat_STD2=[sigx_sq_STD2(i,1),rho_sigx_sigy_STD2(i,1);rho_sigx_sigy_STD2(i,1),sigy_sq_STD2(i,1)];
+	[PD_STD2,PV_STD2]=eig(covmat_STD2);
+	PV_STD2 = diag(PV_STD2).^.5;
+	theta_STD2 = linspace(0,2.*pi,numpoints)';
+	elpt_STD2 = [cos(theta_STD2),sin(theta_STD2)]*diag(PV_STD2)*PD_STD2';
+	numsigma = length(sigmarule);
+	elpt_STD2 = repmat(elpt_STD2,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
+	elpt_STD2_out(:,:,i) = elpt_STD2 + repmat(center_STD2(i,1:2),numpoints,numsigma);
+	if WM_Data(i,1) < WM_Data_hi && WM_Data(i,1) > WM_Data_lo
+		plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'b','LineWidth',1.2);
+	else
+		plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'r','LineWidth',1.2);
+		WM_Data(i,:) = [0,0];
+	end
+	hold on
 end
 
 WM_Data( ~any(WM_Data,2), : ) = [];  %rows
@@ -5797,3 +5964,16 @@ function Ufilt_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in largenigneous.
+function largenigneous_Callback(hObject, eventdata, handles)
+% hObject    handle to largenigneous (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of largenigneous
+
+
+
+function igrun_Callback(hObject, eventdata, H)

@@ -383,14 +383,14 @@ end
 
 if get(H.primary, 'Value') == 5
 	STD1 = 'FC';
-	STD1_68 = 0.0044154;
-	STD1_67  = 21.350337692;
-	STD1_82  = 0.0212; %NOT FCT
-	STD1_64c = 9.05;
-	STD1_67c = 15.573;
-	STD1_68c = 37.846;
-	STD1_Uppm = 470.9666667;
-	STD1_Thppm = 118;
+	STD1_68 = 0.18588;
+	STD1_67  = 13.132;
+	STD1_82  = 0.05588;
+	STD1_64c = 16.882;
+	STD1_67c = 15.463;
+	STD1_68c = 36.533;
+	STD1_Uppm = 457;
+	STD1_Thppm = 271;
 end
 
 %{
