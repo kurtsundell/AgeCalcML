@@ -6972,6 +6972,43 @@ H.rereduce = 1;
 guidata(hObject,H);
 reduce_data_Callback(hObject, eventdata, H)
 
+function bestage_cutoff_Callback(hObject, eventdata, H)
+function filter_err68_Callback(hObject, eventdata, H)
+function filter_err67_Callback(hObject, eventdata, H)
+function filter_cutoff_Callback(hObject, eventdata, H)
+
+function filter_disc_Callback(hObject, eventdata, H)
+function filter_disc_rev_Callback(hObject, eventdata, H)
+function filter_204_Callback(hObject, eventdata, H)
+function factor64_Callback(hObject, eventdata, H)
+
+function ODF_68_Callback(hObject, eventdata, H)
+
+function ODF_67_Callback(hObject, eventdata, H)
+function reject_std_Callback(hObject, eventdata, H)
+function reject_yes_Callback(hObject, eventdata, H)
+function R1min_Callback(hObject, eventdata, H)
+function R1max_Callback(hObject, eventdata, H)
+
+
+function R2min_Callback(hObject, eventdata, H)
+
+function R2max_Callback(hObject, eventdata, H)
+function R3min_Callback(hObject, eventdata, H)
+function R3max_Callback(hObject, eventdata, H)
+
+
+function R4min_Callback(hObject, eventdata, H)
+
+function R4max_Callback(hObject, eventdata, H)
+
+
+
+
+
+
+
+
 function slider_lowint_238_Callback(hObject, eventdata, H)
 lowint_238 = get(H.slider_lowint_238,'Value')*100-50; %slider val
 set(H.lowint_val_238, 'String', lowint_238);
