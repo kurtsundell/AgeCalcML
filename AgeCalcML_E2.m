@@ -5104,24 +5104,24 @@ end
 samplename = c(s(end)+1:end);
 
 if ispc == 1
-	path_mat = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_Session'));
+	path_mat = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_Session.mat'));
 end
 if ismac == 1
-	path_mat = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_Session'));
+	path_mat = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_Session.mat'));
 end
 
 if ispc == 1
-	path_detailed = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DetailedDataTable'));
+	path_detailed = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DetailedDataTable.xls'));
 end
 if ismac == 1
-	path_detailed = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DetailedDataTable'));
+	path_detailed = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DetailedDataTable.xls'));
 end
 
 if ispc == 1
-	path_datatable = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DataTable'));
+	path_datatable = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DataTable.xls'));
 end
 if ismac == 1
-	path_datatable = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DataTable'));
+	path_datatable = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DataTable.xls'));
 end
 
 save(path_mat,'H')

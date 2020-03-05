@@ -2547,11 +2547,11 @@ H.samp_length = samp_length;
 		end
 	end
 
-	if length(syst_err_68) >= 126
-		systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
-	else
+	%if length(syst_err_68) >= 126
+	%	systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
+	%else
 		systerr68 = 2*mean(nonzeros(syst_err_68));
-	end
+	%end
 
 	for i = 1:length(STD1_idx)
 		if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400
@@ -2559,17 +2559,21 @@ H.samp_length = samp_length;
 		end
 	end
 
-	if length(syst_err_67) >= 126
-		systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
-	else
+	%if length(syst_err_67) >= 126
+	%	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
+	%else
 		systerr67 = 2*mean(nonzeros(syst_err_67));
-	end
+	%end
+
+set(H.SE6867,'String',strcat(sprintf('%.2f ', systerr68), {'%, '}, sprintf('%.2f ', systerr67), {'%'}))
 
 
+H.systerr68 = systerr68;
+H.systerr67 = systerr67;
 
 %New
 
-
+%{
 	for i = 1:length(STD1_idx)
 		if STD1_idx(i,1) == 1
 			STD1_data68(i,1) = BLS_68_corr(i,1);
@@ -2608,12 +2612,12 @@ H.samp_length = samp_length;
 
 	syst_err_68 = 2*sqrt(s_perc68^2 + 0.053^2 + 0.33^2); 
 
+%}
 
 
 
 
 
-set(H.SE6867,'String',strcat(sprintf('%.2f ', systerr68), {'%, '}, sprintf('%.2f ', systerr67), {'%'}))
 
 
 guidata(hObject,H);
@@ -5273,7 +5277,12 @@ BLS_67_err = H.BLS_67_err;
 pbcerr68 = H.pbcerr68;
 pbcerr67 = H.pbcerr67;
 Age68 = H.Age68;
+systerr68 = H.systerr68;
+systerr67 = H.systerr67;
 
+
+
+%{
 % Calculate systematic Uncertainties
 
 for i = 1:length(STD1_idx)
@@ -5301,6 +5310,8 @@ if length(syst_err_67) >= 126
 else
 	systerr67 = 2*mean(nonzeros(syst_err_67));
 end
+
+%}
 
 for i = 1:length(current_status_num)
 	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1

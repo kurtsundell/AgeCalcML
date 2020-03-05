@@ -32,6 +32,12 @@ H.folder_name = folder_name;
 guidata(hObject,H);
 
 function reduce_data_Callback(hObject, eventdata, H)
+
+cla(H.STDS_plot,'reset');
+cla(H.SingleAnalysis_plot,'reset');
+cla(H.Results_plot,'reset');
+set(H.ind_listbox1,'String','');
+
 folder_name = H.folder_name;
 
 files=dir([folder_name]); %this maps out the directory to that folder
@@ -154,7 +160,6 @@ Yb_bias = str2num(get(H.stdopt_Ybbias,'String'));
 
 INT_cutoff_stds = str2num(get(H.stdopt_intcutoff,'String'))/100;
 INT_cutoff_unknowns = str2num(get(H.results_intcutoff,'String'))/100;
-DM_Slider = get(H.results_dmt,'Value')*4500;
 
 Hf_LBL = 0;
 Hf_AVG = 1;
@@ -468,68 +473,51 @@ end
 
 waitbar(1)
 
+count = 1;
 if sum(SAMPLES_idx) > 0
-	for i = 1:length(v180_UNKNOWN)
-		if v180_UNKNOWN ~= 0
-			eHf_UNKNOWNS(i,1) = 10000*((Ratio_UNKNOWN_176_177_mean(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(i,1))*1.867*10^-11)-1))))-1);
+	for i = 1:length(SAMPLES_idx)
+		if SAMPLES_idx(i,1) == 1
+			if v180_UNKNOWN(count,1) ~= 0
+				eHf_UNKNOWNS(count,1) = 10000*((Ratio_UNKNOWN_176_177_mean(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+			end
+			count = count + 1;
 		end
 	end
 end
 
-Epsilon_plot = [16.5,14.6,0,15.6,0;15.0,13.0,500,14.0,0;13.4,11.5,1000,12.5,0;11.9,9.9,1500,10.9,0;10.3,8.3,2000,9.3,0; ...
-	8.7,6.7,2500,7.7,0;5.4,3.4,3500,4.4,0;3.7,1.7,4000,2.7,0;2.0,0.0,4500,1.0,0];
 
-Evolution_plot = [0.283253,0.283197,0,0.283225,0.282785;0.282894,0.282838,500,0.282865796,0.282470;0.282531,0.282475,1000,0.282503222,0.282152; ...
-	0.282165,0.282109,1500,0.282137248,0.281831;0.281796,0.281740,2000,0.281767842,0.281507;0.281423,0.281367,2500,0.281394971,0.281180; ...
-	0.280667,0.280611,3500,0.280638706,0.280516;0.280283,0.280227,4000,0.280255245,0.280180;0.279896,0.279840,4500,0.279868189,0.279840];
 
-Decay_const_176Lu = 0.01867; %176Lu decay constant (Scherer et al., 2001) 1.867*10^-11 (same as Soderland et al., 2004)
-DM_176Hf_177Hf = 0.283225; %Vervoort and Blichert-Toft, 1999
-DM_176Lu_177Hf = 0.0383; %Vervoort and Blichert-Toft, 1999
-BSE_176Hf_177Hf = 0.282785; %Bouvier et al. 2008
-BSE_176Lu_177Hf = 0.0336; %Bouvier et al. 2008
 
-t_176Hf_177Hf = DM_176Hf_177Hf - (DM_176Lu_177Hf*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
 
-CHURt = BSE_176Hf_177Hf - (BSE_176Lu_177Hf*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
 
-DMpoint_Evol_x = DM_Slider;
-DMpoint_Evol_y = t_176Hf_177Hf;
 
-DMpoint_Epsi_x = DM_Slider;
-DMpoint_Epsi_y = 10000*((t_176Hf_177Hf/CHURt)-1);
 
-Y0_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0115*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_u_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0193*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_l_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0036*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
-Ys_Evol_DM_176Lu_177Hf = t_176Hf_177Hf;
 
-Y0_Epsi_DM_176Lu_177Hf = 10000*((Y0_Evol_DM_176Lu_177Hf/BSE_176Hf_177Hf)-1);
-Y0_u_Epsi_DM_176Lu_177Hf = 10000*((Y0_u_Evol_DM_176Lu_177Hf/BSE_176Hf_177Hf)-1);
-Y0_l_Epsi_DM_176Lu_177Hf = 10000*((Y0_l_Evol_DM_176Lu_177Hf/BSE_176Hf_177Hf)-1);
-Ys_Epsi_DM_176Lu_177Hf = DMpoint_Epsi_y;
+
+
+
 
 STD_offset = [];
 if get(H.stds_MT,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_MT_mean) - 0.282507;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_MT_mean)) - 0.282507;
 end
 if get(H.stds_91500,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_91500_mean) - 0.282313;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_91500_mean)) - 0.282313;
 end
 if get(H.stds_TEM,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_TEM_mean) - 0.282686;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_TEM_mean)) - 0.282686;
 end
 if get(H.stds_PLES,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_PLES_mean) - 0.282484;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_PLES_mean)) - 0.282484;
 end
 if get(H.stds_FC,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_FC_mean) - 0.282183;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_FC_mean)) - 0.282183;
 end
 if get(H.stds_SL,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_SL_mean) - 0.282163;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_SL_mean)) - 0.282163;
 end
 if get(H.stds_R33,'Value') == 1
-	STD_offset(end+1,1) = mean(Ratio_STD_176_177_R33_mean) - 0.282764; % R33 STD should end in 1 to be consistent
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_R33_mean)) - 0.282764; % R33 STD should end in 1 to be consistent
 end
 
 STD_offset_avg = mean(STD_offset);
@@ -565,9 +553,12 @@ retained_unknowns_p = sum(retained_unknowns)/sum(SAMPLES_idx)*100;
 set(H.stdopt_percret,'String',round(retained_stds_p,1))
 set(H.unks_percret,'String',round(retained_unknowns_p,1))
 
+BLS_176_177_corr = Filter_95;
+
 reduced = 1;
 
 close(h)
+
 
 for i=1:length(sample)
 	name_char(i,1)=(sample(i,1));
@@ -587,169 +578,48 @@ for i=1:length(sample)
     end
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-if sum(SAMPLES_idx) > 0
-	if get(H.results_data, 'Value') == 1
-		cla(H.Results_plot,'reset');
-		axes(H.Results_plot);
-		scatter(Yb_Lu_Hf_UNKNOWN_mean, Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-		legend('Unknowns')
-		xlabel('176(Yb+Lu) / 176Hf (%)')
-		ylabel('176Hf/177Hf')
-		hold off
-	end
-end
-
-if get(H.results_evolution, 'Value') == 1
-	cla(H.Results_plot,'reset');
-	axes(H.Results_plot);
-	hold on
-	if sum(SAMPLES_idx) > 0
-		scatter(Ages_ascribed, Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	end
-	plot(Evolution_plot(:,3),Evolution_plot(:,5),'k','LineWidth',2)
-	plot(Evolution_plot(:,3),Evolution_plot(:,4),'r','LineWidth',2)
-	plot(Evolution_plot(:,3),Evolution_plot(:,1),'r','LineWidth',1)
-	plot(Evolution_plot(:,3),Evolution_plot(:,2),'r','LineWidth',1)
-	plot([0 DM_Slider],[Y0_u_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	plot([0 DM_Slider],[Y0_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
-	plot([0 DM_Slider],[Y0_l_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-	xlabel('Age (Ma)')
-	ylabel('176Hf/177Hf(T)')
-	hold off
-end
-
-if get(H.results_epsilon, 'Value') == 1
-	cla(H.Results_plot,'reset');
-	axes(H.Results_plot);
-	
-	hold on
-	if sum(SAMPLES_idx) > 0
-		scatter(Ages_ascribed(:,1), eHf_UNKNOWNS, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	end
-	plot(Epsilon_plot(:,3),Epsilon_plot(:,5),'k','LineWidth',2)
-	plot(Epsilon_plot(:,3),Epsilon_plot(:,4),'r','LineWidth',2)
-	plot(Epsilon_plot(:,3),Epsilon_plot(:,1),'--r','LineWidth',1)
-	plot(Epsilon_plot(:,3),Epsilon_plot(:,2),'--r','LineWidth',1)
-	plot([0 DM_Slider],[Y0_u_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	plot([0 DM_Slider],[Y0_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
-	plot([0 DM_Slider],[Y0_l_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-    
-    idx = match2(get(H.ind_listbox1,'Value'),1);
-    if idx ~= 0
-        s1 = scatter(Ages_ascribed(idx,1), eHf_UNKNOWNS(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
-        %legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-    else    
-        s1 = scatter(Ages_ascribed(1,1), eHf_UNKNOWNS(1,1), 150, 'o', 'MarkerEdgeColor', 'b');
-        set(s1,'Visible','off')
-    end
-
-	legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-	xlabel('Age (Ma)')
-	ylabel('Epsilon Hf')
-	hold on
-end
-%axis([0 27 -50 20])
-
-BLS_176_177_corr = Filter_95;
-
-name_idx = length(sample); %automatically plot final sample run
-
-axes(H.SingleAnalysis_plot);
-hold on
-x = 1:1:60;
-if get(H.ind_176_177,'Value') == 1
-	for i = 1:60
-		if BLS_176_177_corr(i,length(sample)) ~= 0
-			scatter(x(1,i), BLS_176_177_corr(i,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-		end
-	end
-	rectangle('Position',[0 min(nonzeros(BLS_176_177_corr(:,name_idx))) 60 max(BLS_176_177_corr(:,length(sample))) - min(nonzeros(BLS_176_177_corr(:,name_idx)))], 'LineWidth', 1)
-	hold off
-	legend(sample(length(sample),1))
-	xlabel('Time (s)')
-	ylabel('176/177 Corrected')
-end
-if get(H.ind_180,'Value') == 1
-	hold on
-	scatter(x, BLS_180(:,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	legend(sample(length(sample),1))
-	xlabel('Time (s)')
-	ylabel('Baseline subtracted 177/176')
-	hold off
-end
-axis([0, 60, min(nonzeros(BLS_176_177_corr(:,name_idx))), max(BLS_176_177_corr(:,length(sample)))])
-
-
-
-
-
-%set(H.status,'String',{'Accepted'},'ForegroundColor','blue');
-
-
-
-
-
-
 H.sample = sample;
 H.BLS_176 = BLS_176;
 H.BLS_177 = BLS_177;
 H.BLS_180 = BLS_180;
 H.BLS_176_177_corr = BLS_176_177_corr;
-H.DM_Slider = DM_Slider;
-H.Y0_u_Evol_DM_176Lu_177Hf = Y0_u_Evol_DM_176Lu_177Hf;
-H.Ys_Evol_DM_176Lu_177Hf = Ys_Evol_DM_176Lu_177Hf;
-H.Y0_Evol_DM_176Lu_177Hf = Y0_Evol_DM_176Lu_177Hf;
-H.Y0_l_Evol_DM_176Lu_177Hf = Y0_l_Evol_DM_176Lu_177Hf;
-H.Y0_u_Epsi_DM_176Lu_177Hf = Y0_u_Epsi_DM_176Lu_177Hf;
-H.Ys_Epsi_DM_176Lu_177Hf = Ys_Epsi_DM_176Lu_177Hf;
-H.Y0_Epsi_DM_176Lu_177Hf = Y0_Epsi_DM_176Lu_177Hf;
-H.Y0_l_Epsi_DM_176Lu_177Hf = Y0_l_Epsi_DM_176Lu_177Hf;
-H.Epsilon_plot = Epsilon_plot;
-H.Evolution_plot = Evolution_plot;
-H.Decay_const_176Lu = Decay_const_176Lu;
-H.DM_176Lu_177Hf = DM_176Lu_177Hf;
-H.DM_176Hf_177Hf = DM_176Hf_177Hf;
-H.BSE_176Lu_177Hf = BSE_176Lu_177Hf;
-H.BSE_176Hf_177Hf = BSE_176Hf_177Hf;
+%H.DM_Slider = DM_Slider;
+%H.Y0_u_Evol_DM_176Lu_177Hf = Y0_u_Evol_DM_176Lu_177Hf;
+%H.Ys_Evol_DM_176Lu_177Hf = Ys_Evol_DM_176Lu_177Hf;
+%H.Y0_Evol_DM_176Lu_177Hf = Y0_Evol_DM_176Lu_177Hf;
+%H.Y0_l_Evol_DM_176Lu_177Hf = Y0_l_Evol_DM_176Lu_177Hf;
+%H.Y0_u_Epsi_DM_176Lu_177Hf = Y0_u_Epsi_DM_176Lu_177Hf;
+%H.Ys_Epsi_DM_176Lu_177Hf = Ys_Epsi_DM_176Lu_177Hf;
+%H.Y0_Epsi_DM_176Lu_177Hf = Y0_Epsi_DM_176Lu_177Hf;
+%H.Y0_l_Epsi_DM_176Lu_177Hf = Y0_l_Epsi_DM_176Lu_177Hf;
+%H.Epsilon_plot = Epsilon_plot;
+%H.Evolution_plot = Evolution_plot;
+%H.Decay_const_176Lu = Decay_const_176Lu;
+%H.DM_176Lu_177Hf = DM_176Lu_177Hf;
+%H.DM_176Hf_177Hf = DM_176Hf_177Hf;
+%H.BSE_176Lu_177Hf = BSE_176Lu_177Hf;
+%H.BSE_176Hf_177Hf = BSE_176Hf_177Hf;
 H.reduced = reduced;
 H.match = match;
 H.match2 = match2;
 H.Ages_ascribed = Ages_ascribed;
 H.eHf_UNKNOWNS = eHf_UNKNOWNS;
-H.s1 = s1;
+H.SAMPLES_idx = SAMPLES_idx;
+H.Ages_ascribed = Ages_ascribed;
+
+if sum(SAMPLES_idx) > 0
+	H.eHf_UNKNOWNS = eHf_UNKNOWNS;
+	H.Ages_ascribed = Ages_ascribed;
+	H.Yb_Lu_Hf_UNKNOWN_mean = Yb_Lu_Hf_UNKNOWN_mean;
+	H.Ratio_UNKNOWN_176_177_mean = Ratio_UNKNOWN_176_177_mean;
+	H.Ratio_UNKNOWN_176_177_mean = Ratio_UNKNOWN_176_177_mean;
+end
+
+stds_PLOT_Callback(hObject, eventdata, H)
+
+ind_PLOT_Callback(hObject, eventdata, H)
+
+results_PLOT_Callback(hObject, eventdata, H)
 
 if sum(SAMPLES_idx) > 0
 	H.eHf_UNKNOWNS = eHf_UNKNOWNS;
@@ -762,20 +632,6 @@ end
 if get(H.auto_reduce,'Value') == 0
 	guidata(hObject,H);
 end
-
-
-H.SAMPLES_idx = SAMPLES_idx;
-
-guidata(hObject,H);
-
-
-
-
-
-stds_PLOT_Callback(hObject, eventdata, H)
-
-
-
 
 function auto_reduce_Callback(hObject, eventdata, H)
 	
@@ -796,6 +652,8 @@ end
 
 H.t = t;
 guidata(hObject,H);
+
+
 
 function stds_PLOT_Callback(hObject, eventdata, H)
 axes(H.STDS_plot);
@@ -831,327 +689,306 @@ ylabel('176Hf/177Hf')
 axis([-10 80 0.2813 0.2831])
 hold off
 
+function ind_PLOT_Callback(hObject, eventdata, H)
+
+cla(H.SingleAnalysis_plot,'reset')
+
+BLS_176_177_corr = H.BLS_176_177_corr;
+sample = H.sample;
+name_idx = get(H.ind_listbox1,'Value');
+
+axes(H.SingleAnalysis_plot);
+hold on
+x = 1:1:60;
+if get(H.ind_176_177,'Value') == 1
+	for i = 1:60
+		if BLS_176_177_corr(i,name_idx) ~= 0
+			scatter(x(1,i), BLS_176_177_corr(i,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+		end
+	end
+	hold off
+	legend(sample(name_idx,1))
+	xlabel('Time (s)')
+	ylabel('176/177 Corrected')
+	xlim([0 60])
+end
+if get(H.ind_180,'Value') == 1
+	scatter(x, H.BLS_180(:,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+	legend(sample(name_idx,1))
+	xlabel('Time (s)')
+	ylabel('Baseline subtracted 180')
+	hold off
+end
+
+function results_PLOT_Callback(hObject, eventdata, H)
+
+DM_Slider = str2num(get(H.results_dmt,'String'));
+
+Epsilon_plot = [16.5,14.6,0,15.6,0;15.0,13.0,500,14.0,0;13.4,11.5,1000,12.5,0;11.9,9.9,1500,10.9,0;10.3,8.3,2000,9.3,0; ...
+	8.7,6.7,2500,7.7,0;5.4,3.4,3500,4.4,0;3.7,1.7,4000,2.7,0;2.0,0.0,4500,1.0,0];
+
+Evolution_plot = [0.283253,0.283197,0,0.283225,0.282785;0.282894,0.282838,500,0.282865796,0.282470;0.282531,0.282475,1000,0.282503222,0.282152; ...
+	0.282165,0.282109,1500,0.282137248,0.281831;0.281796,0.281740,2000,0.281767842,0.281507;0.281423,0.281367,2500,0.281394971,0.281180; ...
+	0.280667,0.280611,3500,0.280638706,0.280516;0.280283,0.280227,4000,0.280255245,0.280180;0.279896,0.279840,4500,0.279868189,0.279840];
+
+Decay_const_176Lu = 0.01867; %176Lu decay constant (Scherer et al., 2001) 1.867*10^-11 (same as Soderland et al., 2004)
+DM_176Hf_177Hf = 0.283225; %Vervoort and Blichert-Toft, 1999
+DM_176Lu_177Hf = 0.0383; %Vervoort and Blichert-Toft, 1999
+BSE_176Hf_177Hf = 0.282785; %Bouvier et al. 2008
+BSE_176Lu_177Hf = 0.0336; %Bouvier et al. 2008
+
+t_176Hf_177Hf = DM_176Hf_177Hf - (DM_176Lu_177Hf*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
+
+CHURt = BSE_176Hf_177Hf - (BSE_176Lu_177Hf*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
+
+DMpoint_Evol_x = DM_Slider;
+DMpoint_Evol_y = t_176Hf_177Hf;
+
+DMpoint_Epsi_x = DM_Slider;
+DMpoint_Epsi_y = 10000*((t_176Hf_177Hf/CHURt)-1);
+
+Y0_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0115*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
+Y0_u_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0193*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
+Y0_l_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0036*(exp(Decay_const_176Lu*DM_Slider/1000)-1));
+Ys_Evol_DM_176Lu_177Hf = t_176Hf_177Hf;
+
+Y0_Epsi_DM_176Lu_177Hf = 10000*((Y0_Evol_DM_176Lu_177Hf/BSE_176Hf_177Hf)-1);
+Y0_u_Epsi_DM_176Lu_177Hf = 10000*((Y0_u_Evol_DM_176Lu_177Hf/BSE_176Hf_177Hf)-1);
+Y0_l_Epsi_DM_176Lu_177Hf = 10000*((Y0_l_Evol_DM_176Lu_177Hf/BSE_176Hf_177Hf)-1);
+Ys_Epsi_DM_176Lu_177Hf = DMpoint_Epsi_y;
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cla(H.Results_plot,'reset');
+axes(H.Results_plot);
+hold on
+
+if sum(H.SAMPLES_idx) > 0
+	if get(H.results_data, 'Value') == 1
+		scatter(H.Yb_Lu_Hf_UNKNOWN_mean, H.Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+		legend('Unknowns')
+		xlabel('176(Yb+Lu) / 176Hf (%)')
+		ylabel('176Hf/177Hf')
+	end
+end
+
+if get(H.results_evolution, 'Value') == 1
+	if sum(H.SAMPLES_idx) > 0
+		for i = 1:length(H.Ratio_UNKNOWN_176_177_mean)
+			if H.SAMPLES_idx(i,1) == 0
+				UNKNOWN_176_177_mean_plot(i,1) = 0;
+			else
+				UNKNOWN_176_177_mean_plot(i,1) = H.Ratio_UNKNOWN_176_177_mean(i,1);
+			end
+		end
+		UNKNOWN_176_177_mean_plot( all(~UNKNOWN_176_177_mean_plot,2), : ) = [];
+		scatter(H.Ages_ascribed(:,1), UNKNOWN_176_177_mean_plot, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+	end
+	plot(Evolution_plot(:,3),Evolution_plot(:,5),'k','LineWidth',2)
+	plot(Evolution_plot(:,3),Evolution_plot(:,4),'r','LineWidth',2)
+	plot(Evolution_plot(:,3),Evolution_plot(:,1),'r','LineWidth',1)
+	plot(Evolution_plot(:,3),Evolution_plot(:,2),'r','LineWidth',1)
+	plot([0 DM_Slider],[Y0_u_Evol_DM_176Lu_177Hf,Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
+	plot([0 DM_Slider],[Y0_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
+	plot([0 DM_Slider],[Y0_l_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
+	legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+	xlabel('Age (Ma)')
+	ylabel('176Hf/177Hf(T)')
+end
+
+if get(H.results_epsilon, 'Value') == 1
+	if sum(H.SAMPLES_idx) > 0
+		scatter(H.Ages_ascribed(:,1), H.eHf_UNKNOWNS, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+	end
+	plot(Epsilon_plot(:,3),Epsilon_plot(:,5),'k','LineWidth',2)
+	plot(Epsilon_plot(:,3),Epsilon_plot(:,4),'r','LineWidth',2)
+	plot(Epsilon_plot(:,3),Epsilon_plot(:,1),'--r','LineWidth',1)
+	plot(Epsilon_plot(:,3),Epsilon_plot(:,2),'--r','LineWidth',1)
+	plot([0 DM_Slider],[Y0_u_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
+	plot([0 DM_Slider],[Y0_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
+	plot([0 DM_Slider],[Y0_l_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
+    
+    idx = H.match2(get(H.ind_listbox1,'Value'),1);
+    if idx ~= 0
+        s1 = scatter(H.Ages_ascribed(idx,1), H.eHf_UNKNOWNS(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
+        %legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+    else    
+        s1 = scatter(H.Ages_ascribed(1,1), H.eHf_UNKNOWNS(1,1), 150, 'o', 'MarkerEdgeColor', 'b');
+        set(s1,'Visible','off')
+	end
+	legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+	xlabel('Age (Ma)')
+	ylabel('Epsilon Hf')
+end
+if get(H.results_autoscale,'Value') == 0
+	axis([str2num(get(H.results_xmin,'String')) str2num(get(H.results_xmax,'String')) str2num(get(H.results_ymin,'String')) str2num(get(H.results_ymax,'String'))])
+end
+hold off
 
 
 
 function stds_MT_Callback(hObject, eventdata, H)
 stds_PLOT_Callback(hObject, eventdata, H)
+
 function stds_91500_Callback(hObject, eventdata, H)
 stds_PLOT_Callback(hObject, eventdata, H)
+
 function stds_TEM_Callback(hObject, eventdata, H)
 stds_PLOT_Callback(hObject, eventdata, H)
+
 function stds_PLES_Callback(hObject, eventdata, H)
 stds_PLOT_Callback(hObject, eventdata, H)
+
 function stds_FC_Callback(hObject, eventdata, H)
 stds_PLOT_Callback(hObject, eventdata, H)
+
 function stds_SL_Callback(hObject, eventdata, H)
 stds_PLOT_Callback(hObject, eventdata, H)
+
 function stds_R33_Callback(hObject, eventdata, H)
 stds_PLOT_Callback(hObject, eventdata, H)
 
-
-
 function stds_setscale_Callback(hObject, eventdata, H)
+
 function stds_xmin_Callback(hObject, eventdata, H)
+
 function stds_xmax_Callback(hObject, eventdata, H)
+
 function stds_ymin_Callback(hObject, eventdata, H)
+
 function stds_ymax_Callback(hObject, eventdata, H)
+
 function stds_autoscale_Callback(hObject, eventdata, H)
+
 function stds_accepted_Callback(hObject, eventdata, H)
+
 function stds_unknowns_Callback(hObject, eventdata, H)
+
 function stds_legend_Callback(hObject, eventdata, H)
 
+
+
 function stdopt_AVG_Callback(hObject, eventdata, H)
+
 function stdopt_LBL_Callback(hObject, eventdata, H)
+
 function stdopt_SW_Callback(hObject, eventdata, H)
+
 function stdopt_Hfbias_Callback(hObject, eventdata, H)
+
 function stdopt_Ybbias_Callback(hObject, eventdata, H)
+
 function stdopt_Hfcutoff_Callback(hObject, eventdata, H)
+
 function stdopt_Ybcutoff_Callback(hObject, eventdata, H)
+
 function stdopt_percrej_Callback(hObject, eventdata, H)
+
 function stdopt_intcutoff_Callback(hObject, eventdata, H)
 
+
+
 function ind_listbox1_Callback(hObject, eventdata, H)
-cla(H.SingleAnalysis_plot,'reset');
+ind_PLOT_Callback(hObject, eventdata, H)
 
-sample = H.sample;
-BLS_176 = H.BLS_176;
-BLS_177 = H.BLS_177;
-match = H.match;
-match2 = H.match2;
-Ages_ascribed = H.Ages_ascribed;
-eHf_UNKNOWNS = H.eHf_UNKNOWNS;
-s1 = H.s1;
-
-name_idx = get(H.ind_listbox1,'Value');
-
-axes(H.SingleAnalysis_plot);
-x = 1:1:60;
-
-if get(H.ind_176_177,'Value') == 1
-	for i = 1:60
-	hold on
-		if H.BLS_176_177_corr(i,name_idx) ~= 0
-			scatter(x(1,i), H.BLS_176_177_corr(i,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-		end
-	hold off
-	end
-
-	legend(sample(name_idx,1))
-	xlabel('Time (s)')
-	ylabel('Baseline subtracted 177/176')
-end
-
-
-if get(H.ind_180,'Value') == 1
-
-	scatter(x, H.BLS_180(:,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	legend(sample(name_idx,1))
-	xlabel('Time (s)')
-	ylabel('Baseline subtracted 177/176')
-	axis([0 60 0 4])
-end
-
-
-axes(H.Results_plot);
-idx = match2(get(H.ind_listbox1,'Value'),1);
-if idx ~= 0
-    set(s1,'Visible','off')
-	clear s1
-    s1 = scatter(Ages_ascribed(idx,1), eHf_UNKNOWNS(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
-    %legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-else
-    set(s1,'Visible','off')
-end
-
-H.s1 = s1;
-guidata(hObject,H);
 function ind_180_Callback(hObject, eventdata, H)
 set(H.ind_180,'Value', 1)
 set(H.ind_176_177,'Value', 0) 
-cla(H.SingleAnalysis_plot,'reset');
-sample = H.sample;
-BLS_180 = H.BLS_180;
-x = 1:1:60;
-if get(H.ind_180,'Value') == 1
-	hold on
-	scatter(x, BLS_180(:,length(sample)), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	legend(sample(length(sample),1))
-	xlabel('Time (s)')
-	ylabel('Baseline subtracted 177/176')
-	hold off
-end
+ind_PLOT_Callback(hObject, eventdata, H)
+
 function ind_176_177_Callback(hObject, eventdata, H)
 set(H.ind_180,'Value', 0)
 set(H.ind_176_177,'Value', 1) 
-cla(H.SingleAnalysis_plot,'reset');
-sample = H.sample;
-BLS_176 = H.BLS_176;
-BLS_177 = H.BLS_177;
+ind_PLOT_Callback(hObject, eventdata, H)
 
-name_idx = get(H.listbox1,'Value');
 
-axes(H.SingleAnalysis_plot);
-x = 1:1:60;
 
-if get(H.ind_176_177,'Value') == 1
-	for i = 1:60
-	hold on
-		if H.BLS_176_177_corr(i,name_idx) ~= 0
-			scatter(x(1,i), H.BLS_176_177_corr(i,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-		end
-	hold off
-	end
-
-	legend(sample(name_idx,1))
-	xlabel('Time (s)')
-	ylabel('Baseline subtracted 177/176')
-end
-function ind_SE_Callback(hObject, eventdata, H)
 function AccRej_Callback(hObject, eventdata, H)
+
 function EditSampleName_Callback(hObject, eventdata, H)
 
+
+
 function results_data_Callback(hObject, eventdata, H)
-set(H.EvolutionPlot, 'Value', 0);
-set(H.EpsilonPlot, 'Value', 0);
-set(H.DataPlot, 'Value', 1);
+set(H.results_autoscale, 'Value', 1);
+set(H.results_data, 'Value', 1);
+set(H.results_evolution, 'Value', 0);
+set(H.results_epsilon, 'Value', 0);
+results_PLOT_Callback(hObject, eventdata, H)
 
-if H.reduced == 1
-	cla(H.Results_plot,'reset'); 
-	axes(H.Results_plot);
-	Ratio_UNKNOWN_176_177_mean = H.Ratio_UNKNOWN_176_177_mean;
-	scatter(H.Yb_Lu_Hf_UNKNOWN_mean, H.Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	legend('Unknowns')
-	xlabel('176(Yb+Lu) / 176Hf (%)')
-	ylabel('176Hf/177Hf')
-	title('Unknowns')
-end
 function results_evolution_Callback(hObject, eventdata, H)
-set(H.DataPlot, 'Value', 0);
-set(H.EpsilonPlot, 'Value', 0);
-set(H.EvolutionPlot, 'Value', 1);
+set(H.results_autoscale, 'Value', 1);
+set(H.results_data, 'Value', 0);
+set(H.results_evolution, 'Value', 1);
+set(H.results_epsilon, 'Value', 0);
+results_PLOT_Callback(hObject, eventdata, H)
 
-DM_Slider = get(H.DMslider,'Value')*4500;
-set(H.DMtext,'String',DM_Slider);
-
-t_176Hf_177Hf = H.DM_176Hf_177Hf - (H.DM_176Lu_177Hf*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-
-Y0_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0115*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_u_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0193*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_l_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0036*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Ys_Evol_DM_176Lu_177Hf = t_176Hf_177Hf;
-
-if H.reduced == 1
-	cla(H.Results_plot,'reset');
-	axes(H.Results_plot);
-	hold on
-	scatter(H.Ages_ascribed(:,1), H.Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,5),'k','LineWidth',2)
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,4),'r','LineWidth',2)
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,1),'r','LineWidth',1)
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,2),'r','LineWidth',1)
-	plot([0 DM_Slider],[Y0_u_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	plot([0 DM_Slider],[Y0_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
-	plot([0 DM_Slider],[Y0_l_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	legend('Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193')
-	xlabel('Age (Ma)')
-	ylabel('176Hf/177Hf(T)')
-	%title('Evolution Plot')
-end
 function results_epsilon_Callback(hObject, eventdata, H)
-set(H.DataPlot, 'Value', 0);
-set(H.EvolutionPlot, 'Value', 0);
-set(H.EpsilonPlot, 'Value', 1);
+set(H.results_autoscale, 'Value', 1);
+set(H.results_data, 'Value', 0);
+set(H.results_evolution, 'Value', 0);
+set(H.results_epsilon, 'Value', 1);
+results_PLOT_Callback(hObject, eventdata, H)
 
-DM_Slider = get(H.DMslider,'Value')*4500;
-set(H.DMtext,'String',DM_Slider);
-
-
-t_176Hf_177Hf = H.DM_176Hf_177Hf - (H.DM_176Lu_177Hf*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-
-CHURt = H.BSE_176Hf_177Hf - (H.BSE_176Lu_177Hf*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-
-DMpoint_Evol_x = DM_Slider;
-DMpoint_Evol_y = t_176Hf_177Hf;
- 
-DMpoint_Epsi_x = DM_Slider;
-DMpoint_Epsi_y = 10000*((t_176Hf_177Hf/CHURt)-1);
-
-Y0_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0115*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_u_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0193*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_l_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0036*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Ys_Evol_DM_176Lu_177Hf = t_176Hf_177Hf;
-
-Y0_Epsi_DM_176Lu_177Hf = 10000*((Y0_Evol_DM_176Lu_177Hf/H.BSE_176Hf_177Hf)-1);
-Y0_u_Epsi_DM_176Lu_177Hf = 10000*((Y0_u_Evol_DM_176Lu_177Hf/H.BSE_176Hf_177Hf)-1);
-Y0_l_Epsi_DM_176Lu_177Hf = 10000*((Y0_l_Evol_DM_176Lu_177Hf/H.BSE_176Hf_177Hf)-1);
-Ys_Epsi_DM_176Lu_177Hf = DMpoint_Epsi_y;
-
-if H.reduced == 1
-	cla(H.Results_plot,'reset'); 
-	axes(H.Results_plot);
-	hold on
-	scatter(H.Ages_ascribed(:,1), H.eHf_UNKNOWNS, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,5),'k','LineWidth',2)
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,4),'r','LineWidth',2)
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,1),'--r','LineWidth',1)
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,2),'--r','LineWidth',1)
-	plot([0 DM_Slider],[Y0_u_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	plot([0 DM_Slider],[Y0_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
-	plot([0 DM_Slider],[Y0_l_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	legend('Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193')
-	xlabel('Age (Ma)')
-	ylabel('Epsilon Hf')
-end
 function results_dmt_Callback(hObject, eventdata, H)
-str2num(get(H.DMtext,'String'));
-set(H.DM_Slider, 'Value', str2num(get(H.DMtext,'String'))/4500);
+H.DM_Slider = str2num(get(H.results_dmt,'String'))/4500;
+set(H.results_dms, 'Value', H.DM_Slider);
+guidata(hObject,H);
+results_PLOT_Callback(hObject, eventdata, H)
+
 function results_dms_Callback(hObject, eventdata, H)
+H.DM_Slider = get(H.results_dms,'Value')*4500;
+set(H.results_dmt,'String',H.DM_Slider);
+guidata(hObject,H);
+results_PLOT_Callback(hObject, eventdata, H)
 
-DM_Slider = get(H.DMslider,'Value')*4500;
-set(H.DMtext,'String',DM_Slider);
-
-if get(H.EvolutionPlot, 'Value') == 1
-	cla(H.Results_plot,'reset');
-
-t_176Hf_177Hf = H.DM_176Hf_177Hf - (H.DM_176Lu_177Hf*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-
-Y0_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0115*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_u_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0193*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_l_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0036*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Ys_Evol_DM_176Lu_177Hf = t_176Hf_177Hf;
-
-	axes(H.Results_plot);
-	hold on
-	scatter(H.Ages_ascribed(:,1), H.Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,5),'k','LineWidth',2)
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,4),'r','LineWidth',2)
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,1),'r','LineWidth',1)
-	plot(H.Evolution_plot(:,3),H.Evolution_plot(:,2),'r','LineWidth',1)
-	plot([0 DM_Slider],[Y0_u_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	plot([0 DM_Slider],[Y0_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
-	plot([0 DM_Slider],[Y0_l_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	legend('Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193')
-	xlabel('Age (Ma)')
-	ylabel('176Hf/177Hf(T)')
-	%title('Evolution Plot')
-end
-
-if get(H.EpsilonPlot, 'Value') == 1
-	cla(H.Results_plot,'reset');
-
-
-t_176Hf_177Hf = H.DM_176Hf_177Hf - (H.DM_176Lu_177Hf*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-
-CHURt = H.BSE_176Hf_177Hf - (H.BSE_176Lu_177Hf*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-
-DMpoint_Evol_x = DM_Slider;
-DMpoint_Evol_y = t_176Hf_177Hf;
- 
-DMpoint_Epsi_x = DM_Slider;
-DMpoint_Epsi_y = 10000*((t_176Hf_177Hf/CHURt)-1);
-
-Y0_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0115*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_u_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0193*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Y0_l_Evol_DM_176Lu_177Hf = t_176Hf_177Hf + (0.0036*(exp(H.Decay_const_176Lu*DM_Slider/1000)-1));
-Ys_Evol_DM_176Lu_177Hf = t_176Hf_177Hf;
-
-Y0_Epsi_DM_176Lu_177Hf = 10000*((Y0_Evol_DM_176Lu_177Hf/H.BSE_176Hf_177Hf)-1);
-Y0_u_Epsi_DM_176Lu_177Hf = 10000*((Y0_u_Evol_DM_176Lu_177Hf/H.BSE_176Hf_177Hf)-1);
-Y0_l_Epsi_DM_176Lu_177Hf = 10000*((Y0_l_Evol_DM_176Lu_177Hf/H.BSE_176Hf_177Hf)-1);
-Ys_Epsi_DM_176Lu_177Hf = DMpoint_Epsi_y;
-
-	axes(H.Results_plot);
-	hold on
-	scatter(H.Ages_ascribed(:,1), H.eHf_UNKNOWNS, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,5),'k','LineWidth',2)
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,4),'r','LineWidth',2)
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,1),'--r','LineWidth',1)
-	plot(H.Epsilon_plot(:,3),H.Epsilon_plot(:,2),'--r','LineWidth',1)
-	plot([0 DM_Slider],[Y0_u_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	plot([0 DM_Slider],[Y0_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
-	plot([0 DM_Slider],[Y0_l_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	legend('Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193')
-	xlabel('Age (Ma)')
-	ylabel('Epsilon Hf')
-	%title('Epsilon Plot')
-end
-function results_setscale_Callback(hObject, eventdata, H)
 function results_xmin_Callback(hObject, eventdata, H)
+results_PLOT_Callback(hObject, eventdata, H)
+set(H.results_autoscale,'Value',0)
+
 function results_xmax_Callback(hObject, eventdata, H)
+results_PLOT_Callback(hObject, eventdata, H)
+set(H.results_autoscale,'Value',0)
+
 function results_ymin_Callback(hObject, eventdata, H)
+results_PLOT_Callback(hObject, eventdata, H)
+set(H.results_autoscale,'Value',0)
+
 function results_ymax_Callback(hObject, eventdata, H)
-function results_autorejn_Callback(hObject, eventdata, H)
+results_PLOT_Callback(hObject, eventdata, H)
+set(H.results_autoscale,'Value',0)
+
 function results_legend_Callback(hObject, eventdata, H)
-function results_rej_Callback(hObject, eventdata, H)
+
 function results_autoscale_Callback(hObject, eventdata, H)
+results_PLOT_Callback(hObject, eventdata, H)
+
 function results_intcutoff_Callback(hObject, eventdata, H)
 
+
+
 function Export_Reduced_Callback(hObject, eventdata, H)
+
 function Export_Plots_Callback(hObject, eventdata, H)
+
 function Save_Session_Callback(hObject, eventdata, H)
+
 function Upload_Session_Callback(hObject, eventdata, H)
