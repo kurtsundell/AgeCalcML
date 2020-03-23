@@ -1071,6 +1071,65 @@ end
 end
 
 
+for i = 1:data_count
+	if STD1_idx(i,1) == 1
+		FF68_t(i,1) = STD1_68./(BLS_68_corr(i,1).*(((BLS_64_corr(i,1)*factor64)-STD1_64c)./(BLS_64_corr(i,1)*factor64))); %Column CC;
+		FF67_t(i,1) = STD1_67./((((BLS_64_corr(i,1)*factor64)-STD1_64c)/((BLS_64_corr(i,1).*factor64./BLS_67_corr(i,1))-(STD1_67c)))); %Column CL;
+	else
+		FF68_t(i,1) = 0;
+		FF67_t(i,1) = 0;
+	end
+end
+
+
+FF68_median = median(nonzeros(FF68_t));
+FF67_median = median(nonzeros(FF67_t));
+
+FF68_2std = 2*std(nonzeros(FF68_t));
+FF67_2std = 2*std(nonzeros(FF67_t));
+
+if get(H.sigmafilt,'Value') == 1
+	FF68_hi = FF68_median + FF68_2std;
+	FF68_lo = FF68_median - FF68_2std;
+	FF67_hi = FF67_median + FF67_2std;
+	FF67_lo = FF67_median - FF67_2std;
+else
+	FF68_hi = FF68_median + (str2num(get(H.reject68,'String')))*.01.*FF68_median;
+	FF68_lo = FF68_median - (str2num(get(H.reject68,'String')))*.01.*FF68_median;
+	FF67_hi = FF67_median + (str2num(get(H.reject67,'String')))*.01.*FF67_median;
+	FF67_lo = FF67_median - (str2num(get(H.reject67,'String')))*.01.*FF67_median;
+end
+
+for i = 1:data_count
+	if STD1_idx(i,1) == 1 && FF68_t(i,1) > FF68_hi
+		STD1_idx(i,1) = 0;
+	end
+end
+
+for i = 1:data_count
+	if STD1_idx(i,1) == 1 && FF68_t(i,1) < FF68_lo
+		STD1_idx(i,1) = 0;
+	end
+end
+
+for i = 1:data_count
+	if STD1_idx(i,1) == 1 && FF67_t(i,1) > FF67_hi
+		STD1_idx(i,1) = 0;
+	end
+end
+
+for i = 1:data_count
+	if STD1_idx(i,1) == 1 && FF67_t(i,1) < FF67_lo
+		STD1_idx(i,1) = 0;
+	end
+end
+
+
+
+
+
+
+
 STD1_idx_rej = STD1_idx_orig - sum(STD1_idx);
 set(H.standards_rejected, 'String', STD1_idx_rej);
 
