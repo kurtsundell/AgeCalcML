@@ -2956,10 +2956,10 @@ if get(H.plot_fract_68,'Value') == 1
 	hold off
 	xlabel('Analysis number')
 	ylabel('Pb206/U238 fractionation factor')
-	%axis([0 H.data_count+1 min([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])-...
-	%	0.02*min([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])...
-	%	max([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])+...
-	%	0.02*max([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])])
+	axis([0 H.data_count+1 min([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])-...
+		0.02*min([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])...
+		max([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])+...
+		0.02*max([(H.ffsw68-H.ffsw68*0.02);H.FC_IC_y;H.FC_MI_y;H.FC_AN_y;H.SL_IC_y;H.SL_MI_y;H.SL_AN_y;H.R33_IC_y;H.R33_MI_y;H.R33_AN_y])])
 	box on	
 end
 if get(H.plot_fract_76,'Value') == 1
@@ -2973,8 +2973,8 @@ if get(H.plot_fract_76,'Value') == 1
 	hold off
 	xlabel('Analysis number')
 	ylabel('Pb206/Pb207 fractionation factor')
-	%axis([0 H.data_count+1 min([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y])-0.02*min([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y]) max([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y])+...
-	%	0.02*max([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y])])
+	axis([0 H.data_count+1 min([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y])-0.02*min([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y]) max([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y])+...
+		0.02*max([(H.ffsw67-H.ffsw67*0.02);H.FC_67_y;H.SL_67_y])])
 	box on
 end
 if get(H.plot_fract_82,'Value') == 1
@@ -2988,8 +2988,8 @@ if get(H.plot_fract_82,'Value') == 1
 	hold off
 	xlabel('Analysis number')
 	ylabel('Pb208/Th232 fractionation factor')
-	%axis([0 H.data_count+1 min([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y])-0.02*min([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y]) max([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y])+...
-	%	0.02*max([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y])])
+	axis([0 H.data_count+1 min([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y])-0.02*min([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y]) max([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y])+...
+		0.02*max([(H.ffsw82-H.ffsw82*0.02);H.FC_82_y;H.SL_82_y])])
 	box on
 end
 end
