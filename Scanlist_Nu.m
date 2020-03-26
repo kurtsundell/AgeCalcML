@@ -152,7 +152,7 @@ if get(H.num_unknowns, 'Value') == 1 || get(H.num_unknowns, 'Value') == 2 || get
 	
 	for i = 1:n 
 		S = strcat({'Spot'}, {' '}, num2str(i));
-		Names(i,1) = strrep(Names(i,1), S, Sample);
+		Names(i,1) = strrep(Names(i,1), S, strcat(Sample, {' '}, num2str(i)));
 	end
 	
 	Unknowns = Names(1:n); % 1:300 for 300
