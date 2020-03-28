@@ -38,6 +38,22 @@ cla(H.SingleAnalysis_plot,'reset');
 cla(H.Results_plot,'reset');
 set(H.ind_listbox1,'String','');
 
+Hf_LBL = 0;
+Hf_AVG = 1;
+Hf_SW = 0;
+Yb_LBL = 0;
+Yb_AVG = 1;
+Yb_SW = 0;
+
+STD_MT = 'MT';
+STD_R33 = 'R33';
+STD_PLES = 'PLES';
+STD_FC = 'FC';
+STD_TEM = 'TEM';
+STD_91500 = '91500';
+STD_SL = 'SL';
+
+
 folder_name = H.folder_name;
 
 files=dir([folder_name]); %this maps out the directory to that folder
@@ -59,7 +75,7 @@ end
 
 filenames(all(cellfun('isempty',filenames),2),:) = [];
 filenames_sorted = filenames;
-
+TRA = 0;
 Agefile = 0;
 for i = 1:size(filenames_sorted,1)
 	if isempty(findstr(char(filenames_sorted(i,1)), '.txt')) == 0
@@ -73,6 +89,12 @@ for i = 1:size(filenames_sorted,1)
 	elseif isempty(findstr(char(filenames_sorted(i,1)), '.csv')) == 0
 		filename_ages{i,1} = filenames_sorted(i,1);
 		Agefile = 1;
+	elseif isempty(findstr(char(filenames_sorted(i,1)), '.run')) == 0
+		filename_data{i,1} = filenames_sorted(i,1);
+	elseif isempty(findstr(char(filenames_sorted(i,1)), '.scancsv')) == 0
+		filename_scancsv{i,1} = filenames_sorted(i,1);
+		filename_scancsv(all(cellfun('isempty',filename_scancsv),2),:) = [];
+		TRA = 1;
 	end
 end
 
@@ -80,74 +102,230 @@ filename_data(all(cellfun('isempty',filename_data),2),:) = [];
 
 h = waitbar(0,'Reducing data. Please wait...');
 
-for i = 1:length(filename_data)
-
-	fullpathname = char(strcat(folder_name, '/', filename_data{i,1}));
-
-	Data = importdata(fullpathname,',',500000);
-
-	if i == 1
-		data_length = 0;
+if TRA == 1
+	
+	if ispc == 1
+		fullpathname_data = char(strcat(folder_name, '\', filename_data{1,1}));
 	end
+	if ismac == 1
+		fullpathname_data = char(strcat(folder_name, '/', filename_data{1,1}));
+	end	
+	
+	if ispc == 1
+		fullpathname_names = char(strcat(folder_name, '\', filename_scancsv{1,1}));
+	end
+	if ismac == 1
+		fullpathname_names = char(strcat(folder_name, '/', filename_scancsv{1,1}));
+	end
+	
+	Data = importdata(char(fullpathname_data),',',500000);
+	Names = importdata(fullpathname_names);
+	Names = Names(2:end,1);
+	data_count = length(Names);	
+	
+	for i = 1:data_count
+		name_tmp = char(Names(i,1));
+		name_tmp_idx = strfind(name_tmp, '"');
+		sample{i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
+		clear name_tmp name_tmp_idx
+	end	
+	
+	firstline = 74;
+	cols = 13;
 
-	SampleNameIs = strfind(Data(:,1), 'Sample Name is');
-	EndAnalysis = strfind(Data(:,1), 'End of Analysis');
-
-	for j = 1:length(Data(:,1))
-		if isempty(SampleNameIs(~cellfun('isempty',SampleNameIs(j,1)))) == 0
-			data_parse(j,1) = 1;
+	values_tmp = zeros(length(Data(firstline:end,1)),cols);
+	for j = 1:length(Data(firstline:end,1))
+		values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
+		for k = 1:cols
+			values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
 		end
 	end
-
-	for j = 1:length(Data(:,1))
-		if isempty(EndAnalysis(~cellfun('isempty',EndAnalysis(j,1)))) == 0
-			data_parse(j,1) = 2;
+	
+	thresh = 0;
+	
+	for i = 1:length(Data(firstline:end,1))
+		if values_tmp(i,1) > thresh
+			thresh180(i,1) = 1;
+		else
+			thresh180(i,1) = 0;
 		end
-	end
-
-	data_parse = data_parse(1:find(data_parse==2, 1,'last'),1);
-
-	for j = 1:length(data_parse(:,1))
-		if data_parse(j,1) == 1 && data_parse(j+60+1,1) == 2
-			sample_start_idx(j,1) = j;
-			sample_end_idx(j,1) = j+60+1;
+	end	
+	
+	for i = 2:length(Data(firstline:end,1))-2
+		if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
+			values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh 
+			t0_180(i,1) = values_tmp(i,cols-1);
+			t0_idx(i,1) = values_tmp(i,cols-2);
+		else
+			t0_180(i,1) = 0;
 		end
+	end	
+
+	t0_180 = nonzeros(t0_180);
+	t0_idx = nonzeros(t0_idx);
+	diff_idx = diff(t0_idx);
+	
+	%{
+	figure
+	hold on
+	plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
+	scatter(t0_idx,zeros(length(t0_idx),1),'filled')
+	hold off
+	%}
+	
+	start_idx = t0_idx - 6;
+	end_idx = t0_idx + 69; 	
+	sampl_length = 76;
+	
+	%%% Indexes
+	for i = 1:data_count
+		values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
+		baseline(1:5,1:cols,i) = values_all(1:5,1:cols,i);
+		integration(1:60,1:cols,i) = values_all(9:68,1:cols,i);
+	end	
+	
+	for i = 1:data_count
+		mean180BL(i,1) = mean(baseline(:,1,i));
+		mean179BL(i,1) = mean(baseline(:,2,i));
+		mean178BL(i,1) = mean(baseline(:,3,i));
+		mean177BL(i,1) = mean(baseline(:,4,i));
+		mean176BL(i,1) = mean(baseline(:,5,i));
+		mean175BL(i,1) = mean(baseline(:,6,i));
+		mean174BL(i,1) = mean(baseline(:,7,i));
+		mean173BL(i,1) = mean(baseline(:,8,i));
+		mean172BL(i,1) = mean(baseline(:,9,i));
+		mean171BL(i,1) = mean(baseline(:,10,i));
+	end	
+
+	%{
+	for i = 1:data_count
+		SE180BL(i,1) = std(baseline(:,1,i))./sqrt(length(baseline(:,1,i)))./abs(mean180BL(i,1)).*100;
+		SE179BL(i,1) = std(baseline(:,2,i))./sqrt(length(baseline(:,2,i)))./abs(mean179BL(i,1)).*100;
+		SE178BL(i,1) = std(baseline(:,3,i))./sqrt(length(baseline(:,3,i)))./abs(mean178BL(i,1)).*100;
+		SE177BL(i,1) = std(baseline(:,4,i))./sqrt(length(baseline(:,4,i)))./abs(mean177BL(i,1)).*100;
+		SE176BL(i,1) = std(baseline(:,5,i))./sqrt(length(baseline(:,5,i)))./abs(mean176BL(i,1)).*100;
+		SE175BL(i,1) = std(baseline(:,6,i))./sqrt(length(baseline(:,6,i)))./abs(mean175BL(i,1)).*100;
+		SE174BL(i,1) = std(baseline(:,7,i))./sqrt(length(baseline(:,7,i)))./abs(mean174BL(i,1)).*100;
+		SE173BL(i,1) = std(baseline(:,8,i))./sqrt(length(baseline(:,8,i)))./abs(mean173BL(i,1)).*100;
+		SE172BL(i,1) = std(baseline(:,9,i))./sqrt(length(baseline(:,9,i)))./abs(mean172BL(i,1)).*100;
+		SE171BL(i,1) = std(baseline(:,10,i))./sqrt(length(baseline(:,10,i)))./abs(mean171BL(i,1)).*100;
 	end
-
-	sample_start_idx = nonzeros(sample_start_idx);
-	sample_end_idx = nonzeros(sample_end_idx);
-
-	data_count = length(sample_start_idx(:,1));
-
-	for j = 1:data_count
-		values_all_cell = regexp(Data(sample_start_idx(j,1)+1:sample_end_idx(j,1)-1), ',', 'split');
-		for k = 1:60
-			values_all(k,1:10,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,3:12)));
-			values_all(k,11:20,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,19:28)));
-		end
+	%}
+	
+	for i = 1:data_count
+		BLS_180(:,i) = integration(:,1,i) - mean180BL(i,1);
+		BLS_179(:,i) = integration(:,2,i) - mean179BL(i,1);
+		BLS_178(:,i) = integration(:,3,i) - mean178BL(i,1);
+		BLS_177(:,i) = integration(:,4,i) - mean177BL(i,1);
+		BLS_176(:,i) = integration(:,5,i) - mean176BL(i,1);
+		BLS_175(:,i) = integration(:,6,i) - mean175BL(i,1);
+		BLS_174(:,i) = integration(:,7,i) - mean174BL(i,1);
+		BLS_173(:,i) = integration(:,8,i) - mean173BL(i,1);
+		BLS_172(:,i) = integration(:,9,i) - mean172BL(i,1);
+		BLS_171(:,i) = integration(:,10,i) - mean171BL(i,1);
 	end
-
-	for j = 1:data_count
-		name_tmp(j,1) = Data(sample_start_idx(j,1), 1);
-	end
-
-	name_tmp2 = char(name_tmp);
-	for j = 1:data_count
-		sample{j+data_length,:} = name_tmp2(j, 17:cell2mat(strfind(name_tmp(j,:), '<>'))-2);
-	end
-
-	data_length = length(values_all(1,1,:));
-
-	clear sample_start_idx
-	clear sample_end_idx
-	clear data_parse
-	clear data_count
-	clear name_tmp
-	clear name_tmp2
-
-	waitbar(i*.5/length(filename_data))
-
+	
+	data_length = length(sample);
+	samp_length = length(integration(:,1,1));
+	%set(H.filterSTDs,'Value',0)
 end
+
+
+if TRA == 0
+	
+	for i = 1:length(filename_data)
+
+		fullpathname = char(strcat(folder_name, '/', filename_data{i,1}));
+
+		Data = importdata(fullpathname,',',500000);
+
+		if i == 1
+			data_length = 0;
+		end
+
+		SampleNameIs = strfind(Data(:,1), 'Sample Name is');
+		EndAnalysis = strfind(Data(:,1), 'End of Analysis');
+
+		for j = 1:length(Data(:,1))
+			if isempty(SampleNameIs(~cellfun('isempty',SampleNameIs(j,1)))) == 0
+				data_parse(j,1) = 1;
+			end
+		end
+
+		for j = 1:length(Data(:,1))
+			if isempty(EndAnalysis(~cellfun('isempty',EndAnalysis(j,1)))) == 0
+				data_parse(j,1) = 2;
+			end
+		end
+
+		data_parse = data_parse(1:find(data_parse==2, 1,'last'),1);
+
+		for j = 1:length(data_parse(:,1))
+			if data_parse(j,1) == 1 && data_parse(j+60+1,1) == 2
+				sample_start_idx(j,1) = j;
+				sample_end_idx(j,1) = j+60+1;
+			end
+		end
+
+		sample_start_idx = nonzeros(sample_start_idx);
+		sample_end_idx = nonzeros(sample_end_idx);
+
+		data_count = length(sample_start_idx(:,1));
+
+		for j = 1:data_count
+			values_all_cell = regexp(Data(sample_start_idx(j,1)+1:sample_end_idx(j,1)-1), ',', 'split');
+			for k = 1:60
+				values_all(k,1:10,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,3:12)));
+				values_all(k,11:20,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,19:28)));
+			end
+		end
+
+		for j = 1:data_count
+			name_tmp(j,1) = Data(sample_start_idx(j,1), 1);
+		end
+
+		name_tmp2 = char(name_tmp);
+		for j = 1:data_count
+			sample{j+data_length,:} = name_tmp2(j, 17:cell2mat(strfind(name_tmp(j,:), '<>'))-2);
+		end
+
+		data_length = length(values_all(1,1,:));
+
+		clear sample_start_idx
+		clear sample_end_idx
+		clear data_parse
+		clear data_count
+		clear name_tmp
+		clear name_tmp2
+
+		waitbar(i*.5/length(filename_data))
+
+	end
+
+	for i = 1:length(sample)
+		for j = 1:60
+			BLS_180(j,i) = values_all(j,11,i) - values_all(j,1,i);
+			BLS_179(j,i) = values_all(j,12,i) - values_all(j,2,i);
+			BLS_178(j,i) = values_all(j,13,i) - values_all(j,3,i);
+			BLS_177(j,i) = values_all(j,14,i) - values_all(j,4,i);
+			BLS_176(j,i) = values_all(j,15,i) - values_all(j,5,i);
+			BLS_175(j,i) = values_all(j,16,i) - values_all(j,6,i);
+			BLS_174(j,i) = values_all(j,17,i) - values_all(j,7,i);
+			BLS_173(j,i) = values_all(j,18,i) - values_all(j,8,i);
+			BLS_172(j,i) = values_all(j,19,i) - values_all(j,9,i);
+			BLS_171(j,i) = values_all(j,20,i) - values_all(j,10,i);
+		end
+	end
+	samp_length = length(BLS_180(:,1));
+end
+
+
+
+
+
+
+
+
 
 %cla(H.STDS_plot,'reset'); 
 cla(H.SingleAnalysis_plot,'reset'); 
@@ -161,37 +339,24 @@ Yb_bias = str2num(get(H.stdopt_Ybbias,'String'));
 INT_cutoff_stds = str2num(get(H.stdopt_intcutoff,'String'))/100;
 INT_cutoff_unknowns = str2num(get(H.results_intcutoff,'String'))/100;
 
-Hf_LBL = 0;
-Hf_AVG = 1;
-Hf_SW = 0;
-Yb_LBL = 0;
-Yb_AVG = 1;
-Yb_SW = 0;
+
+
+
+
+
+
+
+
+
+
+
+
 
 Analysis_num = (1:1:length(sample))';
-waitbar(.6)
-for i = 1:length(sample)
-	for j = 1:60
-		BLS_180(j,i) = values_all(j,11,i) - values_all(j,1,i);
-		BLS_179(j,i) = values_all(j,12,i) - values_all(j,2,i);
-		BLS_178(j,i) = values_all(j,13,i) - values_all(j,3,i);
-		BLS_177(j,i) = values_all(j,14,i) - values_all(j,4,i);
-		BLS_176(j,i) = values_all(j,15,i) - values_all(j,5,i);
-		BLS_175(j,i) = values_all(j,16,i) - values_all(j,6,i);
-		BLS_174(j,i) = values_all(j,17,i) - values_all(j,7,i);
-		BLS_173(j,i) = values_all(j,18,i) - values_all(j,8,i);
-		BLS_172(j,i) = values_all(j,19,i) - values_all(j,9,i);
-		BLS_171(j,i) = values_all(j,20,i) - values_all(j,10,i);
-	end
-end
 
-STD_MT = 'MT';
-STD_R33 = 'R33';
-STD_PLES = 'PLES';
-STD_FC = 'FC';
-STD_TEM = 'TEM';
-STD_91500 = '91500';
-STD_SL = 'SL';
+
+
+
 
 STD_MT_idx = strfind(sample, STD_MT);
 STD_R33_idx = strfind(sample, STD_R33);
@@ -214,11 +379,23 @@ SAMPLES_idx = abs((STD_MT_idx + STD_R33_idx + STD_PLES_idx + STD_FC_idx + STD_TE
 
 waitbar(.7)
 
+
+
+
+
+
+
+
+
+
+
+
+
 for i = 1:length(sample)
 	BetaHf(:,i) = (log(0.73250./(abs(BLS_179(:,i)./BLS_177(:,i)))))/(log(178.94583/176.94323)); %0.73250 from Patchett & Tatsumoto (1980)
 end
 
-for i = 1:60
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if BLS_180(i,j) > Hf_cutoff
 			BHf_gt_int(i,j) = BetaHf(i,j);
@@ -234,7 +411,7 @@ for i = 1:length(sample)
 	BetaYb(:,i) = (log(1.132338*(1+Yb_bias/40000)./(abs(BLS_173(:,i)./BLS_171(:,i)))))/(log(172.93822/170.93634)); %173/171 1.132338 from Vervoort et al. (2004)
 end
 
-for i = 1:60
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if BLS_171(i,j) > Yb_cutoff
 			BYb_gt_int(i,j) = BetaYb(i,j);
@@ -246,7 +423,7 @@ end
 
 %BYb_SW Need to code this. Col AL in HfCalc 70.
 
-for i = 1:60
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if Yb_LBL == 1
 			Lu176V(i,j) = (BLS_175(i,j)*0.02653)/((175.94269/174.94079)^(BetaYb(i,j))); %0.02653 from Patchett (1983) -- update to 0.02669 (Debrieve & Taylor)?
@@ -261,7 +438,7 @@ for i = 1:60
 end
 %=IF(K!$R$9=TRUE,(AA11*K!$D$17)/((175.94269/174.94079)^(AJ11))
 %%% should these reference Hf LBL , Hf AVG and Hf SW?
-for i = 1:60
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if Yb_LBL == 1
 			Yb176V(i,j) = (BLS_171(i,j)*0.901691)/((175.94258/170.93634)^(BetaYb(i,j))); %0.901691 from Vervoort et al. (2004)
@@ -275,7 +452,7 @@ for i = 1:60
 	end
 end
 
-for i = 1:60
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if Hf_LBL == 1
 			All(i,j) = ((BLS_176(i,j)-Lu176V(i,j)-Yb176V(i,j))/(BLS_177(i,j)))*((175.94142/176.94323)^(BetaHf(i,j)));
@@ -291,9 +468,9 @@ end
 
 waitbar(.8)
 
-for i = 1:60
-	for j = 1:length(sample)
-		if values_all(i,11,j) > 0.7*max(values_all(i,11,j))
+for j = 1:length(sample)
+	for i = 1:samp_length
+		if values_all(i,11,j) > 0.7*max(values_all(:,11,j))
 			Yb_Lu_Hf(i,j) = 100*(Lu176V(i,j)+Yb176V(i,j))/(BLS_177(i,j)*All(i,j));
 		else
 			Yb_Lu_Hf(i,j) = 0;
@@ -301,7 +478,9 @@ for i = 1:60
 	end
 end
 
-for i = 1:60
+%=IF(L197>0.7*BB256,(100*(AM197+AN197)/(Y197*AO197)),"")
+
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if values_all(i,11,j) > INT_cutoff_stds*max(values_all(:,11,j)) && SAMPLES_idx(j,1) == 0
 			Filter_INT(i,j) = All(i,j);
@@ -313,7 +492,7 @@ for i = 1:60
 	end
 end
 
-for i = 1:60
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if Filter_INT(i,j) == max(Filter_INT(:,j))
 			Filter_MAXMIN(i,j) = 0;
@@ -325,7 +504,7 @@ for i = 1:60
 	end
 end
 
-for i = 1:60
+for i = 1:samp_length
 	for j = 1:length(sample)
 		if Filter_MAXMIN(i,j) > mean(nonzeros(Filter_MAXMIN(:,j))) + 2*std(nonzeros(Filter_MAXMIN(:,j))) || ...
 				Filter_MAXMIN(i,j) < mean(nonzeros(Filter_MAXMIN(:,j))) - 2*std(nonzeros(Filter_MAXMIN(:,j)))
@@ -336,51 +515,180 @@ for i = 1:60
 	end
 end
 
+%if TRA == 0
+	for i = 1:length(sample)
+		if BLS_180(30,i) < 0.1
+			BLS_180(:,i) = 0;
+			BLS_179(:,i) = 0;
+			BLS_178(:,i) = 0;
+			BLS_177(:,i) = 0;
+			BLS_176(:,i) = 0;
+			BLS_175(:,i) = 0;
+			BLS_174(:,i) = 0;
+			BLS_173(:,i) = 0;
+			BLS_172(:,i) = 0;
+			BLS_171(:,i) = 0;
+		end
+	end
+%end
+
+
+
+
+if get(H.filterSTDs,'Value') == 1
+	EL = Filter_95;
+	for j = 1:length(sample)
+		if STD_idx(j,1) == 1
+			for i = 1:10
+				STDSE_EL = std(nonzeros(EL(:,j)))/sqrt(length(nonzeros(EL(:,j))));
+				testsamp = EL(:,j);
+				testsamp(i,1) = 0;
+				STDSE_testsamp = std(nonzeros(testsamp))/sqrt(length(nonzeros(testsamp)));
+				if STDSE_testsamp < STDSE_EL
+					EL(i,j) = 0;
+				end
+			end
+		end
+	end
+
+	for j = 1:length(sample)
+		if STD_idx(j,1) == 1
+			for i = 51:60
+				STDSE_EL = std(nonzeros(EL(:,j)))/sqrt(length(nonzeros(EL(:,j))));
+				testsamp = EL(:,j);
+				testsamp(i,1) = 0;
+				STDSE_testsamp = std(nonzeros(testsamp))/sqrt(length(nonzeros(testsamp)));
+				if STDSE_testsamp < STDSE_EL
+					EL(i,j) = 0;
+				end
+			end
+		end
+	end	
+	Filter_95 = EL;		
+end
+
+
+if get(H.filtersamples,'Value') == 1
+	EL = Filter_95;
+	for j = 1:length(sample)
+		if SAMPLES_idx(j,1) == 1
+			for i = 51:60
+				STDSE_EL = std(nonzeros(EL(:,j)))/sqrt(length(nonzeros(EL(:,j))));
+				testsamp = EL(:,j);
+				testsamp(i,1) = 0;
+				STDSE_testsamp = std(nonzeros(testsamp))/sqrt(length(nonzeros(testsamp)));
+				if STDSE_testsamp < STDSE_EL
+					EL(i,j) = 0;
+				end
+			end
+		end
+	end		
+	for j = 1:length(sample)
+		if SAMPLES_idx(j,1) == 1
+			for i = 1:10
+				STDSE_EL = std(nonzeros(EL(:,j)))/sqrt(length(nonzeros(EL(:,j))));
+				testsamp = EL(:,j);
+				testsamp(i,1) = 0;
+				STDSE_testsamp = std(nonzeros(testsamp))/sqrt(length(nonzeros(testsamp)));
+				if STDSE_testsamp < STDSE_EL
+					EL(i,j) = 0;
+				end
+			end
+		end
+	end	
+	for j = 1:length(sample)
+		if SAMPLES_idx(j,1) == 1
+			for i = 51:60
+				STDSE_EL = std(nonzeros(EL(:,j)))/sqrt(length(nonzeros(EL(:,j))));
+				testsamp = EL(:,j);
+				testsamp(i,1) = 0;
+				STDSE_testsamp = std(nonzeros(testsamp))/sqrt(length(nonzeros(testsamp)));
+				if STDSE_testsamp < STDSE_EL
+					EL(i,j) = 0;
+				end
+			end
+		end
+	end		
+	Filter_95 = EL;	
+end
+
+%if TRA == 0
+	for i = 1:length(sample)
+		if BLS_180(30,i) < 0.1
+			Filter_95(:,i) = 0;
+		end
+	end
+
+	count = 1;
+	for i = 1:length(sample)
+		if SAMPLES_idx(i,1) == 1
+			Filter_95_unks(:,count) = Filter_95(:,i);
+			count = count + 1;
+		end
+	end
+%end
+
+
+
+
+
 waitbar(.9)
 
 for j = 1:length(sample)
+		ALL_176_177_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+		ALL_176_177_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		ALL_Yb_Lu_Hf_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+		ALL_v180(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
 	if STD_MT_idx(j,1) == 1
 		Ratio_STD_176_177_MT_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_MT_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_MT_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_MT(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	elseif STD_R33_idx(j,1) == 1
+    end
+	if STD_R33_idx(j,1) == 1
 		Ratio_STD_176_177_R33_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_R33_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_R33_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_R33(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	elseif STD_PLES_idx(j,1) == 1
+    end
+	if STD_PLES_idx(j,1) == 1
 		Ratio_STD_176_177_PLES_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_PLES_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_PLES_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_PLES(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	elseif STD_FC_idx(j,1) == 1
+    end
+	if STD_FC_idx(j,1) == 1
 		Ratio_STD_176_177_FC_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_FC_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_FC_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_FC(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	elseif STD_TEM_idx(j,1) == 1
+    end
+	if STD_TEM_idx(j,1) == 1
 		Ratio_STD_176_177_TEM_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_TEM_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_TEM_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_TEM(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	elseif STD_91500_idx(j,1) == 1
+    end
+	if STD_91500_idx(j,1) == 1
 		Ratio_STD_176_177_91500_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_91500_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_91500_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_91500(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	elseif STD_SL_idx(j,1) == 1
+    end
+	if STD_SL_idx(j,1) == 1
 		Ratio_STD_176_177_SL_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_SL_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_SL_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_SL(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	else 
+    end
+    if SAMPLES_idx(j,1) == 1
 		Ratio_UNKNOWN_176_177_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_UNKNOWN_176_177_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_UNKNOWN_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_UNKNOWN(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
 		sample_UNKNOWN_idx(j,1) = 1;
-		sample_UNKNOWN_name(j,1) = sort(strtrim(sample(j,1)));
+		sample_UNKNOWN_name(j,1) = sort(strtrim(sample(j,1)));	
+		LuHf_UNKNOWN(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));	
 	end
 end
 
@@ -419,12 +727,16 @@ Ratio_STD_176_177_SL_SE = nonzeros(Ratio_STD_176_177_SL_SE);
 H.Yb_Lu_Hf_SL_mean = nonzeros(Yb_Lu_Hf_SL_mean);
 v180_SL = nonzeros(v180_SL);
 
+
 if sum(SAMPLES_idx) > 0
-	H.Ratio_UNKNOWN_176_177_mean = nonzeros(Ratio_UNKNOWN_176_177_mean);
+	Ratio_UNKNOWN_176_177_mean = nonzeros(Ratio_UNKNOWN_176_177_mean);
+    H.Ratio_UNKNOWN_176_177_mean = Ratio_UNKNOWN_176_177_mean;
 	Ratio_UNKNOWN_176_177_SE = nonzeros(Ratio_UNKNOWN_176_177_SE);
-	H.Yb_Lu_Hf_UNKNOWN_mean = nonzeros(Yb_Lu_Hf_UNKNOWN_mean);
+	Yb_Lu_Hf_UNKNOWN_mean = nonzeros(Yb_Lu_Hf_UNKNOWN_mean);
+    H.Yb_Lu_Hf_UNKNOWN_mean = Yb_Lu_Hf_UNKNOWN_mean;
 	v180_UNKNOWN = nonzeros(v180_UNKNOWN);
 	sample_UNKNOWN_name = sample_UNKNOWN_name(~cellfun('isempty', sample_UNKNOWN_name'));
+	LuHf_UNKNOWN = nonzeros(LuHf_UNKNOWN);
 end
 
 if sum(SAMPLES_idx) > 0
@@ -442,10 +754,21 @@ if sum(SAMPLES_idx) > 0
 	else
 		Ages_names = sample_UNKNOWN_name;
 		%Ages_mean(1:length(sample_UNKNOWN_name),1) = str2double(get(H.age_set,'Value'));
-        Ages_mean(1:length(sample_UNKNOWN_name),1) = 23;
+        Ages_mean(1:length(sample_UNKNOWN_name),1) = str2num(get(H.defaultage,'String'));
 		Ages_uncert(1:length(sample_UNKNOWN_name),1) = 1;
 	end
 end
+
+
+for i = 1:length(v180_UNKNOWN)
+	if v180_UNKNOWN(i,1) ~= 0
+		HfHfT(i,1) = Ratio_UNKNOWN_176_177_mean(i,1) - ( LuHf_UNKNOWN(i,1) * ( exp((1000000*Ages_mean(i,1)) * 1.87 * (10^-11) ) - 1 ) );
+	end
+end
+
+%E4- ( G4 * ( EXP((1000000*L4) * 1.867 * 10^-11 ) -1 ) )
+
+
 
 % Match sample names to optional uploaded age file
 if sum(SAMPLES_idx) > 0
@@ -473,14 +796,46 @@ end
 
 waitbar(1)
 
+%{
+count = 1;
+if sum(SAMPLES_idx) > 0
+	for i = 1:length(SAMPLES_idx)
+		if SAMPLES_idx(i,1) == 1
+			if v180_UNKNOWN(count,1) ~= 0	
+				%eHf_UNKNOWNS(count,1) = 10000*((Ratio_UNKNOWN_176_177_mean(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNSf(i,1) = 10000*((HfHfT(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNS(count,1) = 10000*((HfHfT(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+			end
+			count = count + 1;
+		else
+			eHf_UNKNOWNSf(i,1) = 0;
+		end
+	end
+end
+%}
+
 count = 1;
 if sum(SAMPLES_idx) > 0
 	for i = 1:length(SAMPLES_idx)
 		if SAMPLES_idx(i,1) == 1
 			if v180_UNKNOWN(count,1) ~= 0
-				eHf_UNKNOWNS(count,1) = 10000*((Ratio_UNKNOWN_176_177_mean(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNS(count,1) = 10000*((HfHfT(count,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
 			end
 			count = count + 1;
+		end
+	end
+end
+
+count = 1;
+if sum(SAMPLES_idx) > 0
+	for i = 1:length(SAMPLES_idx)
+		if SAMPLES_idx(i,1) == 1
+			if v180_UNKNOWN(count,1) ~= 0
+				eHf_UNKNOWNSf(i,1) = 10000*((HfHfT(count,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				count = count + 1;
+			else
+				eHf_UNKNOWNSf(i,1) = 0;
+			end
 		end
 	end
 end
@@ -488,6 +843,44 @@ end
 
 
 
+
+
+
+%for i = 1:length(v180_UNKNOWN)
+%	if v180_UNKNOWN(i,1) ~= 0
+%		eHf_UNKNOWNS3(i,1) = 10000 * (( HfHfT(i,1) / (0.282785 - ( 0.0336 * ( exp((1000000*Ages_ascribed(i,1))*1.867*10^-11)-1))))-1);
+%	end
+%end
+
+
+
+
+
+
+
+%for i = 1:length(v180_UNKNOWN)
+%	if v180_UNKNOWN(i,1) ~= 0
+%		eHf_UNKNOWNS2(i,1) = 10000 * (( Ratio_UNKNOWN_176_177_mean(i,1) / (0.282785 - (0.0336 * (exp ((1000000*Ages_ascribed(i,1) ) * 1.867*(10^-11) ) -1 ) ))) -1 );
+%	end
+%end
+
+%eHf_UNKNOWNSf(i,1) = 10000*((Ratio_UNKNOWN_176_177_mean(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+
+
+%10000*(( H8 / (K!$F$37-(K!$E$37 * ( EXP ((1000000 * L8 ) * 1.867*10^-11 ) -1 ) )))-1)
+
+if sum(SAMPLES_idx) > 0
+	for i = 1:length(v180_UNKNOWN)
+		if v180_UNKNOWN(i,1) ~= 0
+			eHf0(i,1) = 10000 * ((Ratio_UNKNOWN_176_177_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0s(i,1) = 10000 * ((Ratio_UNKNOWN_176_177_mean(i,1)/0.282785)-1) - 10000 * ((( Ratio_UNKNOWN_176_177_mean(i,1) - Ratio_UNKNOWN_176_177_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
+		
+		
+		%10000*( ( E4/K!$F$37)-1),"")
+		%-10000*(((E4-F4)/K!$F$37)-1),"")
 
 
 
@@ -502,7 +895,7 @@ if get(H.stds_MT,'Value') == 1
 	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_MT_mean)) - 0.282507;
 end
 if get(H.stds_91500,'Value') == 1
-	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_91500_mean)) - 0.282313;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_91500_mean)) - 0.282298;
 end
 if get(H.stds_TEM,'Value') == 1
 	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_TEM_mean)) - 0.282686;
@@ -511,13 +904,13 @@ if get(H.stds_PLES,'Value') == 1
 	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_PLES_mean)) - 0.282484;
 end
 if get(H.stds_FC,'Value') == 1
-	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_FC_mean)) - 0.282183;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_FC_mean)) - 0.282157;
 end
 if get(H.stds_SL,'Value') == 1
-	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_SL_mean)) - 0.282163;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_SL_mean)) - 0.282167;
 end
 if get(H.stds_R33,'Value') == 1
-	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_R33_mean)) - 0.282764; % R33 STD should end in 1 to be consistent
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_R33_mean)) - 0.282739; % R33 STD should end in 1 to be consistent
 end
 
 STD_offset_avg = mean(STD_offset);
@@ -527,28 +920,37 @@ STD_SE_avg = mean([Ratio_STD_176_177_MT_SE; Ratio_STD_176_177_R33_SE; Ratio_STD_
 	Ratio_STD_176_177_91500_SE; Ratio_STD_176_177_SL_SE]);
 set(H.stdopt_STDSE,'String',sprintf('%f',STD_SE_avg));
 if sum(SAMPLES_idx) > 0
-	set(H.unks_munc,'String',sprintf('%f',mean(Ratio_UNKNOWN_176_177_SE)));
+	set(H.unks_munc,'String',sprintf('%f',mean(Ratio_UNKNOWN_176_177_SE(~isnan(Ratio_UNKNOWN_176_177_SE)))));
 end
 
 % Calculate % data retained
 for j = 1:length(sample)
 	if SAMPLES_idx(j,1) == 0
-		retained_stds(j,1) = length(nonzeros(Filter_INT(:,j)))/60;
-	else
-		retained_stds(j,1) = 0;
+		if sum(BLS_180(:,j)) > 0
+			retained_stds(j,1) = length(nonzeros(Filter_INT(:,j)))/samp_length;
+			retained_stds_idx(j,1) = 1;
+		else
+			retained_stds(j,1) = 0;
+			retained_stds_idx(j,1) = 0;
+		end
 	end
 end
 
 for j = 1:length(sample)
 	if SAMPLES_idx(j,1) == 1
-		retained_unknowns(j,1) = length(nonzeros(Filter_INT(:,j)))/60;
-	else
-	retained_unknowns(j,1) = 0;
+		if sum(BLS_180(:,j)) > 0
+			retained_unknowns(j,1) = length(nonzeros(Filter_INT(:,j)))/samp_length;
+			retained_unknowns_idx(j,1) = 1;
+		else
+			retained_unknowns(j,1) = 0;
+			retained_unknowns_idx(j,1) = 0;
+		end
 	end
 end
 
-retained_stds_p = sum(retained_stds)/sum(STD_idx)*100;
-retained_unknowns_p = sum(retained_unknowns)/sum(SAMPLES_idx)*100;
+retained_stds_p = sum(retained_stds)/sum(retained_stds_idx)*100;
+
+retained_unknowns_p = sum(retained_unknowns)/sum(retained_unknowns_idx)*100;
 
 set(H.stdopt_percret,'String',round(retained_stds_p,1))
 set(H.unks_percret,'String',round(retained_unknowns_p,1))
@@ -558,14 +960,6 @@ BLS_176_177_corr = Filter_95;
 reduced = 1;
 
 close(h)
-
-
-for i=1:length(sample)
-	name_char(i,1)=(sample(i,1));
-end
-
-set(H.ind_listbox1, 'String', name_char);
-set(H.ind_listbox1,'Value',length(sample));
 
 t = 1;
 match = [1:1:length(sample)]';
@@ -578,34 +972,92 @@ for i=1:length(sample)
     end
 end
 
+
+
+
+comment1{length(sample), 1} = [];
+comment2{length(sample), 1} = [];
+comment3{length(sample), 1} = [];
+
+for i = 1:length(sample)
+	if ALL_176_177_SE(i,1) > str2num(get(H.unc_cutoff,'String'))
+		comment1(i,1) = {'high uncertainty  '};
+	end
+	if SAMPLES_idx(i,1) == 1 && eHf_UNKNOWNSf(i,1) > str2num(get(H.epsiloncutoffhi,'String')) 
+		comment2(i,1) = {'high epsilon  '};
+	end
+	if SAMPLES_idx(i,1) == 1 && eHf_UNKNOWNSf(i,1) < str2num(get(H.epsiloncutofflo,'String')) 
+		comment3(i,1) = {'low epsilon  '};
+	end
+end
+		
+comment = strcat(comment1, comment2, comment3);	
+
+for i = 1:length(sample)
+	if isempty(comment{i,1}) == 1 
+		current_status{i,1} = ['Accepted'];
+		current_status_num(i,1) = 1;
+	else
+		current_status{i,1} = ['Rejected: ', comment{i,1}];
+		current_status_num(i,1) = 0;
+	end
+end
+
+current_status_num_orig = current_status_num;
+
+for i=1:length(sample)
+	name_char(i,1)=(sample(i,1));
+end
+
+name_idx = length(sample); %automatically plot final sample run
+
+for i=1:length(sample)
+	if isempty(comment{i,1}) == 0 
+		name_char(i,1) = strcat('<html><BODY bgcolor="red">',name_char(i,1),'</span></html>');
+	end
+end
+
+set(H.ind_listbox1, 'String', name_char);
+set(H.ind_listbox1,'Value',length(sample));
+
+
+if current_status_num(name_idx,1) == 1
+	set(H.status, 'String', current_status{name_idx,1},'ForegroundColor','blue');
+elseif current_status_num(name_idx,1) == 0
+	set(H.status, 'String', current_status{name_idx,1},'ForegroundColor','red');
+end
+
+
+
+
+				
+				
+
+
+
+
+
+
+
+
+H.samp_length = samp_length;
+H.TRA = TRA;
+
+H.current_status = current_status;
+H.current_status_num = current_status_num;
+
+
 H.sample = sample;
 H.BLS_176 = BLS_176;
 H.BLS_177 = BLS_177;
 H.BLS_180 = BLS_180;
 H.BLS_176_177_corr = BLS_176_177_corr;
-%H.DM_Slider = DM_Slider;
-%H.Y0_u_Evol_DM_176Lu_177Hf = Y0_u_Evol_DM_176Lu_177Hf;
-%H.Ys_Evol_DM_176Lu_177Hf = Ys_Evol_DM_176Lu_177Hf;
-%H.Y0_Evol_DM_176Lu_177Hf = Y0_Evol_DM_176Lu_177Hf;
-%H.Y0_l_Evol_DM_176Lu_177Hf = Y0_l_Evol_DM_176Lu_177Hf;
-%H.Y0_u_Epsi_DM_176Lu_177Hf = Y0_u_Epsi_DM_176Lu_177Hf;
-%H.Ys_Epsi_DM_176Lu_177Hf = Ys_Epsi_DM_176Lu_177Hf;
-%H.Y0_Epsi_DM_176Lu_177Hf = Y0_Epsi_DM_176Lu_177Hf;
-%H.Y0_l_Epsi_DM_176Lu_177Hf = Y0_l_Epsi_DM_176Lu_177Hf;
-%H.Epsilon_plot = Epsilon_plot;
-%H.Evolution_plot = Evolution_plot;
-%H.Decay_const_176Lu = Decay_const_176Lu;
-%H.DM_176Lu_177Hf = DM_176Lu_177Hf;
-%H.DM_176Hf_177Hf = DM_176Hf_177Hf;
-%H.BSE_176Lu_177Hf = BSE_176Lu_177Hf;
-%H.BSE_176Hf_177Hf = BSE_176Hf_177Hf;
 H.reduced = reduced;
 H.match = match;
 H.match2 = match2;
-H.Ages_ascribed = Ages_ascribed;
-H.eHf_UNKNOWNS = eHf_UNKNOWNS;
+
 H.SAMPLES_idx = SAMPLES_idx;
-H.Ages_ascribed = Ages_ascribed;
+
 
 if sum(SAMPLES_idx) > 0
 	H.eHf_UNKNOWNS = eHf_UNKNOWNS;
@@ -699,9 +1151,12 @@ name_idx = get(H.ind_listbox1,'Value');
 
 axes(H.SingleAnalysis_plot);
 hold on
-x = 1:1:60;
+
+
+x = 1:1:H.samp_length;
+
 if get(H.ind_176_177,'Value') == 1
-	for i = 1:60
+	for i = 1:H.samp_length
 		if BLS_176_177_corr(i,name_idx) ~= 0
 			scatter(x(1,i), BLS_176_177_corr(i,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
 		end
@@ -710,7 +1165,7 @@ if get(H.ind_176_177,'Value') == 1
 	legend(sample(name_idx,1))
 	xlabel('Time (s)')
 	ylabel('176/177 Corrected')
-	xlim([0 60])
+	xlim([0 H.samp_length])
 end
 if get(H.ind_180,'Value') == 1
 	scatter(x, H.BLS_180(:,name_idx), 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
@@ -809,7 +1264,10 @@ if get(H.results_evolution, 'Value') == 1
 	plot([0 DM_Slider],[Y0_u_Evol_DM_176Lu_177Hf,Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
 	plot([0 DM_Slider],[Y0_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
 	plot([0 DM_Slider],[Y0_l_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-	legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+	
+	if sum(H.SAMPLES_idx) > 0
+		legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+	end
 	xlabel('Age (Ma)')
 	ylabel('176Hf/177Hf(T)')
 end
@@ -826,21 +1284,31 @@ if get(H.results_epsilon, 'Value') == 1
 	plot([0 DM_Slider],[Y0_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
 	plot([0 DM_Slider],[Y0_l_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
     
-    idx = H.match2(get(H.ind_listbox1,'Value'),1);
-    if idx ~= 0
-        s1 = scatter(H.Ages_ascribed(idx,1), H.eHf_UNKNOWNS(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
-        %legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-    else    
-        s1 = scatter(H.Ages_ascribed(1,1), H.eHf_UNKNOWNS(1,1), 150, 'o', 'MarkerEdgeColor', 'b');
-        set(s1,'Visible','off')
+	if sum(H.SAMPLES_idx) > 0
+		idx = H.match2(get(H.ind_listbox1,'Value'),1);
+		if idx ~= 0
+			s1 = scatter(H.Ages_ascribed(idx,1), H.eHf_UNKNOWNS(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
+			%legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+		else    
+			s1 = scatter(H.Ages_ascribed(1,1), H.eHf_UNKNOWNS(1,1), 150, 'o', 'MarkerEdgeColor', 'b');
+			set(s1,'Visible','off')
+		end
+		legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
 	end
-	legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
 	xlabel('Age (Ma)')
 	ylabel('Epsilon Hf')
 end
 if get(H.results_autoscale,'Value') == 0
 	axis([str2num(get(H.results_xmin,'String')) str2num(get(H.results_xmax,'String')) str2num(get(H.results_ymin,'String')) str2num(get(H.results_ymax,'String'))])
 end
+
+
+
+
+
+
+
+
 hold off
 
 
@@ -900,14 +1368,13 @@ function stdopt_Hfcutoff_Callback(hObject, eventdata, H)
 
 function stdopt_Ybcutoff_Callback(hObject, eventdata, H)
 
-function stdopt_percrej_Callback(hObject, eventdata, H)
-
 function stdopt_intcutoff_Callback(hObject, eventdata, H)
 
 
 
 function ind_listbox1_Callback(hObject, eventdata, H)
 ind_PLOT_Callback(hObject, eventdata, H)
+results_PLOT_Callback(hObject, eventdata, H)
 
 function ind_180_Callback(hObject, eventdata, H)
 set(H.ind_180,'Value', 1)
@@ -992,3 +1459,26 @@ function Export_Plots_Callback(hObject, eventdata, H)
 function Save_Session_Callback(hObject, eventdata, H)
 
 function Upload_Session_Callback(hObject, eventdata, H)
+
+
+
+function defaultage_Callback(hObject, eventdata, H)
+
+
+
+function unc_cutoff_Callback(hObject, eventdata, H)
+
+
+
+function epsiloncutoffhi_Callback(hObject, eventdata, H)
+
+
+
+function epsiloncutofflo_Callback(hObject, eventdata, H)
+
+
+
+function filterSTDs_Callback(hObject, eventdata, H)
+
+
+function filtersamples_Callback(hObject, eventdata, H)
