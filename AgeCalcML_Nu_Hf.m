@@ -74,7 +74,8 @@ for i = 1:size(filenames,1)
 end
 
 filenames(all(cellfun('isempty',filenames),2),:) = [];
-filenames_sorted = filenames;
+filenames_sorted = natsortfiles(filenames);
+
 TRA = 0;
 Agefile = 0;
 for i = 1:size(filenames_sorted,1)
@@ -101,135 +102,6 @@ end
 filename_data(all(cellfun('isempty',filename_data),2),:) = [];
 
 h = waitbar(0,'Reducing data. Please wait...');
-
-if TRA == 1
-	
-	if ispc == 1
-		fullpathname_data = char(strcat(folder_name, '\', filename_data{1,1}));
-	end
-	if ismac == 1
-		fullpathname_data = char(strcat(folder_name, '/', filename_data{1,1}));
-	end	
-	
-	if ispc == 1
-		fullpathname_names = char(strcat(folder_name, '\', filename_scancsv{1,1}));
-	end
-	if ismac == 1
-		fullpathname_names = char(strcat(folder_name, '/', filename_scancsv{1,1}));
-	end
-	
-	Data = importdata(char(fullpathname_data),',',500000);
-	Names = importdata(fullpathname_names);
-	Names = Names(2:end,1);
-	data_count = length(Names);	
-	
-	for i = 1:data_count
-		name_tmp = char(Names(i,1));
-		name_tmp_idx = strfind(name_tmp, '"');
-		sample{i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
-		clear name_tmp name_tmp_idx
-	end	
-	
-	firstline = 74;
-	cols = 13;
-
-	values_tmp = zeros(length(Data(firstline:end,1)),cols);
-	for j = 1:length(Data(firstline:end,1))
-		values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
-		for k = 1:cols
-			values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
-		end
-	end
-	
-	thresh = 0;
-	
-	for i = 1:length(Data(firstline:end,1))
-		if values_tmp(i,1) > thresh
-			thresh180(i,1) = 1;
-		else
-			thresh180(i,1) = 0;
-		end
-	end	
-	
-	for i = 2:length(Data(firstline:end,1))-2
-		if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
-			values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh 
-			t0_180(i,1) = values_tmp(i,cols-1);
-			t0_idx(i,1) = values_tmp(i,cols-2);
-		else
-			t0_180(i,1) = 0;
-		end
-	end	
-
-	t0_180 = nonzeros(t0_180);
-	t0_idx = nonzeros(t0_idx);
-	diff_idx = diff(t0_idx);
-	
-	%{
-	figure
-	hold on
-	plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
-	scatter(t0_idx,zeros(length(t0_idx),1),'filled')
-	hold off
-	%}
-	
-	start_idx = t0_idx - 6;
-	end_idx = t0_idx + 69; 	
-	sampl_length = 76;
-	
-	%%% Indexes
-	for i = 1:data_count
-		values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
-		baseline(1:5,1:cols,i) = values_all(1:5,1:cols,i);
-		integration(1:60,1:cols,i) = values_all(9:68,1:cols,i);
-	end	
-	
-	for i = 1:data_count
-		mean180BL(i,1) = mean(baseline(:,1,i));
-		mean179BL(i,1) = mean(baseline(:,2,i));
-		mean178BL(i,1) = mean(baseline(:,3,i));
-		mean177BL(i,1) = mean(baseline(:,4,i));
-		mean176BL(i,1) = mean(baseline(:,5,i));
-		mean175BL(i,1) = mean(baseline(:,6,i));
-		mean174BL(i,1) = mean(baseline(:,7,i));
-		mean173BL(i,1) = mean(baseline(:,8,i));
-		mean172BL(i,1) = mean(baseline(:,9,i));
-		mean171BL(i,1) = mean(baseline(:,10,i));
-	end	
-
-	%{
-	for i = 1:data_count
-		SE180BL(i,1) = std(baseline(:,1,i))./sqrt(length(baseline(:,1,i)))./abs(mean180BL(i,1)).*100;
-		SE179BL(i,1) = std(baseline(:,2,i))./sqrt(length(baseline(:,2,i)))./abs(mean179BL(i,1)).*100;
-		SE178BL(i,1) = std(baseline(:,3,i))./sqrt(length(baseline(:,3,i)))./abs(mean178BL(i,1)).*100;
-		SE177BL(i,1) = std(baseline(:,4,i))./sqrt(length(baseline(:,4,i)))./abs(mean177BL(i,1)).*100;
-		SE176BL(i,1) = std(baseline(:,5,i))./sqrt(length(baseline(:,5,i)))./abs(mean176BL(i,1)).*100;
-		SE175BL(i,1) = std(baseline(:,6,i))./sqrt(length(baseline(:,6,i)))./abs(mean175BL(i,1)).*100;
-		SE174BL(i,1) = std(baseline(:,7,i))./sqrt(length(baseline(:,7,i)))./abs(mean174BL(i,1)).*100;
-		SE173BL(i,1) = std(baseline(:,8,i))./sqrt(length(baseline(:,8,i)))./abs(mean173BL(i,1)).*100;
-		SE172BL(i,1) = std(baseline(:,9,i))./sqrt(length(baseline(:,9,i)))./abs(mean172BL(i,1)).*100;
-		SE171BL(i,1) = std(baseline(:,10,i))./sqrt(length(baseline(:,10,i)))./abs(mean171BL(i,1)).*100;
-	end
-	%}
-	
-	for i = 1:data_count
-		BLS_180(:,i) = integration(:,1,i) - mean180BL(i,1);
-		BLS_179(:,i) = integration(:,2,i) - mean179BL(i,1);
-		BLS_178(:,i) = integration(:,3,i) - mean178BL(i,1);
-		BLS_177(:,i) = integration(:,4,i) - mean177BL(i,1);
-		BLS_176(:,i) = integration(:,5,i) - mean176BL(i,1);
-		BLS_175(:,i) = integration(:,6,i) - mean175BL(i,1);
-		BLS_174(:,i) = integration(:,7,i) - mean174BL(i,1);
-		BLS_173(:,i) = integration(:,8,i) - mean173BL(i,1);
-		BLS_172(:,i) = integration(:,9,i) - mean172BL(i,1);
-		BLS_171(:,i) = integration(:,10,i) - mean171BL(i,1);
-	end
-	
-	data_length = length(sample);
-	samp_length = length(integration(:,1,1));
-	%set(H.filterSTDs,'Value',0)
-end
-
 
 if TRA == 0
 	
@@ -318,6 +190,232 @@ if TRA == 0
 	end
 	samp_length = length(BLS_180(:,1));
 end
+
+if TRA == 1
+	firstline = 74;
+	cols = 13;
+	
+	if length(filename_scancsv) == 1
+		if ispc == 1
+			fullpathname_data = char(strcat(folder_name, '\', filename_data{1,1}));
+		end
+		if ismac == 1
+			fullpathname_data = char(strcat(folder_name, '/', filename_data{1,1}));
+		end
+		
+		if ispc == 1
+			fullpathname_names = char(strcat(folder_name, '\', filename_scancsv{1,1}));
+		end
+		if ismac == 1
+			fullpathname_names = char(strcat(folder_name, '/', filename_scancsv{1,1}));
+		end
+		
+		Data = importdata(char(fullpathname_data),',',500000);
+		Names = importdata(fullpathname_names);
+		Names = Names(2:end,1);
+		data_count = length(Names);
+		
+		for i = 1:data_count
+			name_tmp = char(Names(i,1));
+			name_tmp_idx = strfind(name_tmp, '"');
+			sample{i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
+			clear name_tmp name_tmp_idx
+		end
+		
+		values_tmp = zeros(length(Data(firstline:end,1)),cols);
+		for j = 1:length(Data(firstline:end,1))
+			values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
+			for k = 1:cols
+				values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+			end
+		end
+		
+		thresh = 0;
+		
+		for i = 1:length(Data(firstline:end,1))
+			if values_tmp(i,1) > thresh
+				thresh180(i,1) = 1;
+			else
+				thresh180(i,1) = 0;
+			end
+		end
+		
+		for i = 2:length(Data(firstline:end,1))-2
+			if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
+					values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh
+				t0_180(i,1) = values_tmp(i,cols-1);
+				t0_idx(i,1) = values_tmp(i,cols-2);
+			else
+				t0_180(i,1) = 0;
+			end
+		end
+		
+		t0_180 = nonzeros(t0_180);
+		t0_idx = nonzeros(t0_idx);
+		diff_idx = diff(t0_idx);
+		
+		%{
+		figure
+		hold on
+		plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
+		scatter(t0_idx,zeros(length(t0_idx),1),'filled')
+		hold off
+		%}
+		
+		
+		start_idx = t0_idx - 6;
+		end_idx = t0_idx + 69;
+		sampl_length = 76;
+		
+		%%% Indexes
+		for i = 1:data_count
+			values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
+			baseline(1:5,1:cols,i) = values_all(1:5,1:cols,i);
+			integration(1:60,1:cols,i) = values_all(9:68,1:cols,i);
+		end
+		
+		samp_length = length(integration(:,1,1));
+		
+	end
+    
+	if length(filename_scancsv) > 1
+		for p = 1:length(filename_data)
+			if ispc == 1
+				tmp1 = char(strcat(folder_name, '\', filename_data{p,1}));
+				tmp2 = char(strcat(folder_name, '\', filename_scancsv{p,1}));
+			end
+			if ismac == 1
+				tmp1 = char(strcat(folder_name, '/', filename_data{p,1}));
+				tmp2 = char(strcat(folder_name, '/', filename_scancsv{p,1}));
+			end
+			fullpathname_data(p,1) = {tmp1};
+			fullpathname_names(p,1) = {tmp2};
+		end
+		
+		for p = 1:length(fullpathname_data)
+			
+			if p == 1
+				data_length = 0;
+			end
+			
+			Data = importdata(char(fullpathname_data(p,1)),',',500000);
+			Names = importdata(fullpathname_names{p,1});
+			Names = Names(2:end,1);
+			data_count_tmp = length(Names);
+			
+			for i = 1:data_count_tmp
+				name_tmp = char(Names(i,1));
+				name_tmp_idx = strfind(name_tmp, '"');
+				sample{data_length+i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
+				clear name_tmp name_tmp_idx
+			end
+			
+			values_tmp = zeros(length(Data(firstline:end,1)),cols);
+			for j = 1:length(Data(firstline:end,1))
+				values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
+				for k = 1:cols
+					values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+				end
+			end
+			
+			thresh = 0;
+			
+			for i = 1:length(Data(firstline:end,1))
+				if values_tmp(i,1) > thresh
+					thresh180(i,1) = 1;
+				else
+					thresh180(i,1) = 0;
+				end
+			end
+			
+			for i = 2:length(Data(firstline:end,1))-2
+				if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
+						values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh
+					t0_180(i,1) = values_tmp(i,cols-1);
+					t0_idx(i,1) = values_tmp(i,cols-2);
+				else
+					t0_180(i,1) = 0;
+				end
+			end
+			
+			t0_180 = nonzeros(t0_180);
+			t0_idx = nonzeros(t0_idx);
+			diff_idx = diff(t0_idx);
+			
+			%{
+			figure
+			hold on
+			plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
+			scatter(t0_idx,zeros(length(t0_idx),1),'filled')
+			hold off
+			%}
+			
+			start_idx = t0_idx - 6;
+			end_idx = t0_idx + 69;
+			sampl_length = 76;
+					
+			%%% Indexes
+	
+			for i = 1:data_count_tmp
+				values_all_tmp(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
+				values_all(:,:,data_length+i) = values_all_tmp(:,:,i);
+				baseline(1:5,1:cols,data_length+i) = values_all_tmp(1:5,1:cols,i);
+				integration(1:60,1:cols,data_length+i) = values_all_tmp(9:68,1:cols,i);
+			end
+			
+			samp_length = length(integration(:,1,1));
+			data_length = length(sample);
+			
+			clear Data Names data_count_tmp	values_tmp values_all_cell thresh180 t0_180 t0_idx diff_idx start_idx end_idx
+			
+		end
+		data_count = length(sample);
+	end
+
+	for i = 1:data_count
+		mean180BL(i,1) = mean(baseline(:,1,i));
+		mean179BL(i,1) = mean(baseline(:,2,i));
+		mean178BL(i,1) = mean(baseline(:,3,i));
+		mean177BL(i,1) = mean(baseline(:,4,i));
+		mean176BL(i,1) = mean(baseline(:,5,i));
+		mean175BL(i,1) = mean(baseline(:,6,i));
+		mean174BL(i,1) = mean(baseline(:,7,i));
+		mean173BL(i,1) = mean(baseline(:,8,i));
+		mean172BL(i,1) = mean(baseline(:,9,i));
+		mean171BL(i,1) = mean(baseline(:,10,i));
+	end
+	
+	%{
+		for i = 1:data_count
+			SE180BL(i,1) = std(baseline(:,1,i))./sqrt(length(baseline(:,1,i)))./abs(mean180BL(i,1)).*100;
+			SE179BL(i,1) = std(baseline(:,2,i))./sqrt(length(baseline(:,2,i)))./abs(mean179BL(i,1)).*100;
+			SE178BL(i,1) = std(baseline(:,3,i))./sqrt(length(baseline(:,3,i)))./abs(mean178BL(i,1)).*100;
+			SE177BL(i,1) = std(baseline(:,4,i))./sqrt(length(baseline(:,4,i)))./abs(mean177BL(i,1)).*100;
+			SE176BL(i,1) = std(baseline(:,5,i))./sqrt(length(baseline(:,5,i)))./abs(mean176BL(i,1)).*100;
+			SE175BL(i,1) = std(baseline(:,6,i))./sqrt(length(baseline(:,6,i)))./abs(mean175BL(i,1)).*100;
+			SE174BL(i,1) = std(baseline(:,7,i))./sqrt(length(baseline(:,7,i)))./abs(mean174BL(i,1)).*100;
+			SE173BL(i,1) = std(baseline(:,8,i))./sqrt(length(baseline(:,8,i)))./abs(mean173BL(i,1)).*100;
+			SE172BL(i,1) = std(baseline(:,9,i))./sqrt(length(baseline(:,9,i)))./abs(mean172BL(i,1)).*100;
+			SE171BL(i,1) = std(baseline(:,10,i))./sqrt(length(baseline(:,10,i)))./abs(mean171BL(i,1)).*100;
+		end
+	%}
+	
+	for i = 1:data_count
+		BLS_180(:,i) = integration(:,1,i) - mean180BL(i,1);
+		BLS_179(:,i) = integration(:,2,i) - mean179BL(i,1);
+		BLS_178(:,i) = integration(:,3,i) - mean178BL(i,1);
+		BLS_177(:,i) = integration(:,4,i) - mean177BL(i,1);
+		BLS_176(:,i) = integration(:,5,i) - mean176BL(i,1);
+		BLS_175(:,i) = integration(:,6,i) - mean175BL(i,1);
+		BLS_174(:,i) = integration(:,7,i) - mean174BL(i,1);
+		BLS_173(:,i) = integration(:,8,i) - mean173BL(i,1);
+		BLS_172(:,i) = integration(:,9,i) - mean172BL(i,1);
+		BLS_171(:,i) = integration(:,10,i) - mean171BL(i,1);
+	end
+	
+end
+
+
 
 
 
@@ -782,7 +880,7 @@ if sum(SAMPLES_idx) > 0
 		[~,I(i,1)] = max(s(i,:));
 	end
 
-	for i = 1:data_length
+	for i = 1:data_count
 		if SAMPLES_idx(i,1) == 1
 			Ages_ascribed(i,1:2) = [Ages_mean(I(i,1),1),Ages_uncert(I(i,1),1)];
 		else
