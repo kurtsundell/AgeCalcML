@@ -350,17 +350,17 @@ if TRA == 1
 			hold off
 			%}
 			
-			start_idx = t0_idx - 6;
-			end_idx = t0_idx + 69;
-			sampl_length = 76;
+			start_idx = t0_idx - 12;
+			end_idx = t0_idx + 72;
+			sampl_length = end_idx(1,1)-start_idx(1,1)+1;
 					
 			%%% Indexes
 	
 			for i = 1:data_count_tmp
 				values_all_tmp(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
 				values_all(:,:,data_length+i) = values_all_tmp(:,:,i);
-				baseline(1:5,1:cols,data_length+i) = values_all_tmp(1:5,1:cols,i);
-				integration(1:60,1:cols,data_length+i) = values_all_tmp(9:68,1:cols,i);
+				baseline(1:10,1:cols,data_length+i) = values_all_tmp(1:10,1:cols,i);
+				integration(1:60,1:cols,data_length+i) = values_all_tmp(16:75,1:cols,i);
 			end
 			
 			samp_length = length(integration(:,1,1));
@@ -710,6 +710,13 @@ if get(H.filtersamples,'Value') == 1
 	Filter_95 = EL;	
 end
 
+
+
+
+
+
+
+
 %if TRA == 0
 	for i = 1:length(sample)
 		if BLS_180(30,i) < 0.1
@@ -840,20 +847,28 @@ end
 if sum(SAMPLES_idx) > 0
 	if Agefile == 1
 		filename_ages(all(cellfun('isempty',filename_ages),2),:) = [];
-		fullpathname = char(strcat(folder_name, '/', filename_ages{1,1}));
+		
+		if ispc == 1
+			fullpathname = char(strcat(folder_name, '\', filename_ages{1,1}));
+		end
+		if ismac == 1
+			fullpathname = char(strcat(folder_name, '/', filename_ages{1,1}));
+		end		
+		
+		
 		Data = importdata(fullpathname,',',500000);
 		Ages = regexp(Data, ',', 'split');
 		clear Data
 		for i = 1:length(Ages(:,1))
 			Ages_names(i,1) = strtrim(Ages{i,1}(1,1));
 			Ages_mean(i,1) = str2num(cell2mat(Ages{i,1}(1,2)));
-			Ages_uncert(i,1) = str2num(cell2mat(Ages{i,1}(1,3)));
+			%Ages_uncert(i,1) = str2num(cell2mat(Ages{i,1}(1,3)));
 		end
 	else
 		Ages_names = sample_UNKNOWN_name;
 		%Ages_mean(1:length(sample_UNKNOWN_name),1) = str2double(get(H.age_set,'Value'));
         Ages_mean(1:length(sample_UNKNOWN_name),1) = str2num(get(H.defaultage,'String'));
-		Ages_uncert(1:length(sample_UNKNOWN_name),1) = 1;
+		%Ages_uncert(1:length(sample_UNKNOWN_name),1) = 1;
 	end
 end
 
@@ -882,9 +897,9 @@ if sum(SAMPLES_idx) > 0
 
 	for i = 1:data_count
 		if SAMPLES_idx(i,1) == 1
-			Ages_ascribed(i,1:2) = [Ages_mean(I(i,1),1),Ages_uncert(I(i,1),1)];
+			Ages_ascribed(i,1:2) = [Ages_mean(I(i,1),1)];
 		else
-			Ages_ascribed(i,1:2) = 0;
+			Ages_ascribed(i,1) = 0;
 		end
 	end
 
@@ -1337,6 +1352,21 @@ hold on
 if sum(H.SAMPLES_idx) > 0
 	if get(H.results_data, 'Value') == 1
 		scatter(H.Yb_Lu_Hf_UNKNOWN_mean, H.Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+		
+		
+			
+		idx = H.match2(get(H.ind_listbox1,'Value'),1);
+		if idx ~= 0
+			s1 = scatter(H.Yb_Lu_Hf_UNKNOWN_mean(idx,1), H.Ratio_UNKNOWN_176_177_mean(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
+			%legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+		else    
+			s1 = scatter(H.Yb_Lu_Hf_UNKNOWN_mean(1,1), H.Ratio_UNKNOWN_176_177_mean(1,1), 150, 'o', 'MarkerEdgeColor', 'b');
+			set(s1,'Visible','off')
+		end
+		
+		
+		
+		
 		legend('Unknowns')
 		xlabel('176(Yb+Lu) / 176Hf (%)')
 		ylabel('176Hf/177Hf')
@@ -1345,15 +1375,7 @@ end
 
 if get(H.results_evolution, 'Value') == 1
 	if sum(H.SAMPLES_idx) > 0
-		for i = 1:length(H.Ratio_UNKNOWN_176_177_mean)
-			if H.SAMPLES_idx(i,1) == 0
-				UNKNOWN_176_177_mean_plot(i,1) = 0;
-			else
-				UNKNOWN_176_177_mean_plot(i,1) = H.Ratio_UNKNOWN_176_177_mean(i,1);
-			end
-		end
-		UNKNOWN_176_177_mean_plot( all(~UNKNOWN_176_177_mean_plot,2), : ) = [];
-		scatter(H.Ages_ascribed(:,1), UNKNOWN_176_177_mean_plot, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
+		scatter(H.Ages_ascribed(:,1), H.Ratio_UNKNOWN_176_177_mean, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
 	end
 	plot(Evolution_plot(:,3),Evolution_plot(:,5),'k','LineWidth',2)
 	plot(Evolution_plot(:,3),Evolution_plot(:,4),'r','LineWidth',2)
@@ -1363,9 +1385,33 @@ if get(H.results_evolution, 'Value') == 1
 	plot([0 DM_Slider],[Y0_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
 	plot([0 DM_Slider],[Y0_l_Evol_DM_176Lu_177Hf, Ys_Evol_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
 	
+	
 	if sum(H.SAMPLES_idx) > 0
+		idx = H.match2(get(H.ind_listbox1,'Value'),1);
+		if idx ~= 0
+			s1 = scatter(H.Ages_ascribed(idx,1), H.Ratio_UNKNOWN_176_177_mean(idx,1), 150, 'o', 'MarkerEdgeColor', 'b');
+			%legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+		else    
+			s1 = scatter(H.Ages_ascribed(1,1), H.Ratio_UNKNOWN_176_177_mean(1,1), 150, 'o', 'MarkerEdgeColor', 'b');
+			set(s1,'Visible','off')
+		end
+		
 		legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
 	end
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	%if sum(H.SAMPLES_idx) > 0
+	%	legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
+	%end
 	xlabel('Age (Ma)')
 	ylabel('176Hf/177Hf(T)')
 end
