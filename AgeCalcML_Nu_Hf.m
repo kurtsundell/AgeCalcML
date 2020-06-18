@@ -225,7 +225,13 @@ STD_SL = 'SL';
 			end
 			
 			
-			rws = 50*length(sample)+firstline;
+			if 50*length(sample)+firstline < length(Data(firstline:end,1))
+				rws = 50*length(sample)+firstline;
+			else
+				rws = length(Data(firstline:end,1));
+			end
+			
+			%rws = 50*length(sample)+firstline;
 			values_tmp1{rws,cols} = [];
 			for j = 1:rws
 				values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
