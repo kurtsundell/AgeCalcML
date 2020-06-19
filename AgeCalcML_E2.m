@@ -5181,7 +5181,7 @@ geochron_out(27:end,7:11) = geochron_out_temp(:,32:36);
 geochron_out(27:end,12:17) = geochron_out_temp(:,60:65);
 geochron_out(27:end,18:19) = geochron_out_temp(:,68:69);
 for i = 1:length(geochron_out_temp(:,1))
-	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,21))/cell2num(geochron_out_temp(i,23)))*100};
+	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,23))/cell2num(geochron_out_temp(i,25)))*100};
 end
 
 waitbar(3/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
