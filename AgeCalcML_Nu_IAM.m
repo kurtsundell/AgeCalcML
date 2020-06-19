@@ -1407,7 +1407,7 @@ if get(H.primary, 'Value') == 3
 	age_label2 = {'? Ma'};
 end
 
-if get(H.primary, 'Value') == 3
+if get(H.primary, 'Value') == 5
 	age_label2 = {'1099 Ma'};
 end
 
