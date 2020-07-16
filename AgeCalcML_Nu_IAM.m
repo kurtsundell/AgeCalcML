@@ -443,177 +443,203 @@ serial = sample;
 %clear serial_tmp
 
 if FAR == 1
-% Extract Faraday data
-for i = 1:data_count
-Data_Far_All(:,1:2,i) = values_all(:,1:2,i);
-Data_Far_All(:,3:6,i) = values_all(:,10:13,i);
-Data_Far_All(:,7,i) = values_all(:,15,i);
-Data_Far_All(:,8:9,i) = values_all(:,17:18,i);
-Data_Far_All(:,10:13,i) = values_all(:,26:29,i);
-Data_Far_All(:,14,i) = values_all(:,31,i);
-end
+	% Extract Faraday data
+	for i = 1:data_count
+		Data_Far_All(:,1:2,i) = values_all(:,1:2,i);
+		Data_Far_All(:,3:6,i) = values_all(:,10:13,i);
+		Data_Far_All(:,7,i) = values_all(:,15,i);
+		Data_Far_All(:,8:9,i) = values_all(:,17:18,i);
+		Data_Far_All(:,10:13,i) = values_all(:,26:29,i);
+		Data_Far_All(:,14,i) = values_all(:,31,i);
+	end
 end
 
 if IC == 1
-% Extract Ion Counter data
-for i = 1:data_count
-Data_IC_All(:,1:2,i) = values_all(:,1:2,i);
-Data_IC_All(:,3:8,i) = values_all(:,13:18,i);
-Data_IC_All(:,9:12,i) = values_all(:,29:32,i);
-end
-end
-
-if FAR == 1
-% Baseline subtract (BLS) Faraday
-for i = 1:data_count
-BLS_238(:,i) = Data_Far_All(:,8,i) - Data_Far_All(:,1,i);
-BLS_232(:,i) = Data_Far_All(:,9,i) - Data_Far_All(:,2,i);
-BLS_208(:,i) = Data_Far_All(:,10,i) - Data_Far_All(:,3,i);
-BLS_207(:,i) = Data_Far_All(:,11,i) - Data_Far_All(:,4,i);
-BLS_206(:,i) = Data_Far_All(:,12,i) - Data_Far_All(:,5,i);
-BLS_202(:,i) = Data_Far_All(:,14,i) - Data_Far_All(:,7,i);
-BLS_204(:,i) = Data_Far_All(:,13,i) - Data_Far_All(:,6,i) - (BLS_202(:,i)./4.34);
-end
-end
-
-if IC == 1 
-% Baseline subtract (BLS) Ion Counter
-for i = 1:data_count
-BLS_238(:,i) = Data_IC_All(:,7,i) - Data_IC_All(:,1,i);
-BLS_232(:,i) = Data_IC_All(:,8,i) - Data_IC_All(:,2,i);
-BLS_208(:,i) = Data_IC_All(:,9,i) - Data_IC_All(:,3,i);
-BLS_207(:,i) = Data_IC_All(:,10,i) - Data_IC_All(:,4,i);
-BLS_206(:,i) = Data_IC_All(:,11,i) - Data_IC_All(:,5,i);
-BLS_204(:,i) = Data_IC_All(:,12,i) - Data_IC_All(:,6,i);
-end
+	% Extract Ion Counter data
+	for i = 1:data_count
+		Data_IC_All(:,1:2,i) = values_all(:,1:2,i);
+		Data_IC_All(:,3:8,i) = values_all(:,13:18,i);
+		Data_IC_All(:,9:12,i) = values_all(:,29:32,i);
+	end
 end
 
 if FAR == 1
-Data_All = Data_Far_All(:,8:14,:);
+	% Baseline subtract (BLS) Faraday
+	for i = 1:data_count
+		BLS_238(:,i) = Data_Far_All(:,8,i) - Data_Far_All(:,1,i);
+		BLS_232(:,i) = Data_Far_All(:,9,i) - Data_Far_All(:,2,i);
+		BLS_208(:,i) = Data_Far_All(:,10,i) - Data_Far_All(:,3,i);
+		BLS_207(:,i) = Data_Far_All(:,11,i) - Data_Far_All(:,4,i);
+		BLS_206(:,i) = Data_Far_All(:,12,i) - Data_Far_All(:,5,i);
+		BLS_202(:,i) = Data_Far_All(:,14,i) - Data_Far_All(:,7,i);
+		BLS_204(:,i) = Data_Far_All(:,13,i) - Data_Far_All(:,6,i) - (BLS_202(:,i)./4.34);
+	end
+end
+
+if IC == 1
+	% Baseline subtract (BLS) Ion Counter
+	for i = 1:data_count
+		BLS_238(:,i) = Data_IC_All(:,7,i) - Data_IC_All(:,1,i);
+		BLS_232(:,i) = Data_IC_All(:,8,i) - Data_IC_All(:,2,i);
+		BLS_208(:,i) = Data_IC_All(:,9,i) - Data_IC_All(:,3,i);
+		BLS_207(:,i) = Data_IC_All(:,10,i) - Data_IC_All(:,4,i);
+		BLS_206(:,i) = Data_IC_All(:,11,i) - Data_IC_All(:,5,i);
+		BLS_204(:,i) = Data_IC_All(:,12,i) - Data_IC_All(:,6,i);
+	end
+end
+
+if FAR == 1
+	Data_All = Data_Far_All(:,8:14,:);
 end
 if IC == 1
-Data_All = Data_IC_All(:,7:12,:);
-Data_All(1:end,7,1:end) = 0;
+	Data_All = Data_IC_All(:,7:12,:);
+	Data_All(1:end,7,1:end) = 0;
 end
 
 if IC == 1 && max(Ablate) == 9
-BLS_238(10:15,:,:) = BLS_238(4:9,:,:);
-BLS_232(10:15,:,:) = BLS_232(4:9,:,:);
-BLS_208(10:15,:,:) = BLS_208(4:9,:,:);
-BLS_207(10:15,:,:) = BLS_207(4:9,:,:);
-BLS_206(10:15,:,:) = BLS_206(4:9,:,:);
-BLS_204(10:15,:,:) = BLS_204(4:9,:,:);
+	BLS_238(10:15,:,:) = BLS_238(4:9,:,:);
+	BLS_232(10:15,:,:) = BLS_232(4:9,:,:);
+	BLS_208(10:15,:,:) = BLS_208(4:9,:,:);
+	BLS_207(10:15,:,:) = BLS_207(4:9,:,:);
+	BLS_206(10:15,:,:) = BLS_206(4:9,:,:);
+	BLS_204(10:15,:,:) = BLS_204(4:9,:,:);
 end
 
 if FAR == 1
-for i = 1:data_count
-BLS_68(:,i) = BLS_206(:,i)./BLS_238(:,i); %ActiveCell.FormulaR1C1 = "=RC[-3]/RC[-7]"
-BLS_67(:,i) = BLS_206(:,i)./BLS_207(:,i); %ActiveCell.FormulaR1C1 = "=RC[-4]/RC[-5]"
-BLS_64(:,i) = abs(BLS_206(:,i)./BLS_204(:,i)); %ActiveCell.FormulaR1C1 = "=ABS(RC[-5]/RC[-4])"
-BLS_82(:,i) = abs(BLS_208(:,i)./BLS_232(:,i)); %ActiveCell.FormulaR1C1 = "=RC[-8]/RC[-9]"
-BLS_84(:,i) = abs(BLS_208(:,i)./BLS_204(:,i)); %ActiveCell.FormulaR1C1 = "=ABS(RC[-9]/RC[-6])"
-end
+	for i = 1:data_count
+		BLS_68(:,i) = BLS_206(:,i)./BLS_238(:,i); %ActiveCell.FormulaR1C1 = "=RC[-3]/RC[-7]"
+		BLS_67(:,i) = BLS_206(:,i)./BLS_207(:,i); %ActiveCell.FormulaR1C1 = "=RC[-4]/RC[-5]"
+		BLS_64(:,i) = abs(BLS_206(:,i)./BLS_204(:,i)); %ActiveCell.FormulaR1C1 = "=ABS(RC[-5]/RC[-4])"
+		BLS_82(:,i) = abs(BLS_208(:,i)./BLS_232(:,i)); %ActiveCell.FormulaR1C1 = "=RC[-8]/RC[-9]"
+		BLS_84(:,i) = abs(BLS_208(:,i)./BLS_204(:,i)); %ActiveCell.FormulaR1C1 = "=ABS(RC[-9]/RC[-6])"
+	end
 end
 
 if IC == 1
-for i = 1:data_count
-BLS_68(:,i) = sort(BLS_206(:,i)./BLS_238(:,i)); %ActiveCell.FormulaR1C1 = "=RC[-3]/RC[-7]"
-BLS_67(:,i) = sort(BLS_206(:,i)./BLS_207(:,i)); %ActiveCell.FormulaR1C1 = "=RC[-4]/RC[-5]"
-BLS_64(:,i) = sort(abs(BLS_206(:,i)./BLS_204(:,i))); %ActiveCell.FormulaR1C1 = "=ABS(RC[-5]/RC[-4])"
-BLS_82(:,i) = sort(abs(BLS_208(:,i)./BLS_232(:,i))); %ActiveCell.FormulaR1C1 = "=RC[-8]/RC[-9]"
-BLS_84(:,i) = sort(abs(BLS_208(:,i)./BLS_204(:,i))); %ActiveCell.FormulaR1C1 = "=ABS(RC[-9]/RC[-6])"
-end
+	for i = 1:data_count
+		BLS_68(:,i) = sort(BLS_206(:,i)./BLS_238(:,i)); %ActiveCell.FormulaR1C1 = "=RC[-3]/RC[-7]"
+		BLS_67(:,i) = sort(BLS_206(:,i)./BLS_207(:,i)); %ActiveCell.FormulaR1C1 = "=RC[-4]/RC[-5]"
+		BLS_64(:,i) = sort(abs(BLS_206(:,i)./BLS_204(:,i))); %ActiveCell.FormulaR1C1 = "=ABS(RC[-5]/RC[-4])"
+		BLS_82(:,i) = sort(abs(BLS_208(:,i)./BLS_232(:,i))); %ActiveCell.FormulaR1C1 = "=RC[-8]/RC[-9]"
+		BLS_84(:,i) = sort(abs(BLS_208(:,i)./BLS_204(:,i))); %ActiveCell.FormulaR1C1 = "=ABS(RC[-9]/RC[-6])"
+	end
 end
 
 % Calculate intensities in counts per second (CPS)
 for i = 1:data_count
-if FAR == 1
-CPS_202(1,i) = abs(80000000*mean(BLS_202(:,i)));
-CPS_204(1,i) = abs(80000000*mean(BLS_204(:,i)));
-end
-if IC == 1
-CPS_204(1,i) = abs(8000000*mean(BLS_204(:,i))); % removed 0
-end
-CPS_206(1,i) = 80000000*mean(BLS_206(:,i));
-CPS_207(1,i) = 80000000*mean(BLS_207(:,i));
-CPS_208(1,i) = 80000000*mean(BLS_208(:,i));
-CPS_232(1,i) = 80000000*mean(BLS_232(:,i));
-CPS_238(1,i) = 80000000*mean(BLS_238(:,i));
+	if FAR == 1
+		CPS_202(1,i) = abs(80000000*mean(BLS_202(:,i)));
+		CPS_204(1,i) = abs(80000000*mean(BLS_204(:,i)));
+	end
+	if IC == 1
+		CPS_204(1,i) = abs(8000000*mean(BLS_204(:,i))); % removed 0
+	end
+	CPS_206(1,i) = 80000000*mean(BLS_206(:,i));
+	CPS_207(1,i) = 80000000*mean(BLS_207(:,i));
+	CPS_208(1,i) = 80000000*mean(BLS_208(:,i));
+	CPS_232(1,i) = 80000000*mean(BLS_232(:,i));
+	CPS_238(1,i) = 80000000*mean(BLS_238(:,i));
 end
 
 % Sort BLS 67, 64, and 84
 for i = 1:data_count
-BLS_67_sort(:,i) = sort(BLS_67(:,i));
-BLS_64_sort(:,i) = sort(BLS_64(:,i));
-BLS_84_sort(:,i) = sort(BLS_84(:,i));
+	BLS_67_sort(:,i) = sort(BLS_67(:,i));
+	BLS_64_sort(:,i) = sort(BLS_64(:,i));
+	BLS_84_sort(:,i) = sort(BLS_84(:,i));
 end
 
 if FAR == 1
-% Downhole fractionation correction 68
-for i = 1:data_count
-if INT == 15
-tbl = table((1:1:13)',BLS_68(3:15,i));
-end
-mdl = fitlm(tbl);
-BLS_68_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
-BLS_68_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_68_corr(i,1)));
-BLS_68_slope(i,1) = 1000*mdl.Coefficients.Estimate(2,1);
-end
+	% Downhole fractionation correction 68
+	for i = 1:data_count
+		if INT == 15
+			tbl = table((1:1:13)',BLS_68(3:15,i));
+		end
+		mdl = fitlm(tbl);
+		BLS_68_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
+		BLS_68_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_68_corr(i,1)));
+		BLS_68_slope(i,1) = 1000*mdl.Coefficients.Estimate(2,1);
+	end
 end
 
 if IC == 1
-% Downhole fractionation correction 68
-for i = 1:data_count
-if INT == 9
-tbl = table((1:1:10)',BLS_68(6:15,i));
-end
-mdl = fitlm(tbl);
-BLS_68_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
-BLS_68_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_68_corr(i,1)));
-BLS_68_slope(i,1) = 1000*mdl.Coefficients.Estimate(2,1);
-%waitbar(i/data_count)
-end
+	% Downhole fractionation correction 68
+	for i = 1:data_count
+		if INT == 9
+			tbl = table((1:1:10)',BLS_68(6:15,i));
+		end
+		if INT == 12
+			tbl = table((1:1:10)',BLS_68(3:12,i));
+		end
+		mdl = fitlm(tbl);
+		BLS_68_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
+		BLS_68_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_68_corr(i,1)));
+		BLS_68_slope(i,1) = 1000*mdl.Coefficients.Estimate(2,1);
+		%waitbar(i/data_count)
+	end
 end
 
 for i = 1:data_count
-BLS_67_sort_mean(i,1) = mean(BLS_67_sort(3:13,i));
-BLS_67_sort_err(i,1) = 100*(std(BLS_67_sort(3:13,i))/BLS_67_sort_mean(i,1));
+	if INT ~= 12
+		BLS_67_sort_mean(i,1) = mean(BLS_67_sort(3:13,i));
+		BLS_67_sort_err(i,1) = 100*(std(BLS_67_sort(3:13,i))/BLS_67_sort_mean(i,1));
+	end
+	if INT == 12
+		BLS_67_sort_mean(i,1) = mean(BLS_67_sort(3:12,i));
+		BLS_67_sort_err(i,1) = 100*(std(BLS_67_sort(3:12,i))/BLS_67_sort_mean(i,1));
+	end	
+	if FAR == 1
+		BLS_64_sort_mean(i,1) = 0.85.*(mean(BLS_64_sort(3:13,i))); % Reduced by 0.85 because IC0 gain of 0.85
+	end
+	if IC == 1 && INT ~= 12
+		BLS_64_sort_mean(i,1) = 10.*(mean(BLS_64_sort(3:13,i))); % Reduced by 0.85 because IC0 gain of 0.85
+	end
+	if IC == 1 && INT == 12
+		BLS_64_sort_mean(i,1) = 10.*(mean(BLS_64_sort(3:12,i))); % Reduced by 0.85 because IC0 gain of 0.85
+	end
+	if INT ~= 12
+		BLS_64_sort_err(i,1) = 100*(std(BLS_64_sort(3:13,i))/BLS_64_sort_mean(i,1));
+	end
+	if INT == 12
+		BLS_64_sort_err(i,1) = 100*(std(BLS_64_sort(3:12,i))/BLS_64_sort_mean(i,1));
+	end	
+end
+
 if FAR == 1
-BLS_64_sort_mean(i,1) = 0.85.*(mean(BLS_64_sort(3:13,i))); % Reduced by 0.85 because IC0 gain of 0.85
-end
-if IC == 1
-BLS_64_sort_mean(i,1) = 10.*(mean(BLS_64_sort(3:13,i))); % Reduced by 0.85 because IC0 gain of 0.85
-end
-BLS_64_sort_err(i,1) = 100*(std(BLS_64_sort(3:13,i))/BLS_64_sort_mean(i,1));
-end
-
-if FAR == 1
-% Downhole fractionation correction 82
-for i = 1:data_count
-if INT == 15
-tbl = table((1:1:13)',BLS_82(3:15,i));
-end
-mdl = fitlm(tbl);
-BLS_82_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
-BLS_82_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_82_corr(i,1)));
-end
+	% Downhole fractionation correction 82
+	for i = 1:data_count
+		if INT == 15
+			tbl = table((1:1:13)',BLS_82(3:15,i));
+		end
+		mdl = fitlm(tbl);
+		BLS_82_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
+		BLS_82_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_82_corr(i,1)));
+	end
 end
 
 if IC == 1
-% Downhole fractionation correction 82
-for i = 1:data_count
-if INT == 9
-tbl = table((1:1:10)',BLS_82(6:15,i));
-end
-mdl = fitlm(tbl);
-BLS_82_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
-BLS_82_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_82_corr(i,1)));
-end
+	% Downhole fractionation correction 82
+	for i = 1:data_count
+		if INT == 9
+			tbl = table((1:1:10)',BLS_82(6:15,i));
+		end
+		if INT == 12
+			tbl = table((1:1:10)',BLS_82(3:12,i));
+		end
+		mdl = fitlm(tbl);
+		BLS_82_corr(i,1) = abs(mdl.Coefficients.Estimate(1,1));
+		BLS_82_err(i,1) = abs(300.*((mdl.Coefficients.SE(1,1))./BLS_82_corr(i,1)));
+	end
 end
 
 for i = 1:data_count
-BLS_84_sort_mean(i,1) = mean(BLS_84_sort(3:13,i)); 
-BLS_84_sort_err(i,1) = 100*(std(BLS_84_sort(3:13,i))/BLS_84_sort_mean(i,1));
+	if INT ~= 12
+		BLS_84_sort_mean(i,1) = mean(BLS_84_sort(3:13,i));
+		BLS_84_sort_err(i,1) = 100*(std(BLS_84_sort(3:13,i))/BLS_84_sort_mean(i,1));
+	end
+	if INT == 12
+		BLS_84_sort_mean(i,1) = mean(BLS_84_sort(3:12,i));
+		BLS_84_sort_err(i,1) = 100*(std(BLS_84_sort(3:12,i))/BLS_84_sort_mean(i,1));
+	end	
 end
 
 % Data Export %
@@ -623,9 +649,9 @@ Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cp
 Macro1_Output(2:end,1) = sample;
 Macro1_Output(2:end,2) = {serial};
 if FAR == 1
-Macro1_Output(2:end,3) = num2cell(CPS_202);
-else 
-Macro1_Output(2:end,3) = {'NA'};
+	Macro1_Output(2:end,3) = num2cell(CPS_202);
+else
+	Macro1_Output(2:end,3) = {'NA'};
 end
 Macro1_Output(2:end,4) = num2cell(CPS_204);
 Macro1_Output(2:end,5) = num2cell(CPS_206);
