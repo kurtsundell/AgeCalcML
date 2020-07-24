@@ -1593,8 +1593,8 @@ comment7{data_count, 1} = [];
 for i = 1:data_count
     if BLS_68_err(i,1) > filter_err68
         comment1(i,1) = {'high 6/8 err  '};
-    elseif mean(BLS_238(:,i)) < 0.0001
-    comment1(i,1) = {'Not zircon...  '};
+    %elseif mean(BLS_238(:,i)) < 0.0001
+    %comment1(i,1) = {'Not zircon...  '};
     end
     if cell2num(Age68(i,1)) > filter_cutoff && BLS_67_err(i,1) > filter_err67
         comment2(i,1) = {'high 6/7 err  '};
@@ -1608,9 +1608,9 @@ for i = 1:data_count
     if CPS_204(1,i) > filter_204
         comment5(i,1) = {'high 204  '};
     end
-    if BLS_64_corr(i,1) < filter_204/10
-        comment6(i,1) = {'low 206/204  '};
-    end
+    %if BLS_64_corr(i,1) < filter_204/10
+    %    comment6(i,1) = {'low 206/204  '};
+    %end
     if ppm238(i,1) > str2num(get(H.Ufilt,'String'))
         comment7(i,1) = {'high U!!!  '};
     end
@@ -2599,7 +2599,7 @@ H.samp_length = samp_length;
 
 	
 	for i = 1:length(STD1_idx)
-		if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20 
+		if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20 && isnan(ffse68(i,1)) == 0 && isnan(ffsw68(i,1)) == 0 && isnan(pbcerr68(i,1)) == 0
 			syst_err_68(i,1) = sqrt(100*ffse68(i,1)/ffsw68(i,1)*100*ffse68(i,1)/ffsw68(i,1)+pbcerr68(i,1)*pbcerr68(i,1)+0.053*0.053+0.033*0.033); %.35 SL(?) --> .33 FC Mattinson (2010)
 		else
 			syst_err_68(i,1) = 0;
@@ -2609,11 +2609,11 @@ H.samp_length = samp_length;
 	%if length(syst_err_68) >= 126
 	%	systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
 	%else
-		systerr68 = 2*mean(nonzeros(syst_err_68));
+		systerr68 = 2*median(nonzeros(syst_err_68));
 	%end
 
 	for i = 1:length(STD1_idx)
-		if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400
+		if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400 && isnan(stdswse67(i,1)) == 0 && isnan(stdfcsw67(i,1)) == 0 && isnan(pbcerr67(i,1)) == 0
 			syst_err_67(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1)+(pbcerr67(i,1))*(pbcerr67(i,1))+0.053*0.053+0.069*0.069+0.035*0.035);
 		end
 	end
@@ -2621,7 +2621,7 @@ H.samp_length = samp_length;
 	%if length(syst_err_67) >= 126
 	%	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
 	%else
-		systerr67 = 2*mean(nonzeros(syst_err_67));
+		systerr67 = 2*median(nonzeros(syst_err_67));
 	%end
 
 set(H.SE6867,'String',strcat(sprintf('%.2f ', systerr68), {'%, '}, sprintf('%.2f ', systerr67), {'%'}))
