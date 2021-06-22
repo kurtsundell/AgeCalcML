@@ -107,8 +107,6 @@ set(H.chk_Pb208_Th232,'Value', 0);
 waitnum = 10;
 h = waitbar(1/waitnum,'Calculating. Please wait...');
 
-
-
 folder_name = H.folder_name;
 files=dir([folder_name]); %map out the directory to that folder
 
@@ -153,43 +151,12 @@ for i = 1:length(filenames)
 end
 
 fullpathname_data = sort(fullpathname_data);
-
-batch_files = sum(abs(cellfun(@isempty,tmp)-1));
-
 clear tmp tmp1
-
-if get(H.batches,'Value') == 0
-	Data = importdata(char(fullpathname_data),',',500000);
-	Names = importdata(fullpathname_names);
-	Names = Names(2:end,1);
-	data_count = length(Names);
-	N = data_count;
-end
-
-if get(H.batches,'Value') == 1
-	for i = 1:batch_files
-		Data_tmp = importdata(char(fullpathname_data(i,1)),',',500000);
-		if i == 1
-			Data = Data_tmp;
-		else
-			Data_tmp = Data_tmp(73:end,1);
-			Data(length(Data)+1:length(Data)+length(Data_tmp),1) = Data_tmp;
-		end
-		Names = importdata(fullpathname_names);
-		Names = Names(2:str2num(get(H.batch_num,'String'))+1,1);
-		data_count = length(Names);
-		N = data_count;
-		clear Data_tmp
-	end
-end
-
-
-
-
-
-
-
-
+Data = importdata(char(fullpathname_data),',',500000);
+Names = importdata(fullpathname_names);
+Names = Names(2:end,1);
+data_count = length(Names);
+N = data_count;
 
 for i = 1:data_count
 	name_tmp = char(Names(i,1));
@@ -218,7 +185,7 @@ values_tmp = zeros(length(Data(firstline:end,1)),cols);
 for j = 1:length(Data(firstline:end,1))
 	values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
 	% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
-	% with the update
+	% with the 2021a update
 	if verLessThan('matlab', '9.6') == 1 
 		for k = 1:cols
 			values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
@@ -233,17 +200,7 @@ for j = 1:length(Data(firstline:end,1))
 	end
 end
 
-
-
-if get(H.batches,'Value') == 1
-	values_tmp(:,10) = [1:1:length(values_tmp)];
-	values_tmp(:,11) = [0.2:0.2:length(values_tmp)*0.2];
-end
-
-
 waitbar(2/waitnum,h,'Calculating. Please wait...');
-
-
 
 if IC == 0
 	thresh = -.004;
@@ -397,111 +354,61 @@ end
 
 %T Zero Find by Medians
 % Missing t0s (singles)
-if get(H.tzero_method,'Value') == 1
-	if data_count > length(t0_idx) && sum(diff_ch) > 0
-		for i = 1:length(diff_ch)
-			if mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
-				adjstr = 1.5;
-			else
-				adjstr = 1.3;
-			end
-			if diff_ch(i,1) == 1 && diff_idx(i,1) > adjstr*median(diff_idx)
-				t0_adj = t0_idx(1:i,1);
-				t0_adj(i+1,1) = 0;
-				t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-				t0_idx_bf = t0_adj(i,1);
-				t0_idx_af = t0_adj(i+2,1);
-				t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);
-				t0_idx = t0_adj;
-				diff_idx = diff(nonzeros(t0_adj));
-				diff_ch =  median(diff_idx) < diff_idx - 5;
-				clear t0_adj
-			end
+if data_count > length(t0_idx) && sum(diff_ch) > 0
+	for i = 1:length(diff_ch)
+		if mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
+			adjstr = 1.5;
+		else
+			adjstr = 1.3;
 		end
-		for i = 1:length(t0_idx)
-			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		if diff_ch(i,1) == 1 && diff_idx(i,1) > adjstr*median(diff_idx)
+			t0_adj = t0_idx(1:i,1);
+			t0_adj(i+1,1) = 0;
+			t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+			t0_idx_bf = t0_adj(i,1);
+			t0_idx_af = t0_adj(i+2,1);
+			t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);
+			t0_idx = t0_adj;
+			diff_idx = diff(nonzeros(t0_adj));
+			diff_ch =  median(diff_idx) < diff_idx - 5;
+			clear t0_adj
 		end
-	else
-		t0 = t0_238;
 	end
-	
-	% Missing t0s (multiples)
-	if data_count > length(t0_idx) && sum(diff_ch) > 0
-		for i = 1:length(diff_ch)
-			if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
-				t0_adj = t0_idx(1:i,1);
-				t0_div = round(diff_idx(i,1)/median(diff_idx),0);
-				t0_adj(i+1:i+t0_div-1,1) = 0;
-				t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-				t0_idx_bf = t0_adj(i,1);
-				t0_idx_af = t0_adj(i+t0_div,1);
-				t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);
-				for j = 1:t0_div - 1
-					t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
-				end
-				t0_idx = t0_adj;
-				diff_idx = diff(nonzeros(t0_adj));
-				diff_ch =  median(diff_idx) < diff_idx - 5;
-				clear t0_adj
-			end
-		end
-		for i = 1:length(t0_idx)
-			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
-		end
-	else
-		t0 = t0_238;
+	for i = 1:length(t0_idx)
+		t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
 	end
+else
+	t0 = t0_238;
 end
 
-% T Zero Find by fractions
-if get(H.tzero_method,'Value') == 2
-	if data_count > length(t0_idx)
-		if get(H.method,'Value') == 1 % 120/hour
-			diff_idx_r = round(diff_idx/150)-1;
-		elseif get(H.method,'Value') == 2 % 300/hour
-			diff_idx_r = round(diff_idx/60)-1;
-		elseif get(H.method,'Value') == 3 % 600/hour
-			diff_idx_r = round(diff_idx/30)-1;
-		elseif get(H.method,'Value') == 4 % 1200/hour
-			diff_idx_r = round(diff_idx/15)-1;
-		end
-		for i = 1:data_count-1
-			if diff_idx_r(i,1) > 0
-				t0_adj = t0_idx(1:i,1);
-				t0_adj(i+(diff_idx_r(i,1)+1):i+diff_idx_r(i,1)+length(t0_idx(i+1:end,1)),1) = t0_idx(i+1:end,1);
-				t0_idx_bf = t0_adj(i,1);
-				t0_idx_af = t0_adj(i+(diff_idx_r(i,1)+1),1);
-				t0_idx_rnd = round((t0_idx_af - t0_idx_bf)/(diff_idx_r(i,1)+1));
-				for j = 1:diff_idx_r(i,1)
-					t0_adj(i+j,1) = t0_adj(i,1) + t0_idx_rnd*j;
-				end
-				t0_idx = t0_adj;
-				clear t0_adj diff_idx_r diff_idx
-				diff_idx = diff(t0_idx);
-				if get(H.method,'Value') == 1 % 120/hour
-					diff_idx_r = round(diff_idx/150)-1;
-				elseif get(H.method,'Value') == 2 % 300/hour
-					diff_idx_r = round(diff_idx/60)-1;
-				elseif get(H.method,'Value') == 3 % 600/hour
-					diff_idx_r = round(diff_idx/30)-1;
-				elseif get(H.method,'Value') == 4 % 1200/hour
-					diff_idx_r = round(diff_idx/15)-1;
-				end
+% Missing t0s (multiples)
+if data_count > length(t0_idx) && sum(diff_ch) > 0
+	for i = 1:length(diff_ch)
+		if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
+			t0_adj = t0_idx(1:i,1);
+			t0_div = round(diff_idx(i,1)/median(diff_idx),0);
+			t0_adj(i+1:i+t0_div-1,1) = 0;
+			t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+			t0_idx_bf = t0_adj(i,1);
+			t0_idx_af = t0_adj(i+t0_div,1);
+			t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);
+			for j = 1:t0_div - 1
+				t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
 			end
+			t0_idx = t0_adj;
+			diff_idx = diff(nonzeros(t0_adj));
+			diff_ch =  median(diff_idx) < diff_idx - 5;
+			clear t0_adj
 		end
-		for i = 1:length(t0_idx)
-			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-			t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
-		end
-	else
-		t0 = t0_238;
 	end
+	for i = 1:length(t0_idx)
+		t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		t0_238(i,1) = values_tmp(t0_idx(i,1),cols-1);
+	end
+else
+	t0 = t0_238;
 end
-
-
-
 
 
 if data_count ~= length(t0_idx)
@@ -1007,10 +914,10 @@ end
 waitbar(7/waitnum,h,'Calculating. Please wait...');
 
 Macro1_Output(1:data_count+1,1:20) = {0}; % Preallocate
-Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 � %', 'm68', ...
-	'206207', '67 � %', '206204', '64 � %', '208232', '82 � %', '208204', '84 � %'};
+Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 Â± %', 'm68', ...
+	'206207', '67 Â± %', '206204', '64 Â± %', '208232', '82 Â± %', '208204', '84 Â± %'};
 Macro1_Output(2:end,1) = sample;
-Macro1_Output(2:end,2) = {serial};
+Macro1_Output(2:end,2) = serial;
 Macro1_Output(2:end,3) = num2cell(CPS_202);
 Macro1_Output(2:end,4) = num2cell(CPS_204);
 Macro1_Output(2:end,5) = num2cell(CPS_206);
@@ -1635,11 +1542,11 @@ comment = strcat(comment1, comment2, comment3, comment4, comment5, comment6, com
 % CONCATENATE DATA FOR EXPORT AND PLOTTING %%
 
 AGES_OUT{data_count+1, 6} = [];
-AGES_OUT(1,:) = {'6/8 age', '� (Ma)', '6/7 age', '� (Ma)', '8/2 age', '� (Ma)'};
+AGES_OUT(1,:) = {'6/8 age', 'Â± (Ma)', '6/7 age', 'Â± (Ma)', '8/2 age', 'Â± (Ma)'};
 AGES_OUT(2:end,:) = [Age68, Age68_err, Age67, Age67_err, Age82, Age82_err];
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '�(%)', '6/8 ratio', '�(%)', 'rho', '6/8 age', '�(Ma)', '6/7 age', '�(Ma)', 'BEST AGE', '�(Ma)', '8/2 age', '�(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)', '8/2 age', 'Â±(Ma)'};
 for i = 1:data_count
 	if sample_idx(i,1) == 1 && isempty(comment{i,1}) == 1
 		SAMPLE_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1651,7 +1558,7 @@ for i = 1:data_count
 end
 
 STD_CONCORDIA{data_count+1, 9} = [];
-STD_CONCORDIA(1,:) = {'7/5 ratio', '�(%)', '6/8 ratio', '�(%)', 'rho', '6/8 age', '�(Ma)', '6/7 age', '�(Ma)'};
+STD_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)'};
 for i = 1:data_count
 	if STD1_idx(i,1) == 1
 		STD_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1660,14 +1567,14 @@ for i = 1:data_count
 end
 
 CORRECTED_CONC_RATIOS{data_count+1, 15} = [];
-CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '�(%)', '8/2 ratio', '�(%)', ...
-	'7/5 ratio', '�(%)', '6/8 ratio', '�(%)', 'rho'};
+CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', 'Â±(%)', '8/2 ratio', 'Â±(%)', ...
+	'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho'};
 CORRECTED_CONC_RATIOS(2:end,:) = [sample, num2cell(ppm238), num2cell(ppm232), num2cell(BLS_64_corr.*factor64), num2cell(BLS_84_corr), ...
 	num2cell(UTh), num2cell(fcbc67), num2cell(re67), num2cell(fcbc82), num2cell(re82), num2cell(ratio75), num2cell(ratio75_err), num2cell(ratio68), ...
 	num2cell(err68m), num2cell(rho)];
 
 AGES_1SD_RANDOM_ERRORS{data_count+1, 10} = [];
-AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '�(Ma)', '7/5 age', '�(Ma)', '6/7 age', '�(Ma)', '8/2 age', '�(Ma)', 'BEST AGE', '�(Ma)'};
+AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', 'Â±(Ma)', '7/5 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', '8/2 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)'};
 AGES_1SD_RANDOM_ERRORS(2:end,:) = [Age68, Age68_err, Age75, Age75_err, Age67, Age67_err, Age82, Age82_err, Best_Age, Best_Age_err];
 
 Macro_1_2_Output = [Macro1_Output, AGES_OUT, [{'comment'};comment], SAMPLE_CONCORDIA, STD_CONCORDIA, CORRECTED_CONC_RATIOS, AGES_1SD_RANDOM_ERRORS];
@@ -2033,7 +1940,7 @@ MSWD_STD2 = 1/(length(data2(:,1))-1).*sum(((data2(:,1)- (sum(data2(:,1)./(data2(
 tt4 = sprintf('%.2f ', tt);
 ss4 = sprintf('%.2f ', s);
 mswd4 = sprintf('%.2f ', MSWD_STD2);
-sss = strcat({'Weighted Mean Secondary =  '},tt4,{' � '},ss4,{', '},{'MSWD ='},{' '},mswd4);
+sss = strcat({'Weighted Mean Secondary =  '},tt4,{' Â± '},ss4,{', '},{'MSWD ='},{' '},mswd4);
 set(H.WM_STD2,'String',sss)
 
 end
@@ -2307,7 +2214,7 @@ cla(H.axes_session,'reset');
 %set(H.axes_session,'FontSize',8);
 
 s1 = scatter(raddos, bestage, 50, 'b', 'filled', 'd', 'LineWidth', 1.25);
-xlabel('Radiation Dosage (alpha decays/�g)')
+xlabel('Radiation Dosage (alpha decays/Âµg)')
 ylabel('Best Age (Ma)')
 
 if get(H.leg_on_session,'Value') == 1
@@ -2403,7 +2310,7 @@ axes(H.axes_current_concordia);
 %set(H.axes_current_concordia,'FontSize',8);
 %set(H.axes_current_concordia,'String',sample{name_idx,1});
 
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' � '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 
 concordia_data = [ratio75(name_idx,1), ratio75_err(name_idx,1), ratio68(name_idx,1), err68m(name_idx,1)];
 center = [concordia_data(:,1),concordia_data(:,3)];
@@ -2778,8 +2685,19 @@ end
 values_tmp = zeros(length(Data(firstline:end,1)),cols);
 for j = 1:length(Data(firstline:end,1))
 	values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
-	for k = 1:cols
-		values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+	% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
+	% with the 2021a update
+	if verLessThan('matlab', '9.6') == 1 
+		for k = 1:cols
+			values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+		end
+	else
+		for k = 1:cols
+			if k ~= 11
+				values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+			end
+		end
+		values_tmp(j,11) = str2num(strrep(cell2mat(values_all_cell{1,1}(1,11)),'"',''));
 	end
 end
 
@@ -3053,6 +2971,10 @@ function filter_disc_rev_Callback(hObject, eventdata, H)
 function filter_disc_Callback(hObject, eventdata, H)
 function filter_204_Callback(hObject, eventdata, H)
 function factor64_Callback(hObject, eventdata, H)
+function Ufilt_Callback(hObject, eventdata, H)
+function Ufilt_CreateFcn(hObject, eventdata, H)
+function largenigneous_Callback(hObject, eventdata, H)
+function igrun_Callback(hObject, eventdata, H)
 
 function plot_fract_68_Callback(hObject, eventdata, H)
 cla(H.axes_session_fractionation,'reset');
@@ -3322,7 +3244,7 @@ tt4 = sprintf('%.2f ', tt);
 ss4 = sprintf('%.2f ', s);
 mswd4 = sprintf('%.2f ', MSWD_STD2);
 
-sss = strcat({'Weighted Mean Secondary =  '},tt4,{' � '},ss4,{', '},{'MSWD ='},{' '},mswd4);
+sss = strcat({'Weighted Mean Secondary =  '},tt4,{' Â± '},ss4,{', '},{'MSWD ='},{' '},mswd4);
 
 set(H.WM_STD2,'String',sss)
 function ptype_Unknowns_Callback(hObject, eventdata, H)
@@ -3754,7 +3676,7 @@ cla(H.axes_session,'reset');
 %set(H.axes_session,'FontSize',8);
 set(H.axes_session,'box','on')
 s1 = scatter(raddos, bestage, 50, 'b', 'filled', 'd', 'LineWidth', 1.25);
-xlabel('Radiation Dosage (alpha decays/�g)')
+xlabel('Radiation Dosage (alpha decays/Âµg)')
 ylabel('Best Age (Ma)')
 
 if get(H.leg_on_session,'Value') == 1
@@ -3975,7 +3897,7 @@ set(H.listbox1,'ListBoxTop',currView)
 clear SAMPLE_CONCORDIA
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '�(%)', '6/8 ratio', '�(%)', 'rho', '6/8 age', '�(Ma)', '6/7 age', '�(Ma)', 'BEST AGE', '�(Ma)', '8/2 age', '�(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)', '8/2 age', 'Â±(Ma)'};
 
 for i = 1:data_count
 	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
@@ -3985,7 +3907,7 @@ for i = 1:data_count
 	end
 end
 
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' � '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 
 %clear Best_Age
 %clear Best_Age_err
@@ -4116,7 +4038,7 @@ xlabel('207Pb/235U');
 ylabel('206Pb/238U');
 
 p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' � '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 legend(p3, bestage,  'Location', 'northwest');
 guidata(hObject,H);
 
@@ -4625,7 +4547,7 @@ cla(H.axes_current_concordia,'reset');
 %set(H.axes_current_concordia,'FontSize',8);
 %set(H.axes_current_concordia,'String',sample{name_idx,1});
 
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' � '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 
 
 
@@ -5318,15 +5240,162 @@ H.export_dist = 1;
 guidata(hObject,H);
 plot_distribution(hObject, eventdata, H)
 
-function savesesh_Callback(hObject, eventdata, H)
-[file,path] = uiputfile('*.mat','Save file');
-save([path file],'H')
 function loadsesh_Callback(hObject, eventdata, H)
 [filename pathname] = uigetfile({'*'},'File Selector','MultiSelect','on');
 fullpathname = strcat(pathname, filename);
 load(fullpathname,'H')
-close(AgeCalcML_Nu_TRA_1_23)
+close(AgeCalcML_Nu_TRA)
+function save_all_Callback(hObject, eventdata, H)
+waitnum = 4;
+h = waitbar(0,'Saving the AgeCalcML session (.mat file). Please wait...');
+%set(h, 'Position',[600 1500 300 50]);
+waitbar(1/waitnum, h, 'Saving the AgeCalcML session (.mat file). Please wait...');
 
+c = char(H.folder_name);
+if ispc == 1
+	s = strfind(c,'\');
+end
+if ismac == 1
+	s = strfind(c,'/');
+end
+samplename = c(s(end)+1:end);
+
+if ispc == 1
+	path_mat = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_Session.mat'));
+end
+if ismac == 1
+	path_mat = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_Session.mat'));
+end
+
+if ispc == 1
+	path_detailed = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DetailedDataTable.xls'));
+end
+if ismac == 1
+	path_detailed = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DetailedDataTable.xls'));
+end
+
+if ispc == 1
+	path_datatable = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DataTable.xls'));
+end
+if ismac == 1
+	path_datatable = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DataTable.xls'));
+end
+
+save(path_mat,'H')
+
+waitbar(2/waitnum, h, 'Saving the Detailed Data Table (.xls file). Please wait...');
+
+writetable(table(H.Macro_1_2_Output),path_detailed, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+
+Macro_1_2_Output = H.Macro_1_2_Output(2:end,:);
+
+current_status_num = H.current_status_num;
+STD1_idx = H.STD1_idx;
+sample_idx = H.sample_idx;
+ffsw68 = H.ffsw68;
+ffse68 = H.ffse68;
+stdfcsw67 = H.stdfcsw67;
+stdswse67 = H.stdswse67;
+BLS_68_err = H.BLS_68_err;
+BLS_67_err = H.BLS_67_err;
+pbcerr68 = H.pbcerr68;
+pbcerr67 = H.pbcerr67;
+Age68 = H.Age68;
+systerr68 = H.systerr68;
+systerr67 = H.systerr67;
+
+
+
+%{
+% Calculate systematic Uncertainties
+
+for i = 1:length(STD1_idx)
+	if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20
+		syst_err_68(i,1) = sqrt(100*ffse68(i,1)/ffsw68(i,1)*100*ffse68(i,1)/ffsw68(i,1)+pbcerr68(i,1)*pbcerr68(i,1)+0.053*0.053+0.35*0.35);
+	else
+		syst_err_68(i,1) = 0;
+	end
+end
+
+if length(syst_err_68) >= 126
+	systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
+else
+	systerr68 = 2*mean(nonzeros(syst_err_68));
+end
+
+for i = 1:length(STD1_idx)
+	if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400
+		syst_err_67(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1)+(pbcerr67(i,1))*(pbcerr67(i,1))+0.053*0.053+0.069*0.069+0.35*0.35);
+	end
+end
+
+if length(syst_err_67) >= 126
+	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
+else
+	systerr67 = 2*mean(nonzeros(syst_err_67));
+end
+
+%}
+
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
+		export_num(i,1) = 1;
+	end
+end
+
+geochron_out{sum(export_num)+26, 20} = [];
+geochron_out(1:17,1) = [{'Aliquot Name'; 'Stratigraphic Formation Name';'Stratigraphic Age';'Rock Type';'Mineral';'Method';'Latitude';'Longitude';'Internal Uncertainty Level'; ...
+	'External Uncertainty 206/238 (% two sigma)';'External Uncertainty 206/207 (% two sigma)';'Analysis Purpose';'Laboratory Name';'Analyst Name'; ...
+	'Aliquot Reference';'Aliquot Instrumental Method';'Aliquot Instrumental Reference'}];
+%geochron_out(1:4,2) = answer(1:4,1);
+geochron_out(5,2) = [{'Zircon'}];
+geochron_out(6,2) = [{'U-Pb'}];
+%geochron_out(7:8,2) = answer(5:6,1);
+%geochron_out(12,2) = answer(7,1);
+%geochron_out(14:15,2) = answer(8:9,1);
+geochron_out(9,2) = [{'one sigma'}];
+geochron_out(10,2) = num2cell(systerr68);
+geochron_out(11,2) = num2cell(systerr67);
+geochron_out(13,2) = [{'Arizona LaserChron Center'}];
+geochron_out(16,2) = [{'LA-ICPMS'}];
+geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
+	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','error','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','Best age','Â±','Conc'}];
+geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
+geochron_out(21,8) = [{'Isotope ratios'}];
+geochron_out(21,14) = [{'Apparent ages (Ma)'}];
+
+
+geochron_out_temp{sum(current_status_num), 74} = [];
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
+		geochron_out_temp(i,:) = Macro_1_2_Output(i,:);
+	end
+end
+
+geochron_out_temp(all(cellfun('isempty',geochron_out_temp),2),:) = [];
+
+geochron_out(27:end,1) = geochron_out_temp(:,1);
+geochron_out(27:end,2) = geochron_out_temp(:,51);
+geochron_out(27:end,3) = geochron_out_temp(:,53);
+geochron_out(27:end,4) = geochron_out_temp(:,55);
+geochron_out(27:end,5:6) = geochron_out_temp(:,13:14);
+geochron_out(27:end,7:11) = geochron_out_temp(:,28:32);
+geochron_out(27:end,12:17) = geochron_out_temp(:,65:70);
+geochron_out(27:end,18:19) = geochron_out_temp(:,73:74);
+
+for i = 1:length(geochron_out_temp(:,1))
+	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,21))/cell2num(geochron_out_temp(i,23)))*100};
+end
+
+writetable(table(geochron_out),path_datatable, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+
+%figure('visible', 'off');
+waitbar(4/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
+close(h)
+function savesesh_Callback(hObject, eventdata, H)
+[file,path] = uiputfile('*.mat','Save file');
+save([path file],'H')
 function export_detailed_Callback(hObject, eventdata, H)
 Macro_1_2_Output = H.Macro_1_2_Output;
 
@@ -5405,11 +5474,12 @@ geochron_out(11,2) = num2cell(systerr67);
 geochron_out(13,2) = [{'Arizona LaserChron Center'}];
 geochron_out(16,2) = [{'LA-ICPMS'}];
 geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
-	'Gehrels, G. and Pecha, M., 2014, Detrital zircon U-Pb geochronology and Hf isotope geochemistry of Paleozoic and Triassic passive margin strata of western North America: Geosphere, v. 10 (1), p. 49-65.'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','�','207Pb*','�','206Pb*','�','error','206Pb*','�','207Pb*','�','206Pb*','�','Best age','�','Conc'}];
+	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','error','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','Best age','Â±','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
+
 
 geochron_out_temp{sum(current_status_num), 74} = [];
 for i = 1:length(current_status_num)
@@ -5435,571 +5505,6 @@ end
 
 [file,path] = uiputfile('*.xls','Save file');
 writetable(table(geochron_out),[path file], 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
-function analysis_tools_Callback(hObject, eventdata, H)
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONCORDIA PRIMARY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-sigx_sq_STD1 = H.sigx_sq_STD1;
-rho_sigx_sigy_STD1 = H.rho_sigx_sigy_STD1;
-sigy_sq_STD1 = H.sigy_sq_STD1;
-sigmarule = H.sigmarule;
-numpoints = H.numpoints;
-center_STD1 = H.center_STD1;
-STD1_68 = H.STD1_68;
-STD1_67 = H.STD1_67;
-
-timemin = 0;
-timemax = 4500000000;
-timeinterval = 50000000;
-time3 = timemin:timeinterval:timemax;
-xc = exp(0.00000000098485.*time3)-1;
-yc = exp(0.000000000155125.*time3)-1;
-
-fignew = figure('Visible','off'); % Invisible figure
-
-for i = 1:length(sigx_sq_STD1)
-	covmat_STD1=[sigx_sq_STD1(i,1),rho_sigx_sigy_STD1(i,1);rho_sigx_sigy_STD1(i,1),sigy_sq_STD1(i,1)];
-	[PD_STD1,PV_STD1]=eig(covmat_STD1);
-	PV_STD1 = diag(PV_STD1).^.5;
-	theta_STD1 = linspace(0,2.*pi,numpoints)';
-	elpt_STD1 = [cos(theta_STD1),sin(theta_STD1)]*diag(PV_STD1)*PD_STD1';
-	numsigma = length(sigmarule);
-	elpt_STD1 = repmat(elpt_STD1,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
-	elpt_STD1_out(:,:,i) = elpt_STD1 + repmat(center_STD1(i,1:2),numpoints,numsigma);
-	p1 = plot(elpt_STD1_out(:,1:2:end,i),elpt_STD1_out(:,2:2:end,i),'b','LineWidth',1.2);
-	hold on
-end
-
-%age_label2_x = 0.742701185586296;
-age_label2_x = STD1_68*(1/STD1_67)*137.88;
-%age_label2_y = 0.0912660713153783;
-age_label2_y = STD1_68;
-
-if get(H.primary, 'Value') == 1
-	age_label2 = {'564 Ma'};
-end
-
-plot(xc,yc,'k','LineWidth',1.4)
-hold on
-p1 = scatter(age_label2_x, age_label2_y,50,'MarkerEdgeColor','k','MarkerFaceColor','g','LineWidth',1.5);
-labelpoints (age_label2_x, age_label2_y, age_label2, 'SE', .002);
-
-axis([min(min(elpt_STD1_out(:,1,:))) - min(min(elpt_STD1_out(:,1,:)))*.01 max(max(elpt_STD1_out(:,1,:))) + max(max(elpt_STD1_out(:,1,:)))*.01 ...
-	min(min(elpt_STD1_out(:,2,:))) - min(min(elpt_STD1_out(:,2,:)))*.01 max(max(elpt_STD1_out(:,2,:))) + max(max(elpt_STD1_out(:,2,:)))*.01]);
-
-if get(H.leg_on_session,'Value') == 1
-	legend(p1,'Accepted Age','Location','northwest');
-else
-	legend('hide')
-end
-
-xlabel('207Pb/235U');
-ylabel('206Pb/238U');
-title('Primary Standards')
-
-[file,path] = uiputfile('*','Save file');
-
-export_fig([path file], fignew, '-pdf');
-delete(fignew);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONCORDIA SECONDARY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-sigx_sq_STD2 = H.sigx_sq_STD2;
-rho_sigx_sigy_STD2 = H.rho_sigx_sigy_STD2;
-rho_sigx_sigy_STD2 = H.rho_sigx_sigy_STD2;
-sigy_sq_STD2 = H.sigy_sq_STD2;
-sigmarule = H.sigmarule;
-numpoints = H.numpoints;
-center_STD2 = H.center_STD2;
-STD2_68 = H.STD2_68;
-STD2_67 = H.STD2_67;
-STD2_idx = H.STD2_idx;
-
-timemin = 0;
-timemax = 4500000000;
-timeinterval = 50000000;
-time3 = timemin:timeinterval:timemax;
-xc = exp(0.00000000098485.*time3)-1;
-yc = exp(0.000000000155125.*time3)-1;
-
-if sum(STD2_idx) > 1
-	fignew = figure('Visible','off'); % Invisible figure
-	%set(H.secondary_reference,'String',STD2);
-	
-	for i = 1:length(sigx_sq_STD2)
-		covmat_STD2=[sigx_sq_STD2(i,1),rho_sigx_sigy_STD2(i,1);rho_sigx_sigy_STD2(i,1),sigy_sq_STD2(i,1)];
-		[PD_STD2,PV_STD2]=eig(covmat_STD2);
-		PV_STD2 = diag(PV_STD2).^.5;
-		theta_STD2 = linspace(0,2.*pi,numpoints)';
-		elpt_STD2 = [cos(theta_STD2),sin(theta_STD2)]*diag(PV_STD2)*PD_STD2';
-		numsigma = length(sigmarule);
-		elpt_STD2 = repmat(elpt_STD2,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
-		elpt_STD2_out(:,:,i) = elpt_STD2 + repmat(center_STD2(i,1:2),numpoints,numsigma);
-		plot(elpt_STD2_out(:,1:2:end,i),elpt_STD2_out(:,2:2:end,i),'b','LineWidth',1.2);
-		hold on
-	end
-	
-	age_label3_x = 28.983;
-	age_label3_y = 0.703433333;
-	age_label3 = {'3465.4 Ma'};
-	
-	plot(xc,yc,'k','LineWidth',1.4)
-	hold on
-	p2 = scatter(age_label3_x, age_label3_y,40,'MarkerEdgeColor','k','MarkerFaceColor','g','LineWidth',1.5);
-	labelpoints (age_label3_x, age_label3_y, age_label3, 'SE', .002);
-	
-	axis([min(min(elpt_STD2_out(:,1,:))) - min(min(elpt_STD2_out(:,1,:)))*.01 max(max(elpt_STD2_out(:,1,:))) + max(max(elpt_STD2_out(:,1,:)))*.01 ...
-		min(min(elpt_STD2_out(:,2,:))) - min(min(elpt_STD2_out(:,2,:)))*.01 max(max(elpt_STD2_out(:,2,:))) + max(max(elpt_STD2_out(:,2,:)))*.01]);
-end
-
-if get(H.leg_on_session,'Value') == 1
-	legend([p2],'Accepted age','Location','northwest');
-else
-	legend('hide')
-end
-
-xlabel('207Pb/235U');
-ylabel('206Pb/238U');
-title('Secondary Standards')
-
-export_fig([path file], fignew, '-pdf', '-append');
-delete(fignew);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONCORDIA UNKNOWN ACCEPTED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-sample = H.sample;
-Data_All = H.Data_All;
-Ablate = H.Ablate;
-ratio75 = H.ratio75;
-ratio75_err = H.ratio75_err;
-ratio68 = H.ratio68;
-err68m = H.err68m;
-Best_Age = H.Best_Age;
-Best_Age_err = H.Best_Age_err;
-rho = H.rho;
-numpoints = H.numpoints;
-sigmarule = H.sigmarule;
-xc = H.xc;
-yc = H.yc;
-current_status = H.current_status;
-current_status_num = H.current_status_num;
-current_status_num_orig = H.current_status_num_orig;
-comment = H.comment;
-INT = H.INT;
-
-name_idx = get(H.listbox1, 'Value');
-
-fignew = figure('Visible','off'); % Invisible figure
-hold on
-
-sigx_sq_All = H.sigx_sq_All;
-rho_sigx_sigy_All = H.rho_sigx_sigy_All;
-sigy_sq_All = H.sigy_sq_All;
-numpoints = H.numpoints;
-sigmarule = H.sigmarule;
-center_All = H.center_All;
-sample_idx = H.sample_idx;
-current_status_num = H.current_status_num;
-
-timemin = 0;
-timemax = 4500000000;
-timeinterval = 50000000;
-time = timemin:timeinterval:timemax;
-x = exp(0.00000000098485.*time)-1;
-y = exp(0.000000000155125.*time)-1;
-
-for i = 1:length(sigx_sq_All)
-	covmat=[sigx_sq_All(i,1),rho_sigx_sigy_All(i,1);rho_sigx_sigy_All(i,1),sigy_sq_All(i,1)];
-	[PD,PV]=eig(covmat);
-	PV = diag(PV).^.5;
-	theta = linspace(0,2.*pi,numpoints)';
-	elpt = [cos(theta),sin(theta)]*diag(PV)*PD';
-	numsigma = length(sigmarule);
-	elpt = repmat(elpt,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
-	if sample_idx(i,1) == 1 && current_status_num(i,1) == 1
-		elpt_out_acc(:,:,i) = elpt + repmat(center_All(i,1:2),numpoints,numsigma);
-		p1 = plot(elpt_out_acc(:,1:2:end,i),elpt_out_acc(:,2:2:end,i),'b','LineWidth',1.2);
-	elseif sample_idx(i,1) == 1 && current_status_num(i,1) == 0
-		elpt_out_rej(:,:,i) = elpt + repmat(center_All(i,1:2),numpoints,numsigma);
-		p2 = [];
-	end
-end
-
-plot(x,y,'k','LineWidth',1.4)
-
-time4 = [500000000, 1000000000, 1500000000, 2000000000, 2500000000, 3000000000, 3500000000, 4000000000];
-x4 = (exp(0.00000000098485.*time4)-1)';
-y4 = (exp(0.000000000155125.*time4)-1)';
-
-for i=1:length(x4)
-	age_label4(i,1) = {sprintf('%.0f',time4(1,i)/1000000)};
-end
-
-for i = 1:length(time4)
-	if x4(i,1) > min(min(nonzeros(elpt_out_acc(:,1,:)))) - min(min(nonzeros(elpt_out_acc(:,1,:))))*.01 && x4(i,1) < max(max(nonzeros(elpt_out_acc(:,1,:)))) + max(max(nonzeros(elpt_out_acc(:,1,:))))*.01 ...
-			&& y4(i,1) > min(min(nonzeros(elpt_out_acc(:,2,:)))) - min(min(nonzeros(elpt_out_acc(:,2,:))))*.01 && y4(i,1) < max(max(nonzeros(elpt_out_acc(:,2,:)))) + max(max(nonzeros(elpt_out_acc(:,2,:))))*.01
-		scatter(x4(i,1), y4(i,1),20,'MarkerEdgeColor','k','MarkerFaceColor','y','LineWidth',1.5)
-		labelpoints(x4(i,1), y4(i,1), age_label4(i,1), 'SE', .0002);
-	end
-end
-
-axis([min(min(nonzeros(elpt_out_acc(:,1,:)))) - min(min(nonzeros(elpt_out_acc(:,1,:))))*.01 max(max(nonzeros(elpt_out_acc(:,1,:)))) + max(max(nonzeros(elpt_out_acc(:,1,:))))*.01 ...
-	min(min(nonzeros(elpt_out_acc(:,2,:)))) - min(min(nonzeros(elpt_out_acc(:,2,:))))*.01 max(max(nonzeros(elpt_out_acc(:,2,:)))) + max(max(nonzeros(elpt_out_acc(:,2,:))))*.01]);
-
-%p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
-
-accan= {'Accepted Analyses'};
-
-if get(H.leg_on_session,'Value') == 1
-	legend(p1, accan, 'Location','northwest');
-else
-	legend('hide')
-end
-
-xlabel('207Pb/235U');
-ylabel('206Pb/238U');
-title('Accepted Analyses')
-
-export_fig([path file], fignew, '-pdf', '-append');
-delete(fignew);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONCORDIA UNKNOWN REJECTED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-sample = H.sample;
-Data_All = H.Data_All;
-Ablate = H.Ablate;
-ratio75 = H.ratio75;
-ratio75_err = H.ratio75_err;
-ratio68 = H.ratio68;
-err68m = H.err68m;
-Best_Age = H.Best_Age;
-Best_Age_err = H.Best_Age_err;
-rho = H.rho;
-numpoints = H.numpoints;
-sigmarule = H.sigmarule;
-xc = H.xc;
-yc = H.yc;
-current_status = H.current_status;
-current_status_num = H.current_status_num;
-current_status_num_orig = H.current_status_num_orig;
-comment = H.comment;
-INT = H.INT;
-
-name_idx = get(H.listbox1, 'Value');
-
-fignew = figure('Visible','off'); % Invisible figure
-hold on
-
-sigx_sq_All = H.sigx_sq_All;
-rho_sigx_sigy_All = H.rho_sigx_sigy_All;
-sigy_sq_All = H.sigy_sq_All;
-numpoints = H.numpoints;
-sigmarule = H.sigmarule;
-center_All = H.center_All;
-sample_idx = H.sample_idx;
-current_status_num = H.current_status_num;
-
-timemin = 0;
-timemax = 4500000000;
-timeinterval = 50000000;
-time = timemin:timeinterval:timemax;
-x = exp(0.00000000098485.*time)-1;
-y = exp(0.000000000155125.*time)-1;
-
-for i = 1:length(sigx_sq_All)
-	covmat=[sigx_sq_All(i,1),rho_sigx_sigy_All(i,1);rho_sigx_sigy_All(i,1),sigy_sq_All(i,1)];
-	[PD,PV]=eig(covmat);
-	PV = diag(PV).^.5;
-	theta = linspace(0,2.*pi,numpoints)';
-	elpt = [cos(theta),sin(theta)]*diag(PV)*PD';
-	numsigma = length(sigmarule);
-	elpt = repmat(elpt,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
-	if sample_idx(i,1) == 1 && current_status_num(i,1) == 1
-		elpt_out_acc(:,:,i) = elpt + repmat(center_All(i,1:2),numpoints,numsigma);
-		p1 = [];
-	elseif sample_idx(i,1) == 1 && current_status_num(i,1) == 0
-		elpt_out_rej(:,:,i) = elpt + repmat(center_All(i,1:2),numpoints,numsigma);
-		p2 = plot(elpt_out_rej(:,1:2:end,i),elpt_out_rej(:,2:2:end,i),'r','LineWidth',1.2);
-	end
-end
-
-plot(x,y,'k','LineWidth',1.4)
-
-time4 = [500000000, 1000000000, 1500000000, 2000000000, 2500000000, 3000000000, 3500000000, 4000000000];
-x4 = (exp(0.00000000098485.*time4)-1)';
-y4 = (exp(0.000000000155125.*time4)-1)';
-
-for i=1:length(x4)
-	age_label4(i,1) = {sprintf('%.0f',time4(1,i)/1000000)};
-end
-
-for i = 1:length(time4)
-	if x4(i,1) > min(min(nonzeros(elpt_out_rej(:,1,:)))) - min(min(nonzeros(elpt_out_rej(:,1,:))))*.01 && x4(i,1) < max(max(nonzeros(elpt_out_rej(:,1,:)))) + max(max(nonzeros(elpt_out_rej(:,1,:))))*.01 ...
-			&& y4(i,1) > min(min(nonzeros(elpt_out_rej(:,2,:)))) - min(min(nonzeros(elpt_out_rej(:,2,:))))*.01 && y4(i,1) < max(max(nonzeros(elpt_out_rej(:,2,:)))) + max(max(nonzeros(elpt_out_rej(:,2,:))))*.01
-		scatter(x4(i,1), y4(i,1),20,'MarkerEdgeColor','k','MarkerFaceColor','y','LineWidth',1.5)
-		labelpoints(x4(i,1), y4(i,1), age_label4(i,1), 'SE', .0002);
-	end
-end
-
-axis([min(min(nonzeros(elpt_out_rej(:,1,:)))) - min(min(nonzeros(elpt_out_rej(:,1,:))))*.01 max(max(nonzeros(elpt_out_rej(:,1,:)))) + max(max(nonzeros(elpt_out_rej(:,1,:))))*.01 ...
-	min(min(nonzeros(elpt_out_rej(:,2,:)))) - min(min(nonzeros(elpt_out_rej(:,2,:))))*.01 max(max(nonzeros(elpt_out_rej(:,2,:)))) + max(max(nonzeros(elpt_out_rej(:,2,:))))*.01]);
-
-%p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
-
-rejan = {'Rejected Analyses'};
-
-%legend([p1 p2], [accan, rejan], 'Location','northwest');
-
-if get(H.leg_on_session,'Value') == 1
-	legend(p2, rejan, 'Location','northwest');
-else
-	legend('hide')
-end
-
-xlabel('207Pb/235U');
-ylabel('206Pb/238U');
-title('Rejected Analyses')
-
-export_fig([path file], fignew, '-pdf', '-append');
-delete(fignew);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DISTRIBUTION PLOT ACCEPTED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-data_count = H.data_count;
-SAMPLE_CONCORDIA = H.SAMPLE_CONCORDIA;
-
-for i = 1:data_count
-	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
-		dist_data(i+1,1) = cell2num(SAMPLE_CONCORDIA(i+1,10));
-		dist_data(i+1,2) = cell2num(SAMPLE_CONCORDIA(i+1,11));
-	end
-end
-
-if sum(current_status_num) > 0
-	
-	dist_data = dist_data(any(dist_data ~= 0,2),:);
-	
-	fignew = figure('Visible','off'); % Invisible figure
-	hold on
-	
-	xmin = str2num(get(H.xmin,'String'));
-	xmax = str2num(get(H.xmax,'String'));
-	xint = str2num(get(H.xint,'String'));
-	hist_ymin = 0;
-	bins = str2num(get(H.bins,'String'));
-	[counts binCenters] = hist(dist_data(:,1), bins);
-	hist_ymax = max(counts) + 1;
-	bins = str2num(get(H.bins,'String'));
-	x=xmin:xint:xmax;
-	
-	if get(H.radio_hist, 'Value') == 1
-		[counts binCenters] = hist(dist_data(:,1), bins);
-		bar(binCenters, counts);
-		axis([xmin xmax hist_ymin hist_ymax])
-		xlabel('Age (Ma)')
-		ylabel('Number')
-	end
-	
-	if get(H.radio_pdp, 'Value') == 1
-		pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-		p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
-		lgnd=legend(p, 'Probability Density Plot');
-		pdpmax = max(pdp);
-		axis([xmin xmax 0 pdpmax+0.1*pdpmax])
-		set(lgnd,'color','w');
-		legend boxoff
-		xlabel('Age (Ma)','Color','k')
-		ylabel('Probability','Color','k')
-	end
-	
-	if get(H.radio_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			xA = transpose(x);
-			n = length(dist_data(:,1));
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			hl1 = plot(x,kdeA,'Color',[1 0 0]);
-			kdemax = max(kdeA);
-			axis([xmin xmax 0 kdemax+0.2*kdemax])
-			lgnd=legend('Kernel Density Estimate');
-			set(hl1,'linewidth',2)
-			set(H.Myr_Kernel_text, 'String', bandwidth);
-			set(lgnd,'color','w');
-			legend boxoff
-			xlabel('Age (Ma)')
-			ylabel('Probability')
-		end
-		if get(H.Myr_kernel,'Value') == 1
-			x=xmin:xint:xmax;
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-			hl1 = plot(x,kde1,'Color',[1 0 0]);
-			ax1 = gca;
-			set(ax1,'XColor','k','YColor','k')
-			pdpmax = max(kde1);
-			axis([xmin xmax 0 pdpmax+0.2*pdpmax])
-			lgnd=legend('Kernel Density Estimate');
-			set(hl1,'linewidth',2)
-			set(gca,'box','off')
-		end
-		set(lgnd,'Color','w');
-		legend boxoff
-		xlabel('Age (Ma)')
-		ylabel('Probability')
-	end
-	
-	if get(H.radio_hist_pdp, 'Value') == 1
-		pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-		[counts binCenters] = hist(dist_data(:,1), bins);
-		bar(binCenters, counts);
-		hold on;
-		p = plot(x, pdp*(1/(max(pdp)/max(counts-1))), 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
-		axis([xmin xmax hist_ymin hist_ymax])
-		lgnd=legend(p, 'Probability Density Plot');
-		set(lgnd,'color','w');
-		legend boxoff
-		xlabel('Age (Ma)')
-		ylabel('Probability')
-	end
-	
-	if get(H.radio_hist_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			[counts binCenters] = hist(dist_data(:,1), bins);
-			bar(binCenters, counts);
-			hold on;
-			xA = transpose(x);
-			n = length(dist_data(:,1));
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			p1 = plot(x,kdeA*(1/(max(kdeA)/max(counts-1))),'Color',[1 0 0]);
-			kdemax = max(kdeA);
-			axis([xmin xmax hist_ymin hist_ymax])
-			lgnd=legend(p1,'Kernel Density Estimate');
-			set(p1,'linewidth',2)
-			set(H.Myr_Kernel_text, 'String', bandwidth);
-			xlabel('Age (Ma)')
-			ylabel('Number')
-		end
-		if get(H.Myr_kernel,'Value') == 1
-			[counts binCenters] = hist(dist_data(:,1), bins);
-			bar(binCenters, counts);
-			hold on;
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-			p1 = plot(x,kde1*(1/(max(kde1)/max(counts-1))),'Color',[1 0 0]);
-			ax1 = gca;
-			set(ax1,'XColor','k','YColor','k')
-			pdpmax = max(kde1);
-			axis([xmin xmax hist_ymin hist_ymax])
-			lgnd=legend(p1,'Kernel Density Estimate');
-			set(p1,'linewidth',2)
-		end
-		set(lgnd,'color','w');
-		legend boxoff
-		xlabel('Age (Ma)')
-		ylabel('Number')
-	end
-	
-	if get(H.radio_hist_pdp_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			[counts binCenters] = hist(dist_data(:,1), bins);
-			bar(binCenters, counts);
-			hold on;
-			xA = transpose(x);
-			n = length(dist_data(:,1));
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			p1 = plot(x,kdeA*(1/(max(kdeA)/max(counts-1))),'Color',[1 0 0]);
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			pdpmax = max(pdp);
-			p = plot(x, pdp*(1/(max(pdp)/max(counts-1))), 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
-			kdemax = max(kdeA);
-			axis([xmin xmax hist_ymin hist_ymax])
-			lgnd=legend([p,p1],'Probability Density Plot','Kernel Density Estimate');
-			set(p1,'linewidth',2)
-			set(H.Myr_Kernel_text, 'String', bandwidth);
-			xlabel('Age (Ma)')
-			ylabel('Number')
-		end
-		if get(H.Myr_kernel,'Value') == 1
-			[counts binCenters] = hist(dist_data(:,1), bins);
-			bar(binCenters, counts);
-			hold on;
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-			p1 = plot(x,kde1*(1/(max(kde1)/max(counts-1))),'Color',[1 0 0]);
-			hold on
-			pdpmax = max(kde1);
-			set(p1,'linewidth',2)
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			p = plot(x, pdp*(1/(max(pdp)/max(counts-1))), 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
-			axis([xmin xmax hist_ymin hist_ymax])
-			lgnd=legend([p,p1], 'Probability Density Plot','Kernel Density Estimate');
-		end
-		set(lgnd,'Color','w');
-		legend boxoff
-		xlabel('Age (Ma)')
-		ylabel('Number')
-	end
-	
-	if get(H.radio_pdp_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			xA = transpose(x);
-			n = length(dist_data(:,1));
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			set(H.Myr_Kernel_text, 'String', bandwidth);
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			pdpmax = max(pdp);
-			p1 = plot(x,kdeA*(1/(max(kdeA)/max(pdp))),'Color',[1 0 0]);
-			hold on
-			p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
-			set(p1,'linewidth',2)
-			lgnd=legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
-			axis([xmin xmax 0 pdpmax+0.2*pdpmax])
-		end
-		if get(H.Myr_kernel,'Value') == 1
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			pdpmax = max(pdp);
-			p1 = plot(x,kde1*(1/(max(kde1)/max(pdp))),'Color',[1 0 0]);
-			hold on
-			p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
-			set(p1,'linewidth',2)
-			axis([xmin xmax 0 pdpmax+0.2*pdpmax])
-			lgnd=legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
-			set(p1,'linewidth',2)
-		end
-		set(lgnd,'Color','w');
-		legend boxoff
-		xlabel('Age (Ma)')
-		ylabel('Probability')
-	end
-	
-	hold off
-	
-end
-
-export_fig([path file], fignew, '-pdf', '-append');
-delete(fignew);
 
 function export_plot_fractionation_Callback(hObject, eventdata, H)
 f = figure;
@@ -6016,45 +5521,3 @@ copyobj(H.axes_current_concordia,f3);
 function export_plot_distribution_Callback(hObject, eventdata, H)
 f4 = figure;
 copyobj(H.axes_distribution,f4);
-
-function batches_Callback(hObject, eventdata, H)
-
-function batch_num_Callback(hObject, eventdata, H)
-
-function tzero_method_Callback(hObject, eventdata, H)
-
-
-
-function Ufilt_Callback(hObject, eventdata, handles)
-% hObject    handle to Ufilt (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of Ufilt as text
-%        str2double(get(hObject,'String')) returns contents of Ufilt as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function Ufilt_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Ufilt (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-	set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on button press in largenigneous.
-function largenigneous_Callback(hObject, eventdata, handles)
-% hObject    handle to largenigneous (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of largenigneous
-
-
-
-function igrun_Callback(hObject, eventdata, H)
