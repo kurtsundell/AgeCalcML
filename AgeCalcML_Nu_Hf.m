@@ -231,16 +231,40 @@ STD_SL = 'SL';
 				rws = length(Data(firstline:end,1));
 			end
 			
-			%rws = 50*length(sample)+firstline;
+			%rws = 50*length(sample)+firstline;			
 			values_tmp1{rws,cols} = [];
 			for j = 1:rws
 				values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
 				values_tmp1(j,1:13) = values_all_cell{j,1}(1,1:13);
 			end
-			for k = 1:cols
-				values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+			% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
+			% with the 2021a update
+			if verLessThan('matlab', '9.6') == 1
+				for k = 1:cols
+					values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+				end
+			else
+				for k = 1:cols
+					if k ~= 12
+						values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+					end
+				end
+				for j = 1:rws
+					values_tmp(j,12) = str2num(strrep(cell2mat(values_all_cell{j,1}(1,12)),'"',''));
+				end
 			end
-
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			%{
 			values_tmp = zeros(length(Data(firstline:end,1)),cols);
 			for j = 1:length(Data(firstline:end,1))
@@ -402,6 +426,9 @@ STD_SL = 'SL';
 				else
 					rws = length(Data(firstline:end,1));
 				end
+								
+				
+				
 				
 				
 				
@@ -411,9 +438,27 @@ STD_SL = 'SL';
 					values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
 					values_tmp1(j,1:13) = values_all_cell{j,1}(1,1:13);
 				end
-				for k = 1:cols
-					values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+				% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
+				% with the 2021a update
+				if verLessThan('matlab', '9.6') == 1
+					for k = 1:cols
+						values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+					end
+				else
+					for k = 1:cols
+						if k ~= 12
+							values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+						end
+					end
+					for j = 1:rws
+						values_tmp(j,12) = str2num(strrep(cell2mat(values_all_cell{j,1}(1,12)),'"',''));
+					end
 				end
+				
+				
+				
+				
+				
 				
 				%{
 				values_tmp = zeros(length(Data(firstline:end,1)),cols);
