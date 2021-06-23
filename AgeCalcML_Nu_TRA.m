@@ -5405,52 +5405,9 @@ function export_summary_Callback(hObject, eventdata, H)
 Macro_1_2_Output = H.Macro_1_2_Output(2:end,:);
 
 current_status_num = H.current_status_num;
-STD1_idx = H.STD1_idx;
 sample_idx = H.sample_idx;
-ffsw68 = H.ffsw68;
-ffse68 = H.ffse68;
-stdfcsw67 = H.stdfcsw67;
-stdswse67 = H.stdswse67;
-BLS_68_err = H.BLS_68_err;
-BLS_67_err = H.BLS_67_err;
-pbcerr68 = H.pbcerr68;
-pbcerr67 = H.pbcerr67;
-Age68 = H.Age68;
 systerr68 = H.systerr68;
 systerr67 = H.systerr67;
-
-
-
-%{
-% Calculate systematic Uncertainties
-
-for i = 1:length(STD1_idx)
-	if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20
-		syst_err_68(i,1) = sqrt(100*ffse68(i,1)/ffsw68(i,1)*100*ffse68(i,1)/ffsw68(i,1)+pbcerr68(i,1)*pbcerr68(i,1)+0.053*0.053+0.35*0.35);
-	else
-		syst_err_68(i,1) = 0;
-	end
-end
-
-if length(syst_err_68) >= 126
-	systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
-else
-	systerr68 = 2*mean(nonzeros(syst_err_68));
-end
-
-for i = 1:length(STD1_idx)
-	if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400
-		syst_err_67(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1)+(pbcerr67(i,1))*(pbcerr67(i,1))+0.053*0.053+0.069*0.069+0.35*0.35);
-	end
-end
-
-if length(syst_err_67) >= 126
-	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
-else
-	systerr67 = 2*mean(nonzeros(syst_err_67));
-end
-
-%}
 
 for i = 1:length(current_status_num)
 	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
@@ -5458,16 +5415,19 @@ for i = 1:length(current_status_num)
 	end
 end
 
-geochron_out{sum(export_num)+26, 20} = [];
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 0 && sample_idx(i,1) == 1
+		export_num_rej(i,1) = 1;
+	end
+end
+
+geochron_out{max(sum(export_num),sum(export_num_rej))+26, 44} = [];
+
 geochron_out(1:17,1) = [{'Aliquot Name'; 'Stratigraphic Formation Name';'Stratigraphic Age';'Rock Type';'Mineral';'Method';'Latitude';'Longitude';'Internal Uncertainty Level'; ...
 	'External Uncertainty 206/238 (% two sigma)';'External Uncertainty 206/207 (% two sigma)';'Analysis Purpose';'Laboratory Name';'Analyst Name'; ...
 	'Aliquot Reference';'Aliquot Instrumental Method';'Aliquot Instrumental Reference'}];
-%geochron_out(1:4,2) = answer(1:4,1);
 geochron_out(5,2) = [{'Zircon'}];
 geochron_out(6,2) = [{'U-Pb'}];
-%geochron_out(7:8,2) = answer(5:6,1);
-%geochron_out(12,2) = answer(7,1);
-%geochron_out(14:15,2) = answer(8:9,1);
 geochron_out(9,2) = [{'one sigma'}];
 geochron_out(10,2) = num2cell(systerr68);
 geochron_out(11,2) = num2cell(systerr67);
@@ -5475,11 +5435,12 @@ geochron_out(13,2) = [{'Arizona LaserChron Center'}];
 geochron_out(16,2) = [{'LA-ICPMS'}];
 geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
 	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','error','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','Best age','Â±','Conc'}];
+
+geochron_out(22,1) = [{'Accepted'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
-
 
 geochron_out_temp{sum(current_status_num), 74} = [];
 for i = 1:length(current_status_num)
@@ -5501,6 +5462,129 @@ geochron_out(27:end,18:19) = geochron_out_temp(:,73:74);
 
 for i = 1:length(geochron_out_temp(:,1))
 	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,21))/cell2num(geochron_out_temp(i,23)))*100};
+end
+
+
+%%%%%%%%%%%%% rejected analyses %%%%%%%%%%%%%
+
+geochron_out(22,23) = [{'Rejected (filtered data)'}];
+geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(24,24:42) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
+geochron_out(21,30) = [{'Isotope ratios'}];
+geochron_out(21,36) = [{'Apparent ages (Ma)'}];
+
+geochron_out_temp_rej{sum(current_status_num), 74} = [];
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 0 && sample_idx(i,1) == 1
+		geochron_out_temp_rej(i,:) = Macro_1_2_Output(i,:);
+	end
+end
+
+geochron_out_temp_rej(all(cellfun('isempty',geochron_out_temp_rej),2),:) = [];
+rejl = 27+length(geochron_out_temp_rej(:,1))-1;
+
+geochron_out(27:rejl,23) = geochron_out_temp_rej(:,1);
+geochron_out(27:rejl,24) = geochron_out_temp_rej(:,51);
+geochron_out(27:rejl,25) = geochron_out_temp_rej(:,53);
+geochron_out(27:rejl,26) = geochron_out_temp_rej(:,55);
+geochron_out(27:rejl,27:28) = geochron_out_temp_rej(:,13:14);
+geochron_out(27:rejl,29:33) = geochron_out_temp_rej(:,60:64);
+geochron_out(27:rejl,34:39) = geochron_out_temp_rej(:,65:70);
+geochron_out(27:rejl,40:41) = geochron_out_temp_rej(:,73:74);
+
+for i = 1:length(geochron_out_temp_rej(:,1))
+	geochron_out(26+i,42) = {(cell2num(geochron_out_temp_rej(i,21))/cell2num(geochron_out_temp_rej(i,23)))*100};
+end
+
+
+%%%%%%%%%%%%% standard analyses %%%%%%%%%%%%%
+
+geochron_out(22,45) = {'Standards (primary and secondary reference materials)'};
+geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(24,46:64) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
+geochron_out(21,52) = [{'Isotope ratios'}];
+geochron_out(21,58) = [{'Apparent ages (Ma)'}];
+
+geochron_out_temp_stds{sum(current_status_num), 74} = [];
+for i = 1:length(current_status_num)
+	if sample_idx(i,1) == 0
+		geochron_out_temp_stds(i,:) = Macro_1_2_Output(i,:);
+	end
+end
+
+geochron_out_temp_stds(all(cellfun('isempty',geochron_out_temp_stds),2),:) = [];
+stdsl = 27+length(geochron_out_temp_stds(:,1))-1;
+
+geochron_out(27:stdsl,45) = geochron_out_temp_stds(:,1);
+geochron_out(27:stdsl,46) = geochron_out_temp_stds(:,51);
+geochron_out(27:stdsl,47) = geochron_out_temp_stds(:,53);
+geochron_out(27:stdsl,48) = geochron_out_temp_stds(:,55);
+geochron_out(27:stdsl,49:50) = geochron_out_temp_stds(:,13:14);
+geochron_out(27:stdsl,51:55) = geochron_out_temp_stds(:,60:64);
+geochron_out(27:stdsl,56:61) = geochron_out_temp_stds(:,65:70);
+geochron_out(27:stdsl,62:63) = geochron_out_temp_stds(:,73:74);
+
+for i = 1:length(geochron_out_temp_stds(:,1))
+	geochron_out(26+i,64) = {(cell2num(geochron_out_temp_stds(i,21))/cell2num(geochron_out_temp_stds(i,23)))*100};
+end
+
+geochron_out(1,23) = [{'Data Reduction Filters and Parameters'}];
+geochron_out(2,23) = [{'Acquisition Rate'}];
+geochron_out(2,24) = [{'Downhole Corrected'}];
+geochron_out(2,25) = [{'Standards Reject'}];
+geochron_out(2,26) = [{'Standards Reject 2s Filter'}];
+geochron_out(2,27) = [{'Standards Reject 6/8%'}];
+geochron_out(2,28) = [{'Standards Reject 6/7%'}];
+geochron_out(2,29) = [{'Best age Transition (Ma)'}];
+geochron_out(2,30) = [{'Discordance Transition (Ma)'}];
+geochron_out(2,31) = [{'206/238 Uncertainty Cutoff (%)'}];
+geochron_out(2,32) = [{'206/207 Uncertainty Cutoff (%)'}];
+geochron_out(2,33) = [{'Discordance Cutoff (%)'}];
+geochron_out(2,34) = [{'Reverse Discordance Cutoff (%)'}];
+geochron_out(2,35) = [{'204Pb Filter (cps)'}];
+geochron_out(2,36) = [{'206/204 Factor'}];
+geochron_out(2,37) = [{'U Concentration Filter (ppm)'}];
+geochron_out(2,38) = [{'Set Fractionation Corr. Window'}];
+geochron_out(2,39) = [{'Fractionation Corr. Window Number'}];
+
+method = get(H.method,'String');
+geochron_out(3,23) = method(get(H.method,'Value'));	%	Acquisition Rate
+if get(H.downhole,'Value') == 1
+	geochron_out(3,24) = {'yes'}; %	Downhole Corrected
+else
+	geochron_out(3,24) = {'no'};
+end
+if get(H.reject_yes,'Value') == 1
+	geochron_out(3,25) = {'yes'}; %	Standards Reject
+	if get(H.sigmafilt,'Value') == 1
+		geochron_out(3,26) 	= {'yes'}; %	Standards Reject 2s Filter
+	else
+		geochron_out(3,26) 	= {'no'}; 
+	end
+	geochron_out(3,27) = get(H.reject68);	%	Standards Reject 6/8%
+	geochron_out(3,28) = get(H.reject67);	%	Standards Reject 6/7%
+else
+	geochron_out(3,25) = {'no'}; %	Standards Reject
+	geochron_out(3,26) = {'N/A'};	%	Standards Reject 2s Filter
+	geochron_out(3,27) = {'N/A'};	%	Standards Reject 6/8%
+	geochron_out(3,28) = {'N/A'};	%	Standards Reject 6/7%
+end
+geochron_out(3,29) = {get(H.bestage_cutoff,'String')};	%	Best age Transition (Ma)
+geochron_out(3,30) = {get(H.filter_cutoff,'String')};	%	Discordance Transition (Ma)
+geochron_out(3,31) = {get(H.filter_err68,'String')};	%	206/238 Uncertainty Cutoff (%)
+geochron_out(3,32) = {get(H.filter_err67,'String')};	%	206/207 Uncertainty Cutoff (%)
+geochron_out(3,33) = {get(H.filter_disc,'String')};	%	Discordance Cutoff (%)
+geochron_out(3,34) = {get(H.filter_disc_rev,'String')};	%	Reverse Discordance Cutoff (%)
+geochron_out(3,35) = {get(H.filter_204,'String')};	%	204Pb Filter (cps)
+geochron_out(3,36) = {get(H.factor64,'String')};	%	206/204 Factor
+geochron_out(3,37) = {get(H.Ufilt,'String')};	%	U Concentration Filter (ppm)
+
+if get(H.largenigneous,'Value') == 1
+	geochron_out(3,38)	= {'yes'}; %	Set Fractionation Corr. Window 
+	geochron_out(3,39)	= get(H.igrun,'Value');%	Fractionation Corr. Window Number
+else
+	geochron_out(3,38)	= {'no'}; %	Set Fractionation Corr. Window 
+	geochron_out(3,39)	= {'N/A'};%	Fractionation Corr. Window Number
 end
 
 [file,path] = uiputfile('*.xls','Save file');
