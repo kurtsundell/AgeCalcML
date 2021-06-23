@@ -2,27 +2,27 @@ function varargout = AgeCalcML_Nu_Hf(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',mfilename,'gui_Singleton',gui_Singleton,'gui_OpeningFcn',@AgeCalcML_Nu_Hf_OpeningFcn,'gui_OutputFcn',@AgeCalcML_Nu_Hf_OutputFcn,'gui_LayoutFcn',[],'gui_Callback',[]);
 if nargin && ischar(varargin{1})
-    gui_State.gui_Callback = str2func(varargin{1});
+	gui_State.gui_Callback = str2func(varargin{1});
 end
-if nargout 
-    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+if nargout
+	[varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
 else
-    gui_mainfcn(gui_State, varargin{:});
+	gui_mainfcn(gui_State, varargin{:});
 end
 
 function AgeCalcML_Nu_Hf_OpeningFcn(hObject, eventdata, H, varargin)
 H.output = hObject;
 guidata(hObject, H);
 
-function varargout = AgeCalcML_Nu_Hf_OutputFcn(hObject, eventdata, H) 
+function varargout = AgeCalcML_Nu_Hf_OutputFcn(hObject, eventdata, H)
 H.reduced = 0;
 guidata(hObject,H);
 varargout{1} = H.output;
 
 function browser_Callback(hObject, eventdata, H)
-cla(H.STDS_plot,'reset'); 
-cla(H.SingleAnalysis_plot,'reset'); 
-cla(H.Results_plot,'reset'); 
+cla(H.STDS_plot,'reset');
+cla(H.SingleAnalysis_plot,'reset');
+cla(H.Results_plot,'reset');
 
 folder_name = uigetdir; %prompt browser and select folder
 
@@ -54,176 +54,361 @@ STD_91500 = '91500';
 STD_SL = 'SL';
 
 %if H.reduced == 0
-	
-	folder_name = H.folder_name;
-	
-	files=dir([folder_name]); %this maps out the directory to that folder
-	
-	for i = 1:size(files,1)
-		filenames{i,1} = files(i).name;
-		filedates{i,1} = files(i).date;
+
+folder_name = H.folder_name;
+
+files=dir([folder_name]); %this maps out the directory to that folder
+
+for i = 1:size(files,1)
+	filenames{i,1} = files(i).name;
+	filedates{i,1} = files(i).date;
+end
+
+for i = 1:size(filenames,1)
+	if strcmp(filenames(i,1),'.') == 1
+		filenames{i,1} = [];
+		filedates{i,1} = [];
+	elseif strcmp(filenames(i,1),'..') == 1
+		filenames{i,1} = [];
+		filedates{i,1} = [];
 	end
-	
-	for i = 1:size(filenames,1)
-		if strcmp(filenames(i,1),'.') == 1
-			filenames{i,1} = [];
-			filedates{i,1} = [];
-		elseif strcmp(filenames(i,1),'..') == 1
-			filenames{i,1} = [];
-			filedates{i,1} = [];
-		end
+end
+
+filenames(all(cellfun('isempty',filenames),2),:) = [];
+filenames_sorted = natsortfiles(filenames);
+
+TRA = 0;
+Agefile = 0;
+for i = 1:size(filenames_sorted,1)
+	if isempty(findstr(char(filenames_sorted(i,1)), '.txt')) == 0
+		filename_data{i,1} = filenames_sorted(i,1);
+	elseif isempty(findstr(char(filenames_sorted(i,1)), '.xls')) == 0
+		filename_ages{i,1} = filenames_sorted(i,1);
+		Agefile = 1;
+	elseif isempty(findstr(char(filenames_sorted(i,1)), '.xlsx')) == 0
+		filename_ages{i,1} = filenames_sorted(i,1);
+		Agefile = 1;
+	elseif isempty(findstr(char(filenames_sorted(i,1)), '.csv')) == 0
+		filename_ages{i,1} = filenames_sorted(i,1);
+		Agefile = 1;
+	elseif isempty(findstr(char(filenames_sorted(i,1)), '.run')) == 0
+		filename_data{i,1} = filenames_sorted(i,1);
+	elseif isempty(findstr(char(filenames_sorted(i,1)), '.scancsv')) == 0
+		filename_scancsv{i,1} = filenames_sorted(i,1);
+		filename_scancsv(all(cellfun('isempty',filename_scancsv),2),:) = [];
+		TRA = 1;
 	end
+end
+
+filename_data(all(cellfun('isempty',filename_data),2),:) = [];
+
+h = waitbar(0,'Reducing data. Please wait...');
+
+if TRA == 0
 	
-	filenames(all(cellfun('isempty',filenames),2),:) = [];
-	filenames_sorted = natsortfiles(filenames);
-	
-	TRA = 0;
-	Agefile = 0;
-	for i = 1:size(filenames_sorted,1)
-		if isempty(findstr(char(filenames_sorted(i,1)), '.txt')) == 0
-			filename_data{i,1} = filenames_sorted(i,1);
-		elseif isempty(findstr(char(filenames_sorted(i,1)), '.xls')) == 0
-			filename_ages{i,1} = filenames_sorted(i,1);
-			Agefile = 1;
-		elseif isempty(findstr(char(filenames_sorted(i,1)), '.xlsx')) == 0
-			filename_ages{i,1} = filenames_sorted(i,1);
-			Agefile = 1;
-		elseif isempty(findstr(char(filenames_sorted(i,1)), '.csv')) == 0
-			filename_ages{i,1} = filenames_sorted(i,1);
-			Agefile = 1;
-		elseif isempty(findstr(char(filenames_sorted(i,1)), '.run')) == 0
-			filename_data{i,1} = filenames_sorted(i,1);
-		elseif isempty(findstr(char(filenames_sorted(i,1)), '.scancsv')) == 0
-			filename_scancsv{i,1} = filenames_sorted(i,1);
-			filename_scancsv(all(cellfun('isempty',filename_scancsv),2),:) = [];
-			TRA = 1;
-		end
-	end
-	
-	filename_data(all(cellfun('isempty',filename_data),2),:) = [];
-	
-	h = waitbar(0,'Reducing data. Please wait...');
-	
-	if TRA == 0
+	for i = 1:length(filename_data)
 		
-		for i = 1:length(filename_data)
+		fullpathname = char(strcat(folder_name, '/', filename_data{i,1}));
+		
+		Data = importdata(fullpathname,',',500000);
+		
+		if i == 1
+			data_length = 0;
+		end
+		
+		SampleNameIs = strfind(Data(:,1), 'Sample Name is');
+		EndAnalysis = strfind(Data(:,1), 'End of Analysis');
+		
+		for j = 1:length(Data(:,1))
+			if isempty(SampleNameIs(~cellfun('isempty',SampleNameIs(j,1)))) == 0
+				data_parse(j,1) = 1;
+			end
+		end
+		
+		for j = 1:length(Data(:,1))
+			if isempty(EndAnalysis(~cellfun('isempty',EndAnalysis(j,1)))) == 0
+				data_parse(j,1) = 2;
+			end
+		end
+		
+		data_parse = data_parse(1:find(data_parse==2, 1,'last'),1);
+		
+		for j = 1:length(data_parse(:,1))
+			if data_parse(j,1) == 1 && data_parse(j+60+1,1) == 2
+				sample_start_idx(j,1) = j;
+				sample_end_idx(j,1) = j+60+1;
+			end
+		end
+		
+		sample_start_idx = nonzeros(sample_start_idx);
+		sample_end_idx = nonzeros(sample_end_idx);
+		
+		data_count = length(sample_start_idx(:,1));
+		
+		for j = 1:data_count
+			values_all_cell = regexp(Data(sample_start_idx(j,1)+1:sample_end_idx(j,1)-1), ',', 'split');
+			for k = 1:60
+				values_all(k,1:10,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,3:12)));
+				values_all(k,11:20,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,19:28)));
+			end
+		end
+		
+		for j = 1:data_count
+			name_tmp(j,1) = Data(sample_start_idx(j,1), 1);
+		end
+		
+		name_tmp2 = char(name_tmp);
+		for j = 1:data_count
+			sample{j+data_length,:} = name_tmp2(j, 17:cell2mat(strfind(name_tmp(j,:), '<>'))-2);
+		end
+		
+		data_length = length(values_all(1,1,:));
+		
+		clear sample_start_idx
+		clear sample_end_idx
+		clear data_parse
+		clear data_count
+		clear name_tmp
+		clear name_tmp2
+		
+		waitbar(i*.5/length(filename_data))
+		
+	end
+	
+	for i = 1:length(sample)
+		for j = 1:60
+			BLS_180(j,i) = values_all(j,11,i) - values_all(j,1,i);
+			BLS_179(j,i) = values_all(j,12,i) - values_all(j,2,i);
+			BLS_178(j,i) = values_all(j,13,i) - values_all(j,3,i);
+			BLS_177(j,i) = values_all(j,14,i) - values_all(j,4,i);
+			BLS_176(j,i) = values_all(j,15,i) - values_all(j,5,i);
+			BLS_175(j,i) = values_all(j,16,i) - values_all(j,6,i);
+			BLS_174(j,i) = values_all(j,17,i) - values_all(j,7,i);
+			BLS_173(j,i) = values_all(j,18,i) - values_all(j,8,i);
+			BLS_172(j,i) = values_all(j,19,i) - values_all(j,9,i);
+			BLS_171(j,i) = values_all(j,20,i) - values_all(j,10,i);
+		end
+	end
+	samp_length = length(BLS_180(:,1));
+	data_count = length(sample);
+end
+
+if TRA == 1
+	firstline = 74;
+	cols = 13;
+	
+	if length(filename_scancsv) == 1
+		if ispc == 1
+			fullpathname_data = char(strcat(folder_name, '\', filename_data{1,1}));
+		end
+		if ismac == 1
+			fullpathname_data = char(strcat(folder_name, '/', filename_data{1,1}));
+		end
+		
+		if ispc == 1
+			fullpathname_names = char(strcat(folder_name, '\', filename_scancsv{1,1}));
+		end
+		if ismac == 1
+			fullpathname_names = char(strcat(folder_name, '/', filename_scancsv{1,1}));
+		end
+		
+		Data = importdata(char(fullpathname_data),',',500000);
+		Names = importdata(fullpathname_names);
+		Names = Names(2:end,1);
+		data_count = length(Names);
+		
+		for i = 1:data_count
+			name_tmp = char(Names(i,1));
+			name_tmp_idx = strfind(name_tmp, '"');
+			sample{i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
+			clear name_tmp name_tmp_idx
+		end
+		
+		
+		if 50*length(sample)+firstline < length(Data(firstline:end,1))
+			rws = 50*length(sample)+firstline;
+		else
+			rws = length(Data(firstline:end,1));
+		end
+		
+		%rws = 50*length(sample)+firstline;
+		values_tmp1{rws,cols} = [];
+		for j = 1:rws
+			values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
+			values_tmp1(j,1:13) = values_all_cell{j,1}(1,1:13);
+		end
+		% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
+		% with the 2021a update
+		if verLessThan('matlab', '9.6') == 1
+			for k = 1:cols
+				values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+			end
+		else
+			for k = 1:cols
+				if k ~= 12
+					values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
+				end
+			end
+			for j = 1:rws
+				values_tmp(j,12) = str2num(strrep(cell2mat(values_all_cell{j,1}(1,12)),'"',''));
+			end
+		end
+		
+		%{
+			values_tmp = zeros(length(Data(firstline:end,1)),cols);
+			for j = 1:length(Data(firstline:end,1))
+				values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
+				for k = 1:cols
+					values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+				end
+			end
+		%}
+		
+		
+		thresh = 0;
+		
+		for i = 1:rws
+			if values_tmp(i,1) > thresh
+				thresh180(i,1) = 1;
+			else
+				thresh180(i,1) = 0;
+			end
+		end
+		
+		for i = 2:rws-2
+			if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
+					values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh
+				t0_180(i,1) = values_tmp(i,cols-1);
+				t0_idx(i,1) = values_tmp(i,cols-2);
+			else
+				t0_180(i,1) = 0;
+			end
+		end
+		
+		t0_180 = nonzeros(t0_180);
+		t0_idx = nonzeros(t0_idx);
+		diff_idx = diff(t0_idx);
+		diff_ch =  median(diff_idx) < diff_idx - 10;
+		%{
+		figure
+		hold on
+		plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
+		scatter(t0_idx,zeros(length(t0_idx),1),'filled')
+		hold off
+		%}
+		
+		
+		
+		
+		%T Zero Find by Medians
+		% Missing t0s (singles)
+		if data_count > length(t0_idx) && sum(diff_ch) > 0
+			for i = 1:length(diff_ch)
+				if diff_ch(i,1) == 1
+					t0_adj = t0_idx(1:i,1);
+					t0_adj(i+1,1) = 0;
+					t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+					t0_idx_bf = t0_adj(i,1);
+					t0_idx_af = t0_adj(i+2,1);
+					t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);
+					t0_idx = t0_adj;
+					diff_idx = diff(nonzeros(t0_adj));
+					diff_ch =  median(diff_idx) < diff_idx - 10;
+					clear t0_adj
+				end
+			end
+			for i = 1:length(t0_idx)
+				t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+				t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			end
+		else
+			t0 = t0_180;
+		end
+		
+		% Missing t0s (multiples)
+		if data_count > length(t0_idx) && sum(diff_ch) > 0
+			for i = 1:length(diff_ch)
+				if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
+					t0_adj = t0_idx(1:i,1);
+					t0_div = round(diff_idx(i,1)/median(diff_idx),0);
+					t0_adj(i+1:i+t0_div-1,1) = 0;
+					t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+					t0_idx_bf = t0_adj(i,1);
+					t0_idx_af = t0_adj(i+t0_div,1);
+					t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);
+					for j = 1:t0_div - 1
+						t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
+					end
+					t0_idx = t0_adj;
+					diff_idx = diff(nonzeros(t0_adj));
+					diff_ch =  median(diff_idx) < diff_idx - 50;
+					clear t0_adj
+				end
+			end
+			for i = 1:length(t0_idx)
+				t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+				t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			end
+		else
+			t0 = t0_180;
+		end
+		
+		start_idx = t0_idx - 7;
+		end_idx = t0_idx + 38;
+		sampl_length = end_idx(1,1)-start_idx(1,1)+1;
+		
+		%%% Indexes
+		for i = 1:data_count
+			values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
+			baseline(1:6,1:cols,i) = values_all(1:6,1:cols,i);
+			integration(1:30,1:cols,i) = values_all(10:39,1:cols,i);
+		end
+		
+		for j = 1:data_count
+			for i = 1:length(baseline(:,j))
+				if baseline(i,j) > median(baseline(:,j)) + 2*std(baseline(:,j)) || baseline(i,j) < median(baseline(:,j)) - 2*std(baseline(:,j))
+					baseline(i,j) = 0;
+				else
+					baseline(i,j) = baseline(i,j);
+				end
+			end
+		end
+		
+		samp_length = length(integration(:,1,1));
+		
+	end
+	
+	if length(filename_scancsv) > 1
+		for p = 1:length(filename_data)
+			if ispc == 1
+				tmp1 = char(strcat(folder_name, '\', filename_data{p,1}));
+				tmp2 = char(strcat(folder_name, '\', filename_scancsv{p,1}));
+			end
+			if ismac == 1
+				tmp1 = char(strcat(folder_name, '/', filename_data{p,1}));
+				tmp2 = char(strcat(folder_name, '/', filename_scancsv{p,1}));
+			end
+			fullpathname_data(p,1) = {tmp1};
+			fullpathname_names(p,1) = {tmp2};
+		end
+		
+		for p = 1:length(fullpathname_data)
 			
-			fullpathname = char(strcat(folder_name, '/', filename_data{i,1}));
-			
-			Data = importdata(fullpathname,',',500000);
-			
-			if i == 1
+			if p == 1
 				data_length = 0;
 			end
 			
-			SampleNameIs = strfind(Data(:,1), 'Sample Name is');
-			EndAnalysis = strfind(Data(:,1), 'End of Analysis');
-			
-			for j = 1:length(Data(:,1))
-				if isempty(SampleNameIs(~cellfun('isempty',SampleNameIs(j,1)))) == 0
-					data_parse(j,1) = 1;
-				end
-			end
-			
-			for j = 1:length(Data(:,1))
-				if isempty(EndAnalysis(~cellfun('isempty',EndAnalysis(j,1)))) == 0
-					data_parse(j,1) = 2;
-				end
-			end
-			
-			data_parse = data_parse(1:find(data_parse==2, 1,'last'),1);
-			
-			for j = 1:length(data_parse(:,1))
-				if data_parse(j,1) == 1 && data_parse(j+60+1,1) == 2
-					sample_start_idx(j,1) = j;
-					sample_end_idx(j,1) = j+60+1;
-				end
-			end
-			
-			sample_start_idx = nonzeros(sample_start_idx);
-			sample_end_idx = nonzeros(sample_end_idx);
-			
-			data_count = length(sample_start_idx(:,1));
-			
-			for j = 1:data_count
-				values_all_cell = regexp(Data(sample_start_idx(j,1)+1:sample_end_idx(j,1)-1), ',', 'split');
-				for k = 1:60
-					values_all(k,1:10,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,3:12)));
-					values_all(k,11:20,j+data_length) = str2num(cell2mat(values_all_cell{k,1}(1,19:28)));
-				end
-			end
-			
-			for j = 1:data_count
-				name_tmp(j,1) = Data(sample_start_idx(j,1), 1);
-			end
-			
-			name_tmp2 = char(name_tmp);
-			for j = 1:data_count
-				sample{j+data_length,:} = name_tmp2(j, 17:cell2mat(strfind(name_tmp(j,:), '<>'))-2);
-			end
-			
-			data_length = length(values_all(1,1,:));
-			
-			clear sample_start_idx
-			clear sample_end_idx
-			clear data_parse
-			clear data_count
-			clear name_tmp
-			clear name_tmp2
-			
-			waitbar(i*.5/length(filename_data))
-			
-		end
-		
-		for i = 1:length(sample)
-			for j = 1:60
-				BLS_180(j,i) = values_all(j,11,i) - values_all(j,1,i);
-				BLS_179(j,i) = values_all(j,12,i) - values_all(j,2,i);
-				BLS_178(j,i) = values_all(j,13,i) - values_all(j,3,i);
-				BLS_177(j,i) = values_all(j,14,i) - values_all(j,4,i);
-				BLS_176(j,i) = values_all(j,15,i) - values_all(j,5,i);
-				BLS_175(j,i) = values_all(j,16,i) - values_all(j,6,i);
-				BLS_174(j,i) = values_all(j,17,i) - values_all(j,7,i);
-				BLS_173(j,i) = values_all(j,18,i) - values_all(j,8,i);
-				BLS_172(j,i) = values_all(j,19,i) - values_all(j,9,i);
-				BLS_171(j,i) = values_all(j,20,i) - values_all(j,10,i);
-			end
-		end
-		samp_length = length(BLS_180(:,1));
-		data_count = length(sample);
-	end
-	
-	if TRA == 1
-		firstline = 74;
-		cols = 13;
-		
-		if length(filename_scancsv) == 1
-			if ispc == 1
-				fullpathname_data = char(strcat(folder_name, '\', filename_data{1,1}));
-			end
-			if ismac == 1
-				fullpathname_data = char(strcat(folder_name, '/', filename_data{1,1}));
-			end
-			
-			if ispc == 1
-				fullpathname_names = char(strcat(folder_name, '\', filename_scancsv{1,1}));
-			end
-			if ismac == 1
-				fullpathname_names = char(strcat(folder_name, '/', filename_scancsv{1,1}));
-			end
-			
-			Data = importdata(char(fullpathname_data),',',500000);
-			Names = importdata(fullpathname_names);
+			Data = importdata(char(fullpathname_data(p,1)),',',500000);
+			Names = importdata(fullpathname_names{p,1});
 			Names = Names(2:end,1);
-			data_count = length(Names);
+			data_count_tmp = length(Names);
 			
-			for i = 1:data_count
+			for i = 1:data_count_tmp
 				name_tmp = char(Names(i,1));
 				name_tmp_idx = strfind(name_tmp, '"');
-				sample{i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
+				sample{data_length+i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
 				clear name_tmp name_tmp_idx
 			end
-			
 			
 			if 50*length(sample)+firstline < length(Data(firstline:end,1))
 				rws = 50*length(sample)+firstline;
@@ -231,7 +416,9 @@ STD_SL = 'SL';
 				rws = length(Data(firstline:end,1));
 			end
 			
-			%rws = 50*length(sample)+firstline;			
+			
+			
+			
 			values_tmp1{rws,cols} = [];
 			for j = 1:rws
 				values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
@@ -254,27 +441,15 @@ STD_SL = 'SL';
 				end
 			end
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			%{
-			values_tmp = zeros(length(Data(firstline:end,1)),cols);
-			for j = 1:length(Data(firstline:end,1))
-				values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
-				for k = 1:cols
-					values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+				values_tmp = zeros(length(Data(firstline:end,1)),cols);
+				for j = 1:length(Data(firstline:end,1))
+					values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
+					for k = 1:cols
+						values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
+					end
 				end
-			end
 			%}
-			
 			
 			thresh = 0;
 			
@@ -300,20 +475,18 @@ STD_SL = 'SL';
 			t0_idx = nonzeros(t0_idx);
 			diff_idx = diff(t0_idx);
 			diff_ch =  median(diff_idx) < diff_idx - 10;
+			
 			%{
-		figure
-		hold on
-		plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
-		scatter(t0_idx,zeros(length(t0_idx),1),'filled')
-		hold off
+			figure
+			hold on
+			plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
+			scatter(t0_idx,zeros(length(t0_idx),1),'filled')
+			hold off
 			%}
-			
-			
-			
 			
 			%T Zero Find by Medians
 			% Missing t0s (singles)
-			if data_count > length(t0_idx) && sum(diff_ch) > 0
+			if data_count_tmp > length(t0_idx) && sum(diff_ch) > 0
 				for i = 1:length(diff_ch)
 					if diff_ch(i,1) == 1
 						t0_adj = t0_idx(1:i,1);
@@ -337,7 +510,7 @@ STD_SL = 'SL';
 			end
 			
 			% Missing t0s (multiples)
-			if data_count > length(t0_idx) && sum(diff_ch) > 0
+			if data_count_tmp > length(t0_idx) && sum(diff_ch) > 0
 				for i = 1:length(diff_ch)
 					if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
 						t0_adj = t0_idx(1:i,1);
@@ -363,241 +536,49 @@ STD_SL = 'SL';
 			else
 				t0 = t0_180;
 			end
-				
+			
+			
+			%%% Indexes
+			
 			start_idx = t0_idx - 7;
 			end_idx = t0_idx + 38;
 			sampl_length = end_idx(1,1)-start_idx(1,1)+1;
 			
 			%%% Indexes
-			for i = 1:data_count
-				values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
-				baseline(1:6,1:cols,i) = values_all(1:6,1:cols,i);
-				integration(1:30,1:cols,i) = values_all(10:39,1:cols,i);
-			end
 			
-			for j = 1:data_count
-				for i = 1:length(baseline(:,j))
-					if baseline(i,j) > median(baseline(:,j)) + 2*std(baseline(:,j)) || baseline(i,j) < median(baseline(:,j)) - 2*std(baseline(:,j))
-						baseline(i,j) = 0;
-					else
-						baseline(i,j) = baseline(i,j);
-					end
-				end
+			for i = 1:data_count_tmp
+				values_all_tmp(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
+				values_all(:,:,data_length+i) = values_all_tmp(:,:,i);
+				baseline(1:6,1:cols,data_length+i) = values_all_tmp(1:6,1:cols,i);
+				integration(1:30,1:cols,data_length+i) = values_all_tmp(10:39,1:cols,i);
 			end
 			
 			samp_length = length(integration(:,1,1));
+			data_length = length(sample);
+			
+			clear Data Names data_count_tmp	values_tmp values_tmp1 values_all_cell thresh180 t0_180 t0_idx diff_idx start_idx end_idx
 			
 		end
-		
-		if length(filename_scancsv) > 1
-			for p = 1:length(filename_data)
-				if ispc == 1
-					tmp1 = char(strcat(folder_name, '\', filename_data{p,1}));
-					tmp2 = char(strcat(folder_name, '\', filename_scancsv{p,1}));
-				end
-				if ismac == 1
-					tmp1 = char(strcat(folder_name, '/', filename_data{p,1}));
-					tmp2 = char(strcat(folder_name, '/', filename_scancsv{p,1}));
-				end
-				fullpathname_data(p,1) = {tmp1};
-				fullpathname_names(p,1) = {tmp2};
-			end
-			
-			for p = 1:length(fullpathname_data)
-				
-				if p == 1
-					data_length = 0;
-				end
-				
-				Data = importdata(char(fullpathname_data(p,1)),',',500000);
-				Names = importdata(fullpathname_names{p,1});
-				Names = Names(2:end,1);
-				data_count_tmp = length(Names);
-				
-				for i = 1:data_count_tmp
-					name_tmp = char(Names(i,1));
-					name_tmp_idx = strfind(name_tmp, '"');
-					sample{data_length+i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
-					clear name_tmp name_tmp_idx
-				end
-				
-				if 50*length(sample)+firstline < length(Data(firstline:end,1))
-					rws = 50*length(sample)+firstline;
-				else
-					rws = length(Data(firstline:end,1));
-				end
-								
-				
-				
-				
-				
-				
-				
-				values_tmp1{rws,cols} = [];
-				for j = 1:rws
-					values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
-					values_tmp1(j,1:13) = values_all_cell{j,1}(1,1:13);
-				end
-				% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
-				% with the 2021a update
-				if verLessThan('matlab', '9.6') == 1
-					for k = 1:cols
-						values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
-					end
-				else
-					for k = 1:cols
-						if k ~= 12
-							values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
-						end
-					end
-					for j = 1:rws
-						values_tmp(j,12) = str2num(strrep(cell2mat(values_all_cell{j,1}(1,12)),'"',''));
-					end
-				end
-				
-				
-				
-				
-				
-				
-				%{
-				values_tmp = zeros(length(Data(firstline:end,1)),cols);
-				for j = 1:length(Data(firstline:end,1))
-					values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
-					for k = 1:cols
-						values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
-					end
-				end
-				%}
-				
-				thresh = 0;
-				
-				for i = 1:rws
-					if values_tmp(i,1) > thresh
-						thresh180(i,1) = 1;
-					else
-						thresh180(i,1) = 0;
-					end
-				end
-				
-				for i = 2:rws-2
-					if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
-							values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh
-						t0_180(i,1) = values_tmp(i,cols-1);
-						t0_idx(i,1) = values_tmp(i,cols-2);
-					else
-						t0_180(i,1) = 0;
-					end
-				end
-				
-				t0_180 = nonzeros(t0_180);
-				t0_idx = nonzeros(t0_idx);
-				diff_idx = diff(t0_idx);
-				diff_ch =  median(diff_idx) < diff_idx - 10;
-				
-				%{
-			figure
-			hold on
-			plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
-			scatter(t0_idx,zeros(length(t0_idx),1),'filled')
-			hold off
-				%}
-				
-				%T Zero Find by Medians
-				% Missing t0s (singles)
-				if data_count_tmp > length(t0_idx) && sum(diff_ch) > 0
-					for i = 1:length(diff_ch)
-						if diff_ch(i,1) == 1
-							t0_adj = t0_idx(1:i,1);
-							t0_adj(i+1,1) = 0;
-							t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-							t0_idx_bf = t0_adj(i,1);
-							t0_idx_af = t0_adj(i+2,1);
-							t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);
-							t0_idx = t0_adj;
-							diff_idx = diff(nonzeros(t0_adj));
-							diff_ch =  median(diff_idx) < diff_idx - 10;
-							clear t0_adj
-						end
-					end
-					for i = 1:length(t0_idx)
-						t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-						t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
-					end
-				else
-					t0 = t0_180;
-				end
-				
-				% Missing t0s (multiples)
-				if data_count_tmp > length(t0_idx) && sum(diff_ch) > 0
-					for i = 1:length(diff_ch)
-						if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
-							t0_adj = t0_idx(1:i,1);
-							t0_div = round(diff_idx(i,1)/median(diff_idx),0);
-							t0_adj(i+1:i+t0_div-1,1) = 0;
-							t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-							t0_idx_bf = t0_adj(i,1);
-							t0_idx_af = t0_adj(i+t0_div,1);
-							t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);
-							for j = 1:t0_div - 1
-								t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
-							end
-							t0_idx = t0_adj;
-							diff_idx = diff(nonzeros(t0_adj));
-							diff_ch =  median(diff_idx) < diff_idx - 50;
-							clear t0_adj
-						end
-					end
-					for i = 1:length(t0_idx)
-						t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-						t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
-					end
-				else
-					t0 = t0_180;
-				end
-				
-				
-				%%% Indexes
-				
-				start_idx = t0_idx - 7;
-				end_idx = t0_idx + 38;
-				sampl_length = end_idx(1,1)-start_idx(1,1)+1;
-				
-				%%% Indexes
-				
-				for i = 1:data_count_tmp
-					values_all_tmp(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
-					values_all(:,:,data_length+i) = values_all_tmp(:,:,i);
-					baseline(1:6,1:cols,data_length+i) = values_all_tmp(1:6,1:cols,i);
-					integration(1:30,1:cols,data_length+i) = values_all_tmp(10:39,1:cols,i);
-				end
-				
-				samp_length = length(integration(:,1,1));
-				data_length = length(sample);
-				
-				clear Data Names data_count_tmp	values_tmp values_tmp1 values_all_cell thresh180 t0_180 t0_idx diff_idx start_idx end_idx
-				
-			end
-			data_count = length(sample);
-		end
-		
-		
-		
-		
-		for i = 1:data_count
-			mean180BL(i,1) = mean(nonzeros(baseline(:,1,i)));
-			mean179BL(i,1) = mean(nonzeros(baseline(:,2,i)));
-			mean178BL(i,1) = mean(nonzeros(baseline(:,3,i)));
-			mean177BL(i,1) = mean(nonzeros(baseline(:,4,i)));
-			mean176BL(i,1) = mean(nonzeros(baseline(:,5,i)));
-			mean175BL(i,1) = mean(nonzeros(baseline(:,6,i)));
-			mean174BL(i,1) = mean(nonzeros(baseline(:,7,i)));
-			mean173BL(i,1) = mean(nonzeros(baseline(:,8,i)));
-			mean172BL(i,1) = mean(nonzeros(baseline(:,9,i)));
-			mean171BL(i,1) = mean(nonzeros(baseline(:,10,i)));
-		end
-		
-		%{
+		data_count = length(sample);
+	end
+	
+	
+	
+	
+	for i = 1:data_count
+		mean180BL(i,1) = mean(nonzeros(baseline(:,1,i)));
+		mean179BL(i,1) = mean(nonzeros(baseline(:,2,i)));
+		mean178BL(i,1) = mean(nonzeros(baseline(:,3,i)));
+		mean177BL(i,1) = mean(nonzeros(baseline(:,4,i)));
+		mean176BL(i,1) = mean(nonzeros(baseline(:,5,i)));
+		mean175BL(i,1) = mean(nonzeros(baseline(:,6,i)));
+		mean174BL(i,1) = mean(nonzeros(baseline(:,7,i)));
+		mean173BL(i,1) = mean(nonzeros(baseline(:,8,i)));
+		mean172BL(i,1) = mean(nonzeros(baseline(:,9,i)));
+		mean171BL(i,1) = mean(nonzeros(baseline(:,10,i)));
+	end
+	
+	%{
 		for i = 1:data_count
 			SE180BL(i,1) = std(baseline(:,1,i))./sqrt(length(baseline(:,1,i)))./abs(mean180BL(i,1)).*100;
 			SE179BL(i,1) = std(baseline(:,2,i))./sqrt(length(baseline(:,2,i)))./abs(mean179BL(i,1)).*100;
@@ -610,23 +591,23 @@ STD_SL = 'SL';
 			SE172BL(i,1) = std(baseline(:,9,i))./sqrt(length(baseline(:,9,i)))./abs(mean172BL(i,1)).*100;
 			SE171BL(i,1) = std(baseline(:,10,i))./sqrt(length(baseline(:,10,i)))./abs(mean171BL(i,1)).*100;
 		end
-		%}
-		
-		for i = 1:data_count
-			BLS_180(:,i) = integration(:,1,i) - mean180BL(i,1);
-			BLS_179(:,i) = integration(:,2,i) - mean179BL(i,1);
-			BLS_178(:,i) = integration(:,3,i) - mean178BL(i,1);
-			BLS_177(:,i) = integration(:,4,i) - mean177BL(i,1);
-			BLS_176(:,i) = integration(:,5,i) - mean176BL(i,1);
-			BLS_175(:,i) = integration(:,6,i) - mean175BL(i,1);
-			BLS_174(:,i) = integration(:,7,i) - mean174BL(i,1);
-			BLS_173(:,i) = integration(:,8,i) - mean173BL(i,1);
-			BLS_172(:,i) = integration(:,9,i) - mean172BL(i,1);
-			BLS_171(:,i) = integration(:,10,i) - mean171BL(i,1);
-		end
-		
+	%}
+	
+	for i = 1:data_count
+		BLS_180(:,i) = integration(:,1,i) - mean180BL(i,1);
+		BLS_179(:,i) = integration(:,2,i) - mean179BL(i,1);
+		BLS_178(:,i) = integration(:,3,i) - mean178BL(i,1);
+		BLS_177(:,i) = integration(:,4,i) - mean177BL(i,1);
+		BLS_176(:,i) = integration(:,5,i) - mean176BL(i,1);
+		BLS_175(:,i) = integration(:,6,i) - mean175BL(i,1);
+		BLS_174(:,i) = integration(:,7,i) - mean174BL(i,1);
+		BLS_173(:,i) = integration(:,8,i) - mean173BL(i,1);
+		BLS_172(:,i) = integration(:,9,i) - mean172BL(i,1);
+		BLS_171(:,i) = integration(:,10,i) - mean171BL(i,1);
 	end
 	
+end
+
 %end
 
 
@@ -667,9 +648,9 @@ end
 %}
 
 
-%cla(H.STDS_plot,'reset'); 
-cla(H.SingleAnalysis_plot,'reset'); 
-cla(H.Results_plot,'reset'); 
+%cla(H.STDS_plot,'reset');
+cla(H.SingleAnalysis_plot,'reset');
+cla(H.Results_plot,'reset');
 
 Hf_cutoff = str2num(get(H.stdopt_Hfcutoff,'String'));
 Yb_cutoff = str2num(get(H.stdopt_Ybcutoff,'String'));
@@ -744,7 +725,7 @@ for i = 1:samp_length
 	for j = 1:length(sample)
 		if BLS_180(i,j) > Hf_cutoff
 			BHf_gt_int(i,j) = BetaHf(i,j);
-		else 
+		else
 			BHf_gt_int(i,j) = 0;
 		end
 	end
@@ -779,7 +760,7 @@ end
 
 for i = 1:samp_length
 	for j = 1:length(sample)
-		if BLS_176(i,j) == 0 || BLS_177(i,j) == 0 
+		if BLS_176(i,j) == 0 || BLS_177(i,j) == 0
 			All(i,j) = 0;
 		else
 			All(i,j) = ((BLS_176(i,j)-Lu176V(i,j)-Yb176V(i,j))/(BLS_177(i,j)))*((175.94142/176.94323)^(mean(nonzeros(BetaHf(:,j)))));
@@ -882,7 +863,7 @@ for i = 1:samp_length
 		if Filter_MAXMIN(i,j) > mean(nonzeros(Filter_MAXMIN(:,j))) + 2*std(nonzeros(Filter_MAXMIN(:,j))) || ...
 				Filter_MAXMIN(i,j) < mean(nonzeros(Filter_MAXMIN(:,j))) - 2*std(nonzeros(Filter_MAXMIN(:,j)))
 			Filter_95(i,j) = 0;
-		else 
+		else
 			Filter_95(i,j) = Filter_MAXMIN(i,j);
 		end
 	end
@@ -909,7 +890,7 @@ end
 
 
 
-if get(H.filterSTDs,'Value') == 1
+%if get(H.flagunknowns,'Value') == 1
 	EL = Filter_95;
 	for j = 1:length(sample)
 		if STD_idx(j,1) == 1
@@ -924,7 +905,7 @@ if get(H.filterSTDs,'Value') == 1
 			end
 		end
 	end
-
+	
 	for j = 1:length(sample)
 		if STD_idx(j,1) == 1
 			for i = 21:30
@@ -937,12 +918,12 @@ if get(H.filterSTDs,'Value') == 1
 				end
 			end
 		end
-	end	
-	Filter_95 = EL;		
-end
+	end
+	Filter_95 = EL;
+%end
 
 
-if get(H.filtersamples,'Value') == 1
+%if get(H.filterstandards,'Value') == 1
 	EL = Filter_95;
 	for j = 1:length(sample)
 		if SAMPLES_idx(j,1) == 1
@@ -956,7 +937,7 @@ if get(H.filtersamples,'Value') == 1
 				end
 			end
 		end
-	end		
+	end
 	for j = 1:length(sample)
 		if SAMPLES_idx(j,1) == 1
 			for i = 1:10
@@ -969,7 +950,7 @@ if get(H.filtersamples,'Value') == 1
 				end
 			end
 		end
-	end	
+	end
 	for j = 1:length(sample)
 		if SAMPLES_idx(j,1) == 1
 			for i = 21:30
@@ -982,9 +963,9 @@ if get(H.filtersamples,'Value') == 1
 				end
 			end
 		end
-	end		
-	Filter_95 = EL;	
-end
+	end
+	Filter_95 = EL;
+%end
 
 
 
@@ -1015,53 +996,110 @@ end
 waitbar(.9)
 
 for j = 1:length(sample)
-		ALL_176_177_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
-		ALL_176_177_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
-		ALL_Yb_Lu_Hf_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
-		ALL_v180(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
+	ALL_176_177_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+	ALL_176_177_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+	ALL_Yb_Lu_Hf_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+	ALL_v180(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
+	
 	if STD_MT_idx(j,1) == 1
 		Ratio_STD_176_177_MT_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_MT_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_MT_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_MT(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-    end
+	end
+	if STD_MT_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282507) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		Ratio_STD_176_177_MT_mean(j,1) = 0;
+		Ratio_STD_176_177_MT_SE(j,1) = 0;
+		Yb_Lu_Hf_MT_mean(j,1) = 0;
+		v180_MT(j,1) = 0;
+	end
+	
 	if STD_R33_idx(j,1) == 1
 		Ratio_STD_176_177_R33_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_R33_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_R33_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_R33(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-    end
+	end
+	if STD_R33_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282739) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		Ratio_STD_176_177_R33_mean(j,1) = 0;
+		Ratio_STD_176_177_R33_SE(j,1) = 0;
+		Yb_Lu_Hf_R33_mean(j,1) = 0;
+		v180_R33(j,1) = 0;
+	end
+	
 	if STD_PLES_idx(j,1) == 1
 		Ratio_STD_176_177_PLES_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_PLES_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_PLES_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_PLES(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-    end
+	end
+	if STD_PLES_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282484) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		Ratio_STD_176_177_PLES_mean(j,1) = 0;
+		Ratio_STD_176_177_PLES_SE(j,1) = 0;
+		Yb_Lu_Hf_PLES_mean(j,1) = 0;
+		v180_PLES(j,1) = 0;
+	end
+	
 	if STD_FC_idx(j,1) == 1
 		Ratio_STD_176_177_FC_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_FC_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_FC_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_FC(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-    end
+	end 
+	if STD_FC_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282157) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		Ratio_STD_176_177_FC_mean(j,1) = 0;
+		Ratio_STD_176_177_FC_SE(j,1) = 0;
+		Yb_Lu_Hf_FC_mean(j,1) = 0;
+		v180_FC(j,1) = 0;
+	end
+	
 	if STD_TEM_idx(j,1) == 1
 		Ratio_STD_176_177_TEM_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_TEM_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_TEM_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_TEM(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-    end
+	end
+	if STD_TEM_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282686) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		Ratio_STD_176_177_TEM_mean(j,1) =0;
+		Ratio_STD_176_177_TEM_SE(j,1) = 0;
+		Yb_Lu_Hf_TEM_mean(j,1) = 0;
+		v180_TEM(j,1) = 0;
+	end
+	
 	if STD_91500_idx(j,1) == 1
 		Ratio_STD_176_177_91500_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_91500_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_91500_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_91500(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-    end
+	end
+	if STD_91500_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282298) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		Ratio_STD_176_177_91500_mean(j,1) = 0;
+		Ratio_STD_176_177_91500_SE(j,1) = 0;
+		Yb_Lu_Hf_91500_mean(j,1) = 0;
+		v180_91500(j,1) = 0;
+	end
+	
 	if STD_SL_idx(j,1) == 1
 		Ratio_STD_176_177_SL_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_SL_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		Yb_Lu_Hf_SL_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_SL(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-    end
-    if SAMPLES_idx(j,1) == 1
+	end
+	if STD_SL_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.28170) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		Ratio_STD_176_177_SL_mean(j,1) = 0;
+		Ratio_STD_176_177_SL_SE(j,1) = 0;
+		Yb_Lu_Hf_SL_mean(j,1) = 0;
+		v180_SL(j,1) = 0;
+	end
+	
+	if SAMPLES_idx(j,1) == 1
 		Ratio_UNKNOWN_176_177_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		if std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j)))) == 0
 			Ratio_UNKNOWN_176_177_SE(j,1) = 0.0000000001;
@@ -1071,8 +1109,8 @@ for j = 1:length(sample)
 		Yb_Lu_Hf_UNKNOWN_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_UNKNOWN(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
 		sample_UNKNOWN_idx(j,1) = 1;
-		sample_UNKNOWN_name(j,1) = sort(strtrim(sample(j,1)));	
-		LuHf_UNKNOWN(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));	
+		sample_UNKNOWN_name(j,1) = sort(strtrim(sample(j,1)));
+		LuHf_UNKNOWN(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
 	end
 end
 
@@ -1114,10 +1152,10 @@ v180_SL = nonzeros(v180_SL);
 
 if sum(SAMPLES_idx) > 0
 	Ratio_UNKNOWN_176_177_mean = nonzeros(Ratio_UNKNOWN_176_177_mean);
-    H.Ratio_UNKNOWN_176_177_mean = Ratio_UNKNOWN_176_177_mean;
+	H.Ratio_UNKNOWN_176_177_mean = Ratio_UNKNOWN_176_177_mean;
 	Ratio_UNKNOWN_176_177_SE = nonzeros(Ratio_UNKNOWN_176_177_SE);
 	Yb_Lu_Hf_UNKNOWN_mean = nonzeros(Yb_Lu_Hf_UNKNOWN_mean);
-    H.Yb_Lu_Hf_UNKNOWN_mean = Yb_Lu_Hf_UNKNOWN_mean;
+	H.Yb_Lu_Hf_UNKNOWN_mean = Yb_Lu_Hf_UNKNOWN_mean;
 	v180_UNKNOWN = nonzeros(v180_UNKNOWN);
 	sample_UNKNOWN_name = sample_UNKNOWN_name(~cellfun('isempty', sample_UNKNOWN_name'));
 	LuHf_UNKNOWN = nonzeros(LuHf_UNKNOWN);
@@ -1132,7 +1170,7 @@ if sum(SAMPLES_idx) > 0
 		end
 		if ismac == 1
 			fullpathname = char(strcat(folder_name, '/', filename_ages{1,1}));
-		end		
+		end
 		
 		
 		Data = importdata(fullpathname,',',500000);
@@ -1146,7 +1184,7 @@ if sum(SAMPLES_idx) > 0
 	else
 		Ages_names = sample_UNKNOWN_name;
 		%Ages_mean(1:length(sample_UNKNOWN_name),1) = str2double(get(H.age_set,'Value'));
-        Ages_mean(1:length(sample_UNKNOWN_name),1) = str2num(get(H.defaultage,'String'));
+		Ages_mean(1:length(sample_UNKNOWN_name),1) = str2num(get(H.defaultage,'String'));
 		Ages_uncert(1:length(sample_UNKNOWN_name),1) = 1;
 	end
 end
@@ -1201,23 +1239,23 @@ if sum(SAMPLES_idx) > 0
 	Ages_ascribed( all(~Ages_ascribed,2), : ) = [];
 	
 end
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 waitbar(1)
@@ -1233,7 +1271,7 @@ count = 1;
 if sum(SAMPLES_idx) > 0
 	for i = 1:length(SAMPLES_idx)
 		if SAMPLES_idx(i,1) == 1
-			if v180_UNKNOWN(count,1) ~= 0	
+			if v180_UNKNOWN(count,1) ~= 0
 				%eHf_UNKNOWNS(count,1) = 10000*((Ratio_UNKNOWN_176_177_mean(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
 				eHf_UNKNOWNSf(i,1) = 10000*((HfHfT(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
 				eHf_UNKNOWNS(count,1) = 10000*((HfHfT(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
@@ -1309,10 +1347,37 @@ if sum(SAMPLES_idx) > 0
 		end
 	end
 end
-		
-		
-		%10000*( ( E4/K!$F$37)-1),"")
-		%-10000*(((E4-F4)/K!$F$37)-1),"")
+
+
+%10000*( ( E4/K!$F$37)-1),"")
+%-10000*(((E4-F4)/K!$F$37)-1),"")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1339,7 +1404,7 @@ if get(H.stds_FC,'Value') == 1
 	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_FC_mean)) - 0.282157;
 end
 if get(H.stds_SL,'Value') == 1
-	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_SL_mean)) - 0.282167;
+	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_SL_mean)) - 0.28170;
 end
 if get(H.stds_R33,'Value') == 1
 	STD_offset(end+1,1) = mean(nonzeros(Ratio_STD_176_177_R33_mean)) - 0.282739; % R33 STD should end in 1 to be consistent
@@ -1352,7 +1417,7 @@ for i = 1:data_count
 		offset_MT(i,1) = 0;
 	end
 	if STD_SL_idx(i,1) == 1
-		offset_SL(i,1) = abs(Ratio_STD_176_177_SL_mean(i,1) - 0.282167);
+		offset_SL(i,1) = abs(Ratio_STD_176_177_SL_mean(i,1) - 0.28170);
 	else
 		offset_SL(i,1) = 0;
 	end
@@ -1360,27 +1425,27 @@ for i = 1:data_count
 		offset_R33(i,1) = abs(Ratio_STD_176_177_R33_mean(i,1) - 0.282739);
 	else
 		offset_R33(i,1) = 0;
-	end	
+	end
 	if STD_TEM_idx(i,1) == 1
 		offset_TEM(i,1) = abs(Ratio_STD_176_177_TEM_mean(i,1) - 0.282686);
 	else
 		offset_TEM(i,1) = 0;
-	end		
+	end
 	if STD_91500_idx(i,1) == 1
 		offset_91500(i,1) = abs(Ratio_STD_176_177_91500_mean(i,1) - 0.282298);
 	else
 		offset_91500(i,1) = 0;
-	end		
+	end
 	if STD_PLES_idx(i,1) == 1
 		offset_PLES(i,1) = abs(Ratio_STD_176_177_PLES_mean(i,1) - 0.282484);
 	else
 		offset_PLES(i,1) = 0;
-	end		
+	end
 	if STD_FC_idx(i,1) == 1
 		offset_FC(i,1) = abs(Ratio_STD_176_177_FC_mean(i,1) - 0.282157);
 	else
 		offset_FC(i,1) = 0;
-	end		
+	end
 end
 
 
@@ -1395,10 +1460,10 @@ end
 
 
 
-STD_offset_avg = mean(STD_offset);
+STD_offset_avg = median(STD_offset);
 set(H.stdopt_STDoffset,'String',sprintf('%f',STD_offset_avg))
 
-STD_SE_avg = mean([Ratio_STD_176_177_MT_SE; Ratio_STD_176_177_R33_SE; Ratio_STD_176_177_PLES_SE; Ratio_STD_176_177_FC_SE; Ratio_STD_176_177_TEM_SE; ...
+STD_SE_avg = median([Ratio_STD_176_177_MT_SE; Ratio_STD_176_177_R33_SE; Ratio_STD_176_177_PLES_SE; Ratio_STD_176_177_FC_SE; Ratio_STD_176_177_TEM_SE; ...
 	Ratio_STD_176_177_91500_SE; Ratio_STD_176_177_SL_SE]);
 set(H.stdopt_STDSE,'String',sprintf('%f',STD_SE_avg));
 if sum(SAMPLES_idx) > 0
@@ -1408,7 +1473,8 @@ end
 % Calculate % data retained
 for j = 1:length(sample)
 	if SAMPLES_idx(j,1) == 0
-		if sum(BLS_180(:,j)) > 0
+		if sum(BLS_180(:,j)) > 0 
+			%&& isempty(strmatch(sample(1,1),'xx')) == 1
 			retained_stds(j,1) = length(nonzeros(Filter_INT(:,j)))/samp_length;
 			retained_stds_idx(j,1) = 1;
 		else
@@ -1447,12 +1513,12 @@ t = 1;
 match = [1:1:length(sample)]';
 
 for i=1:length(sample)
-    if SAMPLES_idx(i,1) == 1
-        match2(i,1) = t;
-        t = t+1;
-    else
-        match2(i,1) = 0;
-    end
+	if SAMPLES_idx(i,1) == 1
+		match2(i,1) = t;
+		t = t+1;
+	else
+		match2(i,1) = 0;
+	end
 end
 
 
@@ -1466,18 +1532,18 @@ for i = 1:length(sample)
 	if ALL_176_177_SE(i,1) > str2num(get(H.unc_cutoff,'String'))
 		comment1(i,1) = {'high uncertainty  '};
 	end
-	if SAMPLES_idx(i,1) == 1 && eHf_UNKNOWNSf(i,1) > str2num(get(H.epsiloncutoffhi,'String')) 
+	if SAMPLES_idx(i,1) == 1 && eHf_UNKNOWNSf(i,1) > str2num(get(H.epsiloncutoffhi,'String'))
 		comment2(i,1) = {'high epsilon  '};
 	end
-	if SAMPLES_idx(i,1) == 1 && eHf_UNKNOWNSf(i,1) < str2num(get(H.epsiloncutofflo,'String')) 
+	if SAMPLES_idx(i,1) == 1 && eHf_UNKNOWNSf(i,1) < str2num(get(H.epsiloncutofflo,'String'))
 		comment3(i,1) = {'low epsilon  '};
 	end
 end
-		
-comment = strcat(comment1, comment2, comment3);	
+
+comment = strcat(comment1, comment2, comment3);
 
 for i = 1:length(sample)
-	if isempty(comment{i,1}) == 1 
+	if isempty(comment{i,1}) == 1
 		current_status{i,1} = ['Accepted'];
 		current_status_num(i,1) = 1;
 	else
@@ -1495,16 +1561,20 @@ end
 name_idx = length(sample); %automatically plot final sample run
 
 for i=1:length(sample)
-	if isempty(comment{i,1}) == 0 
+	if isempty(comment{i,1}) == 0 && get(H.flagunknowns,'Value') == 1 && STD_idx(i,1) == 0
 		name_char(i,1) = strcat('<html><BODY bgcolor="red">',name_char(i,1),'</span></html>');
-	end
-	if offset_MT(i,1) > str2num(get(H.flag,'String')) || offset_SL(i,1) > str2num(get(H.flag,'String')) || offset_R33(i,1) > str2num(get(H.flag,'String')) ||...
-			offset_TEM(i,1) > str2num(get(H.flag,'String')) || offset_91500(i,1) > str2num(get(H.flag,'String')) || offset_PLES(i,1) > str2num(get(H.flag,'String')) ||...
-			offset_FC(i,1) > str2num(get(H.flag,'String')) 
-		name_char(i,1) = strcat('<html><BODY bgcolor="orange">',name_char(i,1),'</span></html>');
 	end
 end
 
+for i=1:length(sample)
+	if get(H.filterstandards,'Value') == 1
+		if offset_MT(i,1) > str2num(get(H.flag,'String')) || offset_SL(i,1) > str2num(get(H.flag,'String')) || offset_R33(i,1) > str2num(get(H.flag,'String')) ||...
+				offset_TEM(i,1) > str2num(get(H.flag,'String')) || offset_91500(i,1) > str2num(get(H.flag,'String')) || offset_PLES(i,1) > str2num(get(H.flag,'String')) ||...
+				offset_FC(i,1) > str2num(get(H.flag,'String'))
+			name_char(i,1) = strcat('<html><BODY bgcolor="green">',name_char(i,1),'</span></html>');
+		end
+	end
+end
 
 set(H.ind_listbox1, 'String', name_char);
 set(H.ind_listbox1,'Value',length(sample));
@@ -1558,8 +1628,8 @@ for i = 1:length(SAMPLES_idx)
 	end
 end
 
-				
-				
+
+
 
 
 
@@ -1634,7 +1704,7 @@ if get(H.auto_reduce,'Value') == 0
 end
 
 function auto_reduce_Callback(hObject, eventdata, H)
-	
+
 if get(H.auto_reduce,'Value') == 1
 	set(H.reduce_data,'Enable','off')
 	t = timer;
@@ -1683,7 +1753,7 @@ h7 = scatter(H.Yb_Lu_Hf_SL_mean, H.Ratio_STD_176_177_SL_mean, 150, 'MarkerEdgeCo
 if sum(H.SAMPLES_idx) > 0
 	legend([h0,h1,h2,h3,h4,h5,h6,h7],{'Unknowns','R33','Temora','Mud Tank','Plesovice','91500','FC','Sri Lanka'}, 'Location', 'southeast')
 else
-legend([h1,h2,h3,h4,h5,h6,h7],{'R33','Temora','Mud Tank','Plesovice','91500','FC','Sri Lanka'}, 'Location', 'southeast')
+	legend([h1,h2,h3,h4,h5,h6,h7],{'R33','Temora','Mud Tank','Plesovice','91500','FC','Sri Lanka'}, 'Location', 'southeast')
 end
 xlabel('176(Yb+Lu) / 176Hf (%)')
 ylabel('176Hf/177Hf')
@@ -1691,42 +1761,50 @@ if get(H.stds_setscale,'Value') == 1
 	axis([-10 80 0.2813 0.2831])
 end
 
+name_tmp = (get(H.ind_listbox1,'String'));
 if H.STD_idx(get(H.ind_listbox1,'Value'),1) == 1
 	if H.STD_MT_idx(get(H.ind_listbox1,'Value'),1) == 1
-		idxs = sum(H.STD_MT_idx(1:get(H.ind_listbox1,'Value')));
-		scatter(H.Yb_Lu_Hf_MT_mean(idxs,1), H.Ratio_STD_176_177_MT_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+			idxs = sum(H.STD_MT_idx(1:get(H.ind_listbox1,'Value')));
+			scatter(H.Yb_Lu_Hf_MT_mean(idxs,1), H.Ratio_STD_176_177_MT_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		end
 	end
 	if H.STD_SL_idx(get(H.ind_listbox1,'Value'),1) == 1
-		idxs = sum(H.STD_SL_idx(1:get(H.ind_listbox1,'Value')));
-		scatter(H.Yb_Lu_Hf_SL_mean(idxs,1), H.Ratio_STD_176_177_SL_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
-	end	
+		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+			idxs = sum(H.STD_SL_idx(1:get(H.ind_listbox1,'Value')));
+			scatter(H.Yb_Lu_Hf_SL_mean(idxs,1), H.Ratio_STD_176_177_SL_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		end
+	end
 	if H.STD_R33_idx(get(H.ind_listbox1,'Value'),1) == 1
-		idxs = sum(H.STD_R33_idx(1:get(H.ind_listbox1,'Value')));
-		scatter(H.Yb_Lu_Hf_R33_mean(idxs,1), H.Ratio_STD_176_177_R33_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
-	end	
+		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+			idxs = sum(H.STD_R33_idx(1:get(H.ind_listbox1,'Value')));
+			scatter(H.Yb_Lu_Hf_R33_mean(idxs,1), H.Ratio_STD_176_177_R33_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		end
+	end
 	if H.STD_TEM_idx(get(H.ind_listbox1,'Value'),1) == 1
-		idxs = sum(H.STD_TEM_idx(1:get(H.ind_listbox1,'Value')));
-		scatter(H.Yb_Lu_Hf_TEM_mean(idxs,1), H.Ratio_STD_176_177_TEM_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
-	end		
+		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+			idxs = sum(H.STD_TEM_idx(1:get(H.ind_listbox1,'Value')));
+			scatter(H.Yb_Lu_Hf_TEM_mean(idxs,1), H.Ratio_STD_176_177_TEM_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		end
+	end
 	if H.STD_91500_idx(get(H.ind_listbox1,'Value'),1) == 1
-		idxs = sum(H.STD_91500_idx(1:get(H.ind_listbox1,'Value')));
-		scatter(H.Yb_Lu_Hf_91500_mean(idxs,1), H.Ratio_STD_176_177_91500_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
-	end			
+		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+			idxs = sum(H.STD_91500_idx(1:get(H.ind_listbox1,'Value')));
+			scatter(H.Yb_Lu_Hf_91500_mean(idxs,1), H.Ratio_STD_176_177_91500_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		end
+	end
 	if H.STD_PLES_idx(get(H.ind_listbox1,'Value'),1) == 1
-		idxs = sum(H.STD_PLES_idx(1:get(H.ind_listbox1,'Value')));
-		scatter(H.Yb_Lu_Hf_PLES_mean(idxs,1), H.Ratio_STD_176_177_PLES_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
-	end			
+		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+			idxs = sum(H.STD_PLES_idx(1:get(H.ind_listbox1,'Value')));
+			scatter(H.Yb_Lu_Hf_PLES_mean(idxs,1), H.Ratio_STD_176_177_PLES_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		end
+	end
 	if H.STD_FC_idx(get(H.ind_listbox1,'Value'),1) == 1
-		idxs = sum(H.STD_FC_idx(1:get(H.ind_listbox1,'Value')));
-		scatter(H.Yb_Lu_Hf_FC_mean(idxs,1), H.Ratio_STD_176_177_FC_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
-	end			
-	
-	
-	
-	
-	
-	
-	
+		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+			idxs = sum(H.STD_FC_idx(1:get(H.ind_listbox1,'Value')));
+			scatter(H.Yb_Lu_Hf_FC_mean(idxs,1), H.Ratio_STD_176_177_FC_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
+		end
+	end
 end
 
 hold off
@@ -1831,12 +1909,12 @@ if sum(H.SAMPLES_idx) > 0
 		scatter(H.Yb_Lu_Hf_UNKNOWN_mean, H.Ratio_UNKNOWN_176_177_mean, 100, 'd', 'MarkerEdgeColor','k', 'MarkerFaceColor','b')
 		
 		
-			
+		
 		idx = H.match2(get(H.ind_listbox1,'Value'),1);
 		if idx ~= 0
 			s1 = scatter(H.Yb_Lu_Hf_UNKNOWN_mean(idx,1), H.Ratio_UNKNOWN_176_177_mean(idx,1), 200, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 			%legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-		else    
+		else
 			%s1 = scatter(H.Yb_Lu_Hf_UNKNOWN_mean(1,1), H.Ratio_UNKNOWN_176_177_mean(1,1), 200, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 			%set(s1,'Visible','off')
 		end
@@ -1868,7 +1946,7 @@ if get(H.results_evolution, 'Value') == 1
 		if idx ~= 0
 			s1 = scatter(H.Ages_ascribed(idx,1), H.Ratio_UNKNOWN_176_177_mean(idx,1), 200, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 			%legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-		else    
+		else
 			%s1 = scatter(H.Ages_ascribed(1,1), H.Ratio_UNKNOWN_176_177_mean(1,1), 200, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 			%set(s1,'Visible','off')
 		end
@@ -1904,13 +1982,13 @@ if get(H.results_epsilon, 'Value') == 1
 	plot([0 DM_Slider],[Y0_u_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
 	plot([0 DM_Slider],[Y0_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 2)
 	plot([0 DM_Slider],[Y0_l_Epsi_DM_176Lu_177Hf, Ys_Epsi_DM_176Lu_177Hf], 'Color', [0.4,0.4,0.4], 'LineWidth', 1)
-    
+	
 	if sum(H.SAMPLES_idx) > 0
 		idx = H.match2(get(H.ind_listbox1,'Value'),1);
 		if idx ~= 0
 			s1 = scatter(H.Ages_ascribed(idx,1), H.eHf_UNKNOWNS(idx,1), 200, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 			%legend({'Unknowns', 'CHUR', 'Depleted Mantle (DM)', 'DM+', 'DM-', '176Lu/177Hf = 0.0036', '176Lu/177Hf = 0.0115', '176Lu/177Hf = 0.0193'}, 'Location', 'southeast')
-		else    
+		else
 			%s1 = scatter(H.Ages_ascribed(1,1), H.eHf_UNKNOWNS(1,1), 200, 'o', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 			%set(s1,'Visible','off')
 		end
@@ -2006,12 +2084,12 @@ results_PLOT_Callback(hObject, eventdata, H)
 
 function ind_180_Callback(hObject, eventdata, H)
 set(H.ind_180,'Value', 1)
-set(H.ind_176_177,'Value', 0) 
+set(H.ind_176_177,'Value', 0)
 ind_PLOT_Callback(hObject, eventdata, H)
 
 function ind_176_177_Callback(hObject, eventdata, H)
 set(H.ind_180,'Value', 0)
-set(H.ind_176_177,'Value', 1) 
+set(H.ind_176_177,'Value', 1)
 ind_PLOT_Callback(hObject, eventdata, H)
 
 
@@ -2111,11 +2189,16 @@ function epsiloncutofflo_Callback(hObject, eventdata, H)
 
 
 
-function filterSTDs_Callback(hObject, eventdata, H)
 
 
-function filtersamples_Callback(hObject, eventdata, H)
 
 
 
 function flag_Callback(hObject, eventdata, H)
+
+
+function filterstandards_Callback(hObject, eventdata, H)
+
+
+
+function flagunknowns_Callback(hObject, eventdata, H)
