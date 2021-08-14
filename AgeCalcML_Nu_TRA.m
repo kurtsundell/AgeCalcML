@@ -914,8 +914,8 @@ end
 waitbar(7/waitnum,h,'Calculating. Please wait...');
 
 Macro1_Output(1:data_count+1,1:20) = {0}; % Preallocate
-Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 Â± %', 'm68', ...
-	'206207', '67 Â± %', '206204', '64 Â± %', '208232', '82 Â± %', '208204', '84 Â± %'};
+Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 ± %', 'm68', ...
+	'206207', '67 ± %', '206204', '64 ± %', '208232', '82 ± %', '208204', '84 ± %'};
 Macro1_Output(2:end,1) = sample;
 Macro1_Output(2:end,2) = serial;
 Macro1_Output(2:end,3) = num2cell(CPS_202);
@@ -1542,11 +1542,11 @@ comment = strcat(comment1, comment2, comment3, comment4, comment5, comment6, com
 % CONCATENATE DATA FOR EXPORT AND PLOTTING %%
 
 AGES_OUT{data_count+1, 6} = [];
-AGES_OUT(1,:) = {'6/8 age', 'Â± (Ma)', '6/7 age', 'Â± (Ma)', '8/2 age', 'Â± (Ma)'};
+AGES_OUT(1,:) = {'6/8 age', '± (Ma)', '6/7 age', '± (Ma)', '8/2 age', '± (Ma)'};
 AGES_OUT(2:end,:) = [Age68, Age68_err, Age67, Age67_err, Age82, Age82_err];
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)', '8/2 age', 'Â±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
 for i = 1:data_count
 	if sample_idx(i,1) == 1 && isempty(comment{i,1}) == 1
 		SAMPLE_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1558,7 +1558,7 @@ for i = 1:data_count
 end
 
 STD_CONCORDIA{data_count+1, 9} = [];
-STD_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)'};
+STD_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)'};
 for i = 1:data_count
 	if STD1_idx(i,1) == 1
 		STD_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1567,14 +1567,14 @@ for i = 1:data_count
 end
 
 CORRECTED_CONC_RATIOS{data_count+1, 15} = [];
-CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', 'Â±(%)', '8/2 ratio', 'Â±(%)', ...
-	'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho'};
+CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '±(%)', '8/2 ratio', '±(%)', ...
+	'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho'};
 CORRECTED_CONC_RATIOS(2:end,:) = [sample, num2cell(ppm238), num2cell(ppm232), num2cell(BLS_64_corr.*factor64), num2cell(BLS_84_corr), ...
 	num2cell(UTh), num2cell(fcbc67), num2cell(re67), num2cell(fcbc82), num2cell(re82), num2cell(ratio75), num2cell(ratio75_err), num2cell(ratio68), ...
 	num2cell(err68m), num2cell(rho)];
 
 AGES_1SD_RANDOM_ERRORS{data_count+1, 10} = [];
-AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', 'Â±(Ma)', '7/5 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', '8/2 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)'};
+AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '±(Ma)', '7/5 age', '±(Ma)', '6/7 age', '±(Ma)', '8/2 age', '±(Ma)', 'BEST AGE', '±(Ma)'};
 AGES_1SD_RANDOM_ERRORS(2:end,:) = [Age68, Age68_err, Age75, Age75_err, Age67, Age67_err, Age82, Age82_err, Best_Age, Best_Age_err];
 
 Macro_1_2_Output = [Macro1_Output, AGES_OUT, [{'comment'};comment], SAMPLE_CONCORDIA, STD_CONCORDIA, CORRECTED_CONC_RATIOS, AGES_1SD_RANDOM_ERRORS];
@@ -1829,7 +1829,7 @@ axes(H.axes_session);
 for i = 1:length(sigx_sq_STD1)
 	%if isnan(sigx_sq_STD1(i,1)) == 0 && isnan(rho_sigx_sigy_STD1(i,1)) == 0 && isnan(rho_sigx_sigy_STD1(i,1)) == 0 && isnan(sigy_sq_STD1(i,1)) == 0
 	if sum(sum(isnan([sigx_sq_STD1(i,1),rho_sigx_sigy_STD1(i,1);rho_sigx_sigy_STD1(i,1),sigy_sq_STD1(i,1)]))) == 0
-		if STD1_idx(i,1) == 1
+		%if STD1_idx(i,1) == 1
 			covmat_STD1=[sigx_sq_STD1(i,1),rho_sigx_sigy_STD1(i,1);rho_sigx_sigy_STD1(i,1),sigy_sq_STD1(i,1)];
 			[PD_STD1,PV_STD1]=eig(covmat_STD1);
 			PV_STD1 = diag(PV_STD1).^.5;
@@ -1840,7 +1840,7 @@ for i = 1:length(sigx_sq_STD1)
 			elpt_STD1_out(:,:,i) = elpt_STD1 + repmat(center_STD1(i,1:2),numpoints,numsigma);
 			p1 = plot(elpt_STD1_out(:,1:2:end,i),elpt_STD1_out(:,2:2:end,i),'b','LineWidth',1.2);
 			hold on
-		end
+		%end
 	end
 	%end
 end
@@ -1940,7 +1940,7 @@ MSWD_STD2 = 1/(length(data2(:,1))-1).*sum(((data2(:,1)- (sum(data2(:,1)./(data2(
 tt4 = sprintf('%.2f ', tt);
 ss4 = sprintf('%.2f ', s);
 mswd4 = sprintf('%.2f ', MSWD_STD2);
-sss = strcat({'Weighted Mean Secondary =  '},tt4,{' Â± '},ss4,{', '},{'MSWD ='},{' '},mswd4);
+sss = strcat({'Weighted Mean Secondary =  '},tt4,{' ± '},ss4,{', '},{'MSWD ='},{' '},mswd4);
 set(H.WM_STD2,'String',sss)
 
 end
@@ -2214,7 +2214,7 @@ cla(H.axes_session,'reset');
 %set(H.axes_session,'FontSize',8);
 
 s1 = scatter(raddos, bestage, 50, 'b', 'filled', 'd', 'LineWidth', 1.25);
-xlabel('Radiation Dosage (alpha decays/Âµg)')
+xlabel('Radiation Dosage (alpha decays/µg)')
 ylabel('Best Age (Ma)')
 
 if get(H.leg_on_session,'Value') == 1
@@ -2310,7 +2310,7 @@ axes(H.axes_current_concordia);
 %set(H.axes_current_concordia,'FontSize',8);
 %set(H.axes_current_concordia,'String',sample{name_idx,1});
 
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' ± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 
 concordia_data = [ratio75(name_idx,1), ratio75_err(name_idx,1), ratio68(name_idx,1), err68m(name_idx,1)];
 center = [concordia_data(:,1),concordia_data(:,3)];
@@ -2806,7 +2806,7 @@ end
 
 %T Zero Find by Medians
 % Missing t0s (singles)
-if get(H.tzero_method,'Value') == 1
+%if get(H.tzero_method,'Value') == 1
 	if data_count > length(t0_idx) && sum(diff_ch) > 0
 		for i = 1:length(diff_ch)
 			if mean(diff(t0_idx)) > 5 && mean(diff(t0_idx)) < 25
@@ -2862,8 +2862,9 @@ if get(H.tzero_method,'Value') == 1
 	else
 		t0 = t0_238;
 	end
-end
+%end
 
+%{
 % T Zero Find by fractions
 if get(H.tzero_method,'Value') == 2
 	if data_count > length(t0_idx)
@@ -2908,7 +2909,7 @@ if get(H.tzero_method,'Value') == 2
 		t0 = t0_238;
 	end
 end
-
+%}
 
 
 
@@ -3073,7 +3074,7 @@ set(H.axes_session,'box','on')
 %set(H.primary_reference,'String',STD1);
 
 for i = 1:length(sigx_sq_STD1)
-	if STD1_idx(i,1) == 1
+	%if STD1_idx(i,1) == 1
 		covmat_STD1=[sigx_sq_STD1(i,1),rho_sigx_sigy_STD1(i,1);rho_sigx_sigy_STD1(i,1),sigy_sq_STD1(i,1)];
 		[PD_STD1,PV_STD1]=eig(covmat_STD1);
 		PV_STD1 = diag(PV_STD1).^.5;
@@ -3084,7 +3085,7 @@ for i = 1:length(sigx_sq_STD1)
 		elpt_STD1_out(:,:,i) = elpt_STD1 + repmat(center_STD1(i,1:2),numpoints,numsigma);
 		p1 = plot(elpt_STD1_out(:,1:2:end,i),elpt_STD1_out(:,2:2:end,i),'b','LineWidth',1.2);
 		hold on
-	end
+	%end
 end
 
 %age_label2_x = 0.742701185586296;
@@ -3244,7 +3245,7 @@ tt4 = sprintf('%.2f ', tt);
 ss4 = sprintf('%.2f ', s);
 mswd4 = sprintf('%.2f ', MSWD_STD2);
 
-sss = strcat({'Weighted Mean Secondary =  '},tt4,{' Â± '},ss4,{', '},{'MSWD ='},{' '},mswd4);
+sss = strcat({'Weighted Mean Secondary =  '},tt4,{' ± '},ss4,{', '},{'MSWD ='},{' '},mswd4);
 
 set(H.WM_STD2,'String',sss)
 function ptype_Unknowns_Callback(hObject, eventdata, H)
@@ -3676,7 +3677,7 @@ cla(H.axes_session,'reset');
 %set(H.axes_session,'FontSize',8);
 set(H.axes_session,'box','on')
 s1 = scatter(raddos, bestage, 50, 'b', 'filled', 'd', 'LineWidth', 1.25);
-xlabel('Radiation Dosage (alpha decays/Âµg)')
+xlabel('Radiation Dosage (alpha decays/µg)')
 ylabel('Best Age (Ma)')
 
 if get(H.leg_on_session,'Value') == 1
@@ -3897,7 +3898,7 @@ set(H.listbox1,'ListBoxTop',currView)
 clear SAMPLE_CONCORDIA
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'rho', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)', '8/2 age', 'Â±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
 
 for i = 1:data_count
 	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
@@ -3907,7 +3908,7 @@ for i = 1:data_count
 	end
 end
 
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' ± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 
 %clear Best_Age
 %clear Best_Age_err
@@ -4038,7 +4039,7 @@ xlabel('207Pb/235U');
 ylabel('206Pb/238U');
 
 p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' ± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 legend(p3, bestage,  'Location', 'northwest');
 guidata(hObject,H);
 
@@ -4547,7 +4548,7 @@ cla(H.axes_current_concordia,'reset');
 %set(H.axes_current_concordia,'FontSize',8);
 %set(H.axes_current_concordia,'String',sample{name_idx,1});
 
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' Â± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age{name_idx,1})}, {' ± '},  {sprintf('%.1f',Best_Age_err{name_idx,1})}, {' Ma'});
 
 
 
@@ -4891,11 +4892,9 @@ function plot_distribution(hObject, eventdata, H)
 %		figure;
 %	end
 %	if H.export_dist == 0
+
 cla(H.axes_distribution, 'reset');
 axes(H.axes_distribution);
-%	end
-%	H.export_dist = 0;
-guidata(hObject,H);
 hold on
 
 for i = 1:H.data_count
@@ -5246,9 +5245,8 @@ fullpathname = strcat(pathname, filename);
 load(fullpathname,'H')
 close(AgeCalcML_Nu_TRA)
 function save_all_Callback(hObject, eventdata, H)
-waitnum = 4;
+waitnum = 6;
 h = waitbar(0,'Saving the AgeCalcML session (.mat file). Please wait...');
-%set(h, 'Position',[600 1500 300 50]);
 waitbar(1/waitnum, h, 'Saving the AgeCalcML session (.mat file). Please wait...');
 
 c = char(H.folder_name);
@@ -5262,23 +5260,17 @@ samplename = c(s(end)+1:end);
 
 if ispc == 1
 	path_mat = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_Session.mat'));
+	path_detailed = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DetailedDataTable.xls'));
+	path_datatable = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DataTable.xls'));
+	path_conc = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_Plot_AgeDistribution.pdf'));
+	path_dist = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_Plot_AgeDistribution.pdf'));
 end
 if ismac == 1
 	path_mat = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_Session.mat'));
-end
-
-if ispc == 1
-	path_detailed = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DetailedDataTable.xls'));
-end
-if ismac == 1
 	path_detailed = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DetailedDataTable.xls'));
-end
-
-if ispc == 1
-	path_datatable = char(strcat(H.folder_name, '\', samplename, '_AgeCalcML_DataTable.xls'));
-end
-if ismac == 1
 	path_datatable = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_DataTable.xls'));
+	path_conc = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_Plot_Concordia.pdf'));
+	path_dist = char(strcat(H.folder_name, '/', samplename, '_AgeCalcML_Plot_AgeDistribution.pdf'));
 end
 
 save(path_mat,'H')
@@ -5287,121 +5279,11 @@ waitbar(2/waitnum, h, 'Saving the Detailed Data Table (.xls file). Please wait..
 
 writetable(table(H.Macro_1_2_Output),path_detailed, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
 
-Macro_1_2_Output = H.Macro_1_2_Output(2:end,:);
-
-current_status_num = H.current_status_num;
-STD1_idx = H.STD1_idx;
-sample_idx = H.sample_idx;
-ffsw68 = H.ffsw68;
-ffse68 = H.ffse68;
-stdfcsw67 = H.stdfcsw67;
-stdswse67 = H.stdswse67;
-BLS_68_err = H.BLS_68_err;
-BLS_67_err = H.BLS_67_err;
-pbcerr68 = H.pbcerr68;
-pbcerr67 = H.pbcerr67;
-Age68 = H.Age68;
-systerr68 = H.systerr68;
-systerr67 = H.systerr67;
 
 
 
-%{
-% Calculate systematic Uncertainties
-
-for i = 1:length(STD1_idx)
-	if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20
-		syst_err_68(i,1) = sqrt(100*ffse68(i,1)/ffsw68(i,1)*100*ffse68(i,1)/ffsw68(i,1)+pbcerr68(i,1)*pbcerr68(i,1)+0.053*0.053+0.35*0.35);
-	else
-		syst_err_68(i,1) = 0;
-	end
-end
-
-if length(syst_err_68) >= 126
-	systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
-else
-	systerr68 = 2*mean(nonzeros(syst_err_68));
-end
-
-for i = 1:length(STD1_idx)
-	if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400
-		syst_err_67(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1)+(pbcerr67(i,1))*(pbcerr67(i,1))+0.053*0.053+0.069*0.069+0.35*0.35);
-	end
-end
-
-if length(syst_err_67) >= 126
-	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
-else
-	systerr67 = 2*mean(nonzeros(syst_err_67));
-end
-
-%}
-
-for i = 1:length(current_status_num)
-	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
-		export_num(i,1) = 1;
-	end
-end
-
-geochron_out{sum(export_num)+26, 20} = [];
-geochron_out(1:17,1) = [{'Aliquot Name'; 'Stratigraphic Formation Name';'Stratigraphic Age';'Rock Type';'Mineral';'Method';'Latitude';'Longitude';'Internal Uncertainty Level'; ...
-	'External Uncertainty 206/238 (% two sigma)';'External Uncertainty 206/207 (% two sigma)';'Analysis Purpose';'Laboratory Name';'Analyst Name'; ...
-	'Aliquot Reference';'Aliquot Instrumental Method';'Aliquot Instrumental Reference'}];
-%geochron_out(1:4,2) = answer(1:4,1);
-geochron_out(5,2) = [{'Zircon'}];
-geochron_out(6,2) = [{'U-Pb'}];
-%geochron_out(7:8,2) = answer(5:6,1);
-%geochron_out(12,2) = answer(7,1);
-%geochron_out(14:15,2) = answer(8:9,1);
-geochron_out(9,2) = [{'one sigma'}];
-geochron_out(10,2) = num2cell(systerr68);
-geochron_out(11,2) = num2cell(systerr67);
-geochron_out(13,2) = [{'Arizona LaserChron Center'}];
-geochron_out(16,2) = [{'LA-ICPMS'}];
-geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
-	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','error','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','Best age','Â±','Conc'}];
-geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
-geochron_out(21,8) = [{'Isotope ratios'}];
-geochron_out(21,14) = [{'Apparent ages (Ma)'}];
 
 
-geochron_out_temp{sum(current_status_num), 74} = [];
-for i = 1:length(current_status_num)
-	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
-		geochron_out_temp(i,:) = Macro_1_2_Output(i,:);
-	end
-end
-
-geochron_out_temp(all(cellfun('isempty',geochron_out_temp),2),:) = [];
-
-geochron_out(27:end,1) = geochron_out_temp(:,1);
-geochron_out(27:end,2) = geochron_out_temp(:,51);
-geochron_out(27:end,3) = geochron_out_temp(:,53);
-geochron_out(27:end,4) = geochron_out_temp(:,55);
-geochron_out(27:end,5:6) = geochron_out_temp(:,13:14);
-geochron_out(27:end,7:11) = geochron_out_temp(:,28:32);
-geochron_out(27:end,12:17) = geochron_out_temp(:,65:70);
-geochron_out(27:end,18:19) = geochron_out_temp(:,73:74);
-
-for i = 1:length(geochron_out_temp(:,1))
-	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,21))/cell2num(geochron_out_temp(i,23)))*100};
-end
-
-writetable(table(geochron_out),path_datatable, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
-
-%figure('visible', 'off');
-waitbar(4/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
-close(h)
-function savesesh_Callback(hObject, eventdata, H)
-[file,path] = uiputfile('*.mat','Save file');
-save([path file],'H')
-function export_detailed_Callback(hObject, eventdata, H)
-Macro_1_2_Output = H.Macro_1_2_Output;
-
-[file,path] = uiputfile('*.xls','Save file');
-writetable(table(Macro_1_2_Output),[path file], 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
-function export_summary_Callback(hObject, eventdata, H)
 Macro_1_2_Output = H.Macro_1_2_Output(2:end,:);
 
 current_status_num = H.current_status_num;
@@ -5423,12 +5305,12 @@ end
 
 geochron_out{max(sum(export_num),sum(export_num_rej))+26, 44} = [];
 
-geochron_out(1:17,1) = [{'Aliquot Name'; 'Stratigraphic Formation Name';'Stratigraphic Age';'Rock Type';'Mineral';'Method';'Latitude';'Longitude';'Internal Uncertainty Level'; ...
-	'External Uncertainty 206/238 (% two sigma)';'External Uncertainty 206/207 (% two sigma)';'Analysis Purpose';'Laboratory Name';'Analyst Name'; ...
+geochron_out(1:17,1) = [{'Aliquot Name'; 'Stratigraphic Formation Name';'Stratigraphic Age';'Rock Type';'Mineral';'Method';'Latitude';'Longitude';'Random (Internal) Uncertainty Level'; ...
+	'Systematic (External) Uncertainty 206/238 (% 2 sigma)';'External Uncertainty 206/207 (% 2 sigma)';'Analysis Purpose';'Laboratory Name';'Analyst Name'; ...
 	'Aliquot Reference';'Aliquot Instrumental Method';'Aliquot Instrumental Reference'}];
 geochron_out(5,2) = [{'Zircon'}];
 geochron_out(6,2) = [{'U-Pb'}];
-geochron_out(9,2) = [{'one sigma'}];
+geochron_out(9,2) = [{'2 sigma'}];
 geochron_out(10,2) = num2cell(systerr68);
 geochron_out(11,2) = num2cell(systerr67);
 geochron_out(13,2) = [{'Arizona LaserChron Center'}];
@@ -5437,7 +5319,7 @@ geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced
 	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
 
 geochron_out(22,1) = [{'Accepted'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
@@ -5455,10 +5337,26 @@ geochron_out(27:end,1) = geochron_out_temp(:,1);
 geochron_out(27:end,2) = geochron_out_temp(:,51);
 geochron_out(27:end,3) = geochron_out_temp(:,53);
 geochron_out(27:end,4) = geochron_out_temp(:,55);
-geochron_out(27:end,5:6) = geochron_out_temp(:,13:14);
-geochron_out(27:end,7:11) = geochron_out_temp(:,28:32);
-geochron_out(27:end,12:17) = geochron_out_temp(:,65:70);
-geochron_out(27:end,18:19) = geochron_out_temp(:,73:74);
+geochron_out(27:end,5) = geochron_out_temp(:,13);
+geochron_out(27:end,6) = num2cell(2*cell2num(geochron_out_temp(:,14))); %2s
+geochron_out(27:end,7) = geochron_out_temp(:,28);
+geochron_out(27:end,8) = num2cell(2*cell2num(geochron_out_temp(:,29))); %2s
+geochron_out(27:end,9) = geochron_out_temp(:,30);
+geochron_out(27:end,10) = num2cell(2*cell2num(geochron_out_temp(:,31))); %2s
+geochron_out(27:end,11) = geochron_out_temp(:,32);
+geochron_out(27:end,12) = geochron_out_temp(:,65);
+geochron_out(27:end,13) = num2cell(2*cell2num(geochron_out_temp(:,66))); %2s
+geochron_out(27:end,14) = geochron_out_temp(:,67);
+geochron_out(27:end,15) = num2cell(2*cell2num(geochron_out_temp(:,68))); %2s
+geochron_out(27:end,16) = geochron_out_temp(:,69);
+geochron_out(27:end,17) = num2cell(2*cell2num(geochron_out_temp(:,70))); %2s
+geochron_out(27:end,18) = geochron_out_temp(:,73);
+geochron_out(27:end,19) = num2cell(2*cell2num(geochron_out_temp(:,74))); %2s
+
+%geochron_out(27:end,5:6) = geochron_out_temp(:,13:14);
+%geochron_out(27:end,7:11) = geochron_out_temp(:,28:32);
+%geochron_out(27:end,12:17) = geochron_out_temp(:,65:70);
+%geochron_out(27:end,18:19) = geochron_out_temp(:,73:74);
 
 for i = 1:length(geochron_out_temp(:,1))
 	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,21))/cell2num(geochron_out_temp(i,23)))*100};
@@ -5468,7 +5366,7 @@ end
 %%%%%%%%%%%%% rejected analyses %%%%%%%%%%%%%
 
 geochron_out(22,23) = [{'Rejected (filtered data)'}];
-geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
 geochron_out(24,24:42) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,30) = [{'Isotope ratios'}];
 geochron_out(21,36) = [{'Apparent ages (Ma)'}];
@@ -5487,10 +5385,32 @@ geochron_out(27:rejl,23) = geochron_out_temp_rej(:,1);
 geochron_out(27:rejl,24) = geochron_out_temp_rej(:,51);
 geochron_out(27:rejl,25) = geochron_out_temp_rej(:,53);
 geochron_out(27:rejl,26) = geochron_out_temp_rej(:,55);
+geochron_out(27:rejl,27) = geochron_out_temp_rej(:,13);
+geochron_out(27:rejl,28) = num2cell(2*cell2num(geochron_out_temp_rej(:,14))); %2s
+geochron_out(27:rejl,29) = geochron_out_temp_rej(:,60);
+geochron_out(27:rejl,30) = num2cell(2*cell2num(geochron_out_temp_rej(:,61))); %2s
+geochron_out(27:rejl,31) = geochron_out_temp_rej(:,62);
+geochron_out(27:rejl,32) = num2cell(2*cell2num(geochron_out_temp_rej(:,63))); %2s
+geochron_out(27:rejl,33) = geochron_out_temp_rej(:,64);
+geochron_out(27:rejl,34) = geochron_out_temp_rej(:,65);
+geochron_out(27:rejl,35) = num2cell(2*cell2num(geochron_out_temp_rej(:,66))); %2s
+geochron_out(27:rejl,36) = geochron_out_temp_rej(:,67);
+geochron_out(27:rejl,37) = num2cell(2*cell2num(geochron_out_temp_rej(:,68))); %2s
+geochron_out(27:rejl,38) = geochron_out_temp_rej(:,69);
+geochron_out(27:rejl,39) = num2cell(2*cell2num(geochron_out_temp_rej(:,70))); %2s
+geochron_out(27:rejl,40) = geochron_out_temp_rej(:,73);
+geochron_out(27:rejl,41) = num2cell(2*cell2num(geochron_out_temp_rej(:,74))); %2s
+
+%{
+geochron_out(27:rejl,23) = geochron_out_temp_rej(:,1);
+geochron_out(27:rejl,24) = geochron_out_temp_rej(:,51);
+geochron_out(27:rejl,25) = geochron_out_temp_rej(:,53);
+geochron_out(27:rejl,26) = geochron_out_temp_rej(:,55);
 geochron_out(27:rejl,27:28) = geochron_out_temp_rej(:,13:14);
 geochron_out(27:rejl,29:33) = geochron_out_temp_rej(:,60:64);
 geochron_out(27:rejl,34:39) = geochron_out_temp_rej(:,65:70);
 geochron_out(27:rejl,40:41) = geochron_out_temp_rej(:,73:74);
+%}
 
 for i = 1:length(geochron_out_temp_rej(:,1))
 	geochron_out(26+i,42) = {(cell2num(geochron_out_temp_rej(i,21))/cell2num(geochron_out_temp_rej(i,23)))*100};
@@ -5500,7 +5420,7 @@ end
 %%%%%%%%%%%%% standard analyses %%%%%%%%%%%%%
 
 geochron_out(22,45) = {'Standards (primary and secondary reference materials)'};
-geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
 geochron_out(24,46:64) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,52) = [{'Isotope ratios'}];
 geochron_out(21,58) = [{'Apparent ages (Ma)'}];
@@ -5519,6 +5439,37 @@ geochron_out(27:stdsl,45) = geochron_out_temp_stds(:,1);
 geochron_out(27:stdsl,46) = geochron_out_temp_stds(:,51);
 geochron_out(27:stdsl,47) = geochron_out_temp_stds(:,53);
 geochron_out(27:stdsl,48) = geochron_out_temp_stds(:,55);
+geochron_out(27:stdsl,49) = geochron_out_temp_stds(:,13);
+geochron_out(27:stdsl,50) = num2cell(2*cell2num(geochron_out_temp_stds(:,14))); %2s
+geochron_out(27:stdsl,51) = geochron_out_temp_stds(:,60);
+geochron_out(27:stdsl,52) = num2cell(2*cell2num(geochron_out_temp_stds(:,61))); %2s
+geochron_out(27:stdsl,53) = geochron_out_temp_stds(:,62);
+geochron_out(27:stdsl,54) = num2cell(2*cell2num(geochron_out_temp_stds(:,63))); %2s
+geochron_out(27:stdsl,55) = geochron_out_temp_stds(:,64);
+geochron_out(27:stdsl,56) = geochron_out_temp_stds(:,65);
+geochron_out(27:stdsl,57) = num2cell(2*cell2num(geochron_out_temp_stds(:,66))); %2s
+geochron_out(27:stdsl,58) = geochron_out_temp_stds(:,67);
+geochron_out(27:stdsl,59) = num2cell(2*cell2num(geochron_out_temp_stds(:,68))); %2s
+geochron_out(27:stdsl,60) = geochron_out_temp_stds(:,69);
+geochron_out(27:stdsl,61) = num2cell(2*cell2num(geochron_out_temp_stds(:,70))); %2s
+geochron_out(27:stdsl,62) = geochron_out_temp_stds(:,73);
+geochron_out(27:stdsl,63) = num2cell(2*cell2num(geochron_out_temp_stds(:,74))); %2s
+
+
+
+
+
+
+
+
+
+
+
+%{
+geochron_out(27:stdsl,45) = geochron_out_temp_stds(:,1);
+geochron_out(27:stdsl,46) = geochron_out_temp_stds(:,51);
+geochron_out(27:stdsl,47) = geochron_out_temp_stds(:,53);
+geochron_out(27:stdsl,48) = geochron_out_temp_stds(:,55);
 geochron_out(27:stdsl,49:50) = geochron_out_temp_stds(:,13:14);
 geochron_out(27:stdsl,51:55) = geochron_out_temp_stds(:,60:64);
 geochron_out(27:stdsl,56:61) = geochron_out_temp_stds(:,65:70);
@@ -5527,6 +5478,7 @@ geochron_out(27:stdsl,62:63) = geochron_out_temp_stds(:,73:74);
 for i = 1:length(geochron_out_temp_stds(:,1))
 	geochron_out(26+i,64) = {(cell2num(geochron_out_temp_stds(i,21))/cell2num(geochron_out_temp_stds(i,23)))*100};
 end
+%}
 
 geochron_out(1,23) = [{'Data Reduction Filters and Parameters'}];
 geochron_out(2,23) = [{'Acquisition Rate'}];
@@ -5586,6 +5538,626 @@ else
 	geochron_out(3,38)	= {'no'}; %	Set Fractionation Corr. Window 
 	geochron_out(3,39)	= {'N/A'};%	Fractionation Corr. Window Number
 end
+prim = get(H.primary,'String');
+geochron_out(24,45) = prim(get(H.primary,'Value'));
+
+%[file,path] = uiputfile('*.xls','Save file');
+%writetable(table(geochron_out),[path file], 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+
+waitbar(4/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
+
+writetable(table(geochron_out),path_datatable, 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+
+waitbar(5/waitnum, h, 'Saving the simplified data table (.xls file). Please wait...');
+close(h)
+
+
+
+if verLessThan('matlab', '9.8') == 0
+	
+	
+	
+	
+	
+	f1 = figure('visible','off');
+	
+	sample = H.sample;
+	Ablate = H.Ablate;
+	ratio75 = H.ratio75;
+	ratio75_err = H.ratio75_err;
+	ratio68 = H.ratio68;
+	err68m = H.err68m;
+	Best_Age = H.Best_Age;
+	Best_Age_err = H.Best_Age_err;
+	rho = H.rho;
+	numpoints = H.numpoints;
+	sigmarule = H.sigmarule;
+	xc = H.xc;
+	yc = H.yc;
+	current_status = H.current_status;
+	current_status_num = H.current_status_num;
+	current_status_num_orig = H.current_status_num_orig;
+	comment = H.comment;
+	name_idx = get(H.listbox1, 'Value');
+	
+	hold on
+	set(H.axes_session,'box','on')
+	sigx_sq_All = H.sigx_sq_All;
+	rho_sigx_sigy_All = H.rho_sigx_sigy_All;
+	sigy_sq_All = H.sigy_sq_All;
+	numpoints = H.numpoints;
+	sigmarule = H.sigmarule;
+	center_All = H.center_All;
+	sample_idx = H.sample_idx;
+	current_status_num = H.current_status_num;
+	
+	timemin = 0;
+	timemax = 4500000000;
+	timeinterval = 50000000;
+	time = timemin:timeinterval:timemax;
+	x = exp(0.00000000098485.*time)-1;
+	y = exp(0.000000000155125.*time)-1;
+	
+	for i = 1:length(sigx_sq_All)
+		covmat=[sigx_sq_All(i,1),rho_sigx_sigy_All(i,1);rho_sigx_sigy_All(i,1),sigy_sq_All(i,1)];
+		[PD,PV]=eig(covmat);
+		PV = diag(PV).^.5;
+		theta = linspace(0,2.*pi,numpoints)';
+		elpt = [cos(theta),sin(theta)]*diag(PV)*PD';
+		numsigma = length(sigmarule);
+		elpt = repmat(elpt,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
+		if sample_idx(i,1) == 1 && current_status_num(i,1) == 1
+			elpt_out_acc(:,:,i) = elpt + repmat(center_All(i,1:2),numpoints,numsigma);
+			p1 = plot(elpt_out_acc(:,1:2:end,i),elpt_out_acc(:,2:2:end,i),'b','LineWidth',1.2);
+		elseif sample_idx(i,1) == 1 && current_status_num(i,1) == 0
+			elpt_out_rej(:,:,i) = elpt + repmat(center_All(i,1:2),numpoints,numsigma);
+			p2 = plot(elpt_out_rej(:,1:2:end,i),elpt_out_rej(:,2:2:end,i),'r','LineWidth',1.2);
+		end
+	end
+	
+	plot(x,y,'k','LineWidth',1.4)
+	
+	time4 = [500000000, 1000000000, 1500000000, 2000000000, 2500000000, 3000000000, 3500000000, 4000000000];
+	x4 = (exp(0.00000000098485.*time4)-1)';
+	y4 = (exp(0.000000000155125.*time4)-1)';
+	
+	for i=1:length(x4)
+		age_label4(i,1) = {sprintf('%.0f',time4(1,i)/1000000)};
+	end
+	
+	elpt_min1 = min([min(min(nonzeros(elpt_out_acc(:,1,:)))),min(min(nonzeros(elpt_out_rej(:,1,:))))]);
+	elpt_max1 = max([max(max(elpt_out_acc(:,1,:))),max(max(elpt_out_rej(:,1,:)))]);
+	elpt_min2 = min([min(min(nonzeros(elpt_out_acc(:,2,:)))),min(min(nonzeros(elpt_out_rej(:,2,:))))]);
+	elpt_max2 = max([max(max(elpt_out_acc(:,2,:))),max(max(elpt_out_rej(:,2,:)))]);
+	
+	for i = 1:length(time4)
+		if x4(i,1) > elpt_min1 - elpt_min1*.01 && x4(i,1) < elpt_max1 +elpt_max1*.01 ...
+				&& y4(i,1) > elpt_min2 - elpt_min2*.01 && y4(i,1) < elpt_max2 + elpt_max2*.01
+			scatter(x4(i,1), y4(i,1),20,'MarkerEdgeColor','k','MarkerFaceColor','y','LineWidth',1.5)
+			labelpoints(x4(i,1), y4(i,1), age_label4(i,1), 'SE', .0002);
+		end
+	end
+	
+	axis([elpt_min1 - elpt_min1*.01 elpt_max1 + elpt_max1*.01 ...
+		elpt_min2 - elpt_min2*.01 elpt_max2 + elpt_max2*.01]);
+	xlabel('207Pb/235U');
+	ylabel('206Pb/238U');
+	
+	%p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
+	
+	accan= {'Accepted Analyses'};
+	rejan = {'Rejected Analyses'};
+	
+	%legend([p1 p2], [accan, rejan], 'Location','northwest');
+	
+	%if get(H.leg_on_session,'Value') == 1
+	legend([p1 p2], [accan, rejan], 'Location','northwest');
+	%else
+	%	legend('hide')
+	%end
+	
+	exportgraphics(gcf,path_conc,'ContentType','vector')
+	
+	f2 = figure('visible','off');
+	%axes(H.axes_distribution);
+	hold on
+	
+	for i = 1:H.data_count
+		if H.current_status_num(i,1) == 1 && H.sample_idx(i,1) == 1
+			dist_data(i+1,1) = cell2num(H.SAMPLE_CONCORDIA(i+1,10));
+			dist_data(i+1,2) = cell2num(H.SAMPLE_CONCORDIA(i+1,11));
+			dist_data = dist_data(any(dist_data ~= 0,2),:);
+		end
+	end
+	
+	for i = 1:length(dist_data(:,1))
+		if dist_data(i,1) > str2double(get(H.xmin,'String')) && dist_data(i,1) < str2double(get(H.xmax,'String'))
+			dist_data(i,:) = dist_data(i,:);
+		else
+			dist_data(i,1:2) = 0;
+		end
+	end
+	
+	dist_data = dist_data(any(dist_data ~= 0,2),:);
+	
+	xmin = str2num(get(H.xmin,'String'));
+	xmax = str2num(get(H.xmax,'String'));
+	xint = str2num(get(H.xint,'String'));
+	bins = str2num(get(H.bins,'String'));
+	x=xmin:xint:xmax;
+	
+	if sum(H.current_status_num) > 0
+		if get(H.radio_hist, 'Value') == 1
+			bins = str2num(get(H.bins,'String'));
+			[counts binCenters] = hist(dist_data(:,1), bins);
+			bar(binCenters, counts);
+			axis([xmin xmax 0 max(counts)+1])
+		end
+		if get(H.radio_pdp, 'Value') == 1
+			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+			p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
+			legend(p, 'Probability Density Plot');
+			pdpmax = max(pdp);
+			%set(lgnd,'Color','w');
+			legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Probability','Color','k')
+			axis([xmin xmax 0 pdpmax+0.1*pdpmax])
+		end
+		if get(H.radio_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				xA = transpose(x);
+				n = length(dist_data(:,1));
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				hl1 = plot(x,kdeA,'Color',[1 0 0]);
+				kdemax = max(kdeA);
+				axis([xmin xmax 0 kdemax+0.2*kdemax])
+				legend('Kernel Density Estimate');
+				set(hl1,'linewidth',2)
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+				%set(lgnd,'color','w');
+				legend boxoff
+				xlabel('Age (Ma)','Color','k')
+				ylabel('Probability','Color','k')
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				x=xmin:xint:xmax;
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				hl1 = plot(x,kde1,'Color',[1 0 0]);
+				ax1 = gca;
+				set(ax1,'XColor','k','YColor','k')
+				pdpmax = max(kde1);
+				legend('Kernel Density Estimate');
+				set(hl1,'linewidth',2)
+				set(gca,'box','off')
+				axis([xmin xmax 0 pdpmax+0.2*pdpmax])
+			end
+			%set(lgnd,'Color','w');
+			legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Probability','Color','k')
+		end
+		if get(H.radio_pdp_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				xA = transpose(x);
+				n = length(dist_data(:,1));
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				pdpmax = max(pdp);
+				p1 = plot(x,kdeA*(1/(max(kdeA)/max(pdp))),'Color',[1 0 0]);
+				p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
+				set(p1,'linewidth',2)
+				legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
+				axis([xmin xmax 0 pdpmax+0.2*pdpmax])
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				pdpmax = max(pdp);
+				p1 = plot(x,kde1*(1/(max(kde1)/max(pdp))),'Color',[1 0 0]);
+				p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
+				set(p1,'linewidth',2)
+				axis([xmin xmax 0 pdpmax+0.2*pdpmax])
+				legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
+				set(p1,'linewidth',2)
+			end
+			%set(lgnd,'Color','w');
+			legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Probability','Color','k')
+		end
+		if get(H.radio_hist_pdp, 'Value') == 1
+			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+			bins = str2num(get(H.bins,'String'));
+			[counts binCenters] = hist(dist_data(:,1), bins);
+			bar(binCenters, counts);
+			p = plot(x, pdp*(1/(max(pdp)/max(counts-1))), 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
+			legend(p, 'Probability Density Plot');
+			%set(lgnd,'color','w');
+			legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Probability','Color','k')
+			axis([xmin xmax 0 max(counts)+1])
+		end
+		if get(H.radio_hist_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				[counts binCenters] = hist(dist_data(:,1), bins);
+				bar(binCenters, counts);
+				xA = transpose(x);
+				n = length(dist_data(:,1));
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				p1 = plot(x,kdeA*(1/(max(kdeA)/max(counts-1))),'Color',[1 0 0]);
+				kdemax = max(kdeA);
+				legend(p1,'Kernel Density Estimate');
+				set(p1,'linewidth',2)
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+				xlabel('Age (Ma)','Color','k')
+				ylabel('Number','Color','k')
+				axis([xmin xmax 0 max(counts)+1])
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				[counts binCenters] = hist(dist_data(:,1), bins);
+				bar(binCenters, counts);
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				p1 = plot(x,kde1*(1/(max(kde1)/max(counts-1))),'Color',[1 0 0]);
+				ax1 = gca;
+				set(ax1,'XColor','k','YColor','k')
+				pdpmax = max(kde1);
+				axis([xmin xmax 0 max(counts)+1])
+				legend(p1,'Kernel Density Estimate');
+				set(p1,'linewidth',2)
+			end
+			%set(lgnd,'color','w');
+			legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Number','Color','k')
+		end
+		if get(H.radio_hist_pdp_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				[counts binCenters] = hist(dist_data(:,1), bins);
+				bar(binCenters, counts);
+				xA = transpose(x);
+				n = length(dist_data(:,1));
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				p1 = plot(x,kdeA*(1/(max(kdeA)/max(counts-1))),'Color',[1 0 0]);
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				pdpmax = max(pdp);
+				p = plot(x, pdp*(1/(max(pdp)/max(counts-1))), 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
+				kdemax = max(kdeA);
+				axis([xmin xmax 0 max(counts)+1])
+				legend([p,p1],'Probability Density Plot','Kernel Density Estimate');
+				set(p1,'linewidth',2)
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+				xlabel('Age (Ma)','Color','k')
+				ylabel('Number','Color','k')
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				[counts binCenters] = hist(dist_data(:,1), bins);
+				b = bar(binCenters, counts);
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				p1 = plot(x,kde1*(1/(max(kde1)/max(counts-1))),'Color',[1 0 0]);
+				pdpmax = max(kde1);
+				set(p1,'linewidth',2)
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				p = plot(x, pdp*(1/(max(pdp)/max(counts-1))), 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
+				axis([xmin xmax 0 max(counts)+1])
+				%l1 = {'Probability Density Plot'};
+				%l2 = {'Kernel Density Estimate'};
+				
+				legend([p, p1], 'Probability Density Plot' ,'Kernel Density Estimate', 'Location','northeast');
+			end
+			%set(lgnd,'Color','w');
+			legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Number','Color','k')
+		end
+	end
+	%end
+	%nsamp = num2str(length(dist_data));
+	
+	
+	exportgraphics(f2,path_dist,'ContentType','vector')
+	
+	
+	
+	
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function savesesh_Callback(hObject, eventdata, H)
+[file,path] = uiputfile('*.mat','Save file');
+save([path file],'H')
+function export_detailed_Callback(hObject, eventdata, H)
+Macro_1_2_Output = H.Macro_1_2_Output;
+
+[file,path] = uiputfile('*.xls','Save file');
+writetable(table(Macro_1_2_Output),[path file], 'FileType', 'spreadsheet', 'WriteVariableNames', 0);
+function export_summary_Callback(hObject, eventdata, H)
+Macro_1_2_Output = H.Macro_1_2_Output(2:end,:);
+
+current_status_num = H.current_status_num;
+sample_idx = H.sample_idx;
+systerr68 = H.systerr68;
+systerr67 = H.systerr67;
+
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
+		export_num(i,1) = 1;
+	end
+end
+
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 0 && sample_idx(i,1) == 1
+		export_num_rej(i,1) = 1;
+	end
+end
+
+geochron_out{max(sum(export_num),sum(export_num_rej))+26, 44} = [];
+
+geochron_out(1:17,1) = [{'Aliquot Name'; 'Stratigraphic Formation Name';'Stratigraphic Age';'Rock Type';'Mineral';'Method';'Latitude';'Longitude';'Random (Internal) Uncertainty Level'; ...
+	'Systematic (External) Uncertainty 206/238 (% 2 sigma)';'External Uncertainty 206/207 (% 2 sigma)';'Analysis Purpose';'Laboratory Name';'Analyst Name'; ...
+	'Aliquot Reference';'Aliquot Instrumental Method';'Aliquot Instrumental Reference'}];
+geochron_out(5,2) = [{'Zircon'}];
+geochron_out(6,2) = [{'U-Pb'}];
+geochron_out(9,2) = [{'2 sigma'}];
+geochron_out(10,2) = num2cell(systerr68);
+geochron_out(11,2) = num2cell(systerr67);
+geochron_out(13,2) = [{'Arizona LaserChron Center'}];
+geochron_out(16,2) = [{'LA-ICPMS'}];
+geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
+	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
+
+geochron_out(22,1) = [{'Accepted'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
+geochron_out(21,8) = [{'Isotope ratios'}];
+geochron_out(21,14) = [{'Apparent ages (Ma)'}];
+
+geochron_out_temp{sum(current_status_num), 74} = [];
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
+		geochron_out_temp(i,:) = Macro_1_2_Output(i,:);
+	end
+end
+
+geochron_out_temp(all(cellfun('isempty',geochron_out_temp),2),:) = [];
+
+geochron_out(27:end,1) = geochron_out_temp(:,1);
+geochron_out(27:end,2) = geochron_out_temp(:,51);
+geochron_out(27:end,3) = geochron_out_temp(:,53);
+geochron_out(27:end,4) = geochron_out_temp(:,55);
+geochron_out(27:end,5) = geochron_out_temp(:,13);
+geochron_out(27:end,6) = num2cell(2*cell2num(geochron_out_temp(:,14))); %2s
+geochron_out(27:end,7) = geochron_out_temp(:,28);
+geochron_out(27:end,8) = num2cell(2*cell2num(geochron_out_temp(:,29))); %2s
+geochron_out(27:end,9) = geochron_out_temp(:,30);
+geochron_out(27:end,10) = num2cell(2*cell2num(geochron_out_temp(:,31))); %2s
+geochron_out(27:end,11) = geochron_out_temp(:,32);
+geochron_out(27:end,12) = geochron_out_temp(:,65);
+geochron_out(27:end,13) = num2cell(2*cell2num(geochron_out_temp(:,66))); %2s
+geochron_out(27:end,14) = geochron_out_temp(:,67);
+geochron_out(27:end,15) = num2cell(2*cell2num(geochron_out_temp(:,68))); %2s
+geochron_out(27:end,16) = geochron_out_temp(:,69);
+geochron_out(27:end,17) = num2cell(2*cell2num(geochron_out_temp(:,70))); %2s
+geochron_out(27:end,18) = geochron_out_temp(:,73);
+geochron_out(27:end,19) = num2cell(2*cell2num(geochron_out_temp(:,74))); %2s
+
+%geochron_out(27:end,5:6) = geochron_out_temp(:,13:14);
+%geochron_out(27:end,7:11) = geochron_out_temp(:,28:32);
+%geochron_out(27:end,12:17) = geochron_out_temp(:,65:70);
+%geochron_out(27:end,18:19) = geochron_out_temp(:,73:74);
+
+for i = 1:length(geochron_out_temp(:,1))
+	geochron_out(26+i,20) = {(cell2num(geochron_out_temp(i,21))/cell2num(geochron_out_temp(i,23)))*100};
+end
+
+
+%%%%%%%%%%%%% rejected analyses %%%%%%%%%%%%%
+
+geochron_out(22,23) = [{'Rejected (filtered data)'}];
+geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(24,24:42) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
+geochron_out(21,30) = [{'Isotope ratios'}];
+geochron_out(21,36) = [{'Apparent ages (Ma)'}];
+
+geochron_out_temp_rej{sum(current_status_num), 74} = [];
+for i = 1:length(current_status_num)
+	if current_status_num(i,1) == 0 && sample_idx(i,1) == 1
+		geochron_out_temp_rej(i,:) = Macro_1_2_Output(i,:);
+	end
+end
+
+geochron_out_temp_rej(all(cellfun('isempty',geochron_out_temp_rej),2),:) = [];
+rejl = 27+length(geochron_out_temp_rej(:,1))-1;
+
+geochron_out(27:rejl,23) = geochron_out_temp_rej(:,1);
+geochron_out(27:rejl,24) = geochron_out_temp_rej(:,51);
+geochron_out(27:rejl,25) = geochron_out_temp_rej(:,53);
+geochron_out(27:rejl,26) = geochron_out_temp_rej(:,55);
+geochron_out(27:rejl,27) = geochron_out_temp_rej(:,13);
+geochron_out(27:rejl,28) = num2cell(2*cell2num(geochron_out_temp_rej(:,14))); %2s
+geochron_out(27:rejl,29) = geochron_out_temp_rej(:,60);
+geochron_out(27:rejl,30) = num2cell(2*cell2num(geochron_out_temp_rej(:,61))); %2s
+geochron_out(27:rejl,31) = geochron_out_temp_rej(:,62);
+geochron_out(27:rejl,32) = num2cell(2*cell2num(geochron_out_temp_rej(:,63))); %2s
+geochron_out(27:rejl,33) = geochron_out_temp_rej(:,64);
+geochron_out(27:rejl,34) = geochron_out_temp_rej(:,65);
+geochron_out(27:rejl,35) = num2cell(2*cell2num(geochron_out_temp_rej(:,66))); %2s
+geochron_out(27:rejl,36) = geochron_out_temp_rej(:,67);
+geochron_out(27:rejl,37) = num2cell(2*cell2num(geochron_out_temp_rej(:,68))); %2s
+geochron_out(27:rejl,38) = geochron_out_temp_rej(:,69);
+geochron_out(27:rejl,39) = num2cell(2*cell2num(geochron_out_temp_rej(:,70))); %2s
+geochron_out(27:rejl,40) = geochron_out_temp_rej(:,73);
+geochron_out(27:rejl,41) = num2cell(2*cell2num(geochron_out_temp_rej(:,74))); %2s
+
+%{
+geochron_out(27:rejl,23) = geochron_out_temp_rej(:,1);
+geochron_out(27:rejl,24) = geochron_out_temp_rej(:,51);
+geochron_out(27:rejl,25) = geochron_out_temp_rej(:,53);
+geochron_out(27:rejl,26) = geochron_out_temp_rej(:,55);
+geochron_out(27:rejl,27:28) = geochron_out_temp_rej(:,13:14);
+geochron_out(27:rejl,29:33) = geochron_out_temp_rej(:,60:64);
+geochron_out(27:rejl,34:39) = geochron_out_temp_rej(:,65:70);
+geochron_out(27:rejl,40:41) = geochron_out_temp_rej(:,73:74);
+%}
+
+for i = 1:length(geochron_out_temp_rej(:,1))
+	geochron_out(26+i,42) = {(cell2num(geochron_out_temp_rej(i,21))/cell2num(geochron_out_temp_rej(i,23)))*100};
+end
+
+
+%%%%%%%%%%%%% standard analyses %%%%%%%%%%%%%
+
+geochron_out(22,45) = {'Standards (primary and secondary reference materials)'};
+geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(24,46:64) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
+geochron_out(21,52) = [{'Isotope ratios'}];
+geochron_out(21,58) = [{'Apparent ages (Ma)'}];
+
+geochron_out_temp_stds{sum(current_status_num), 74} = [];
+for i = 1:length(current_status_num)
+	if sample_idx(i,1) == 0
+		geochron_out_temp_stds(i,:) = Macro_1_2_Output(i,:);
+	end
+end
+
+geochron_out_temp_stds(all(cellfun('isempty',geochron_out_temp_stds),2),:) = [];
+stdsl = 27+length(geochron_out_temp_stds(:,1))-1;
+
+geochron_out(27:stdsl,45) = geochron_out_temp_stds(:,1);
+geochron_out(27:stdsl,46) = geochron_out_temp_stds(:,51);
+geochron_out(27:stdsl,47) = geochron_out_temp_stds(:,53);
+geochron_out(27:stdsl,48) = geochron_out_temp_stds(:,55);
+geochron_out(27:stdsl,49) = geochron_out_temp_stds(:,13);
+geochron_out(27:stdsl,50) = num2cell(2*cell2num(geochron_out_temp_stds(:,14))); %2s
+geochron_out(27:stdsl,51) = geochron_out_temp_stds(:,60);
+geochron_out(27:stdsl,52) = num2cell(2*cell2num(geochron_out_temp_stds(:,61))); %2s
+geochron_out(27:stdsl,53) = geochron_out_temp_stds(:,62);
+geochron_out(27:stdsl,54) = num2cell(2*cell2num(geochron_out_temp_stds(:,63))); %2s
+geochron_out(27:stdsl,55) = geochron_out_temp_stds(:,64);
+geochron_out(27:stdsl,56) = geochron_out_temp_stds(:,65);
+geochron_out(27:stdsl,57) = num2cell(2*cell2num(geochron_out_temp_stds(:,66))); %2s
+geochron_out(27:stdsl,58) = geochron_out_temp_stds(:,67);
+geochron_out(27:stdsl,59) = num2cell(2*cell2num(geochron_out_temp_stds(:,68))); %2s
+geochron_out(27:stdsl,60) = geochron_out_temp_stds(:,69);
+geochron_out(27:stdsl,61) = num2cell(2*cell2num(geochron_out_temp_stds(:,70))); %2s
+geochron_out(27:stdsl,62) = geochron_out_temp_stds(:,73);
+geochron_out(27:stdsl,63) = num2cell(2*cell2num(geochron_out_temp_stds(:,74))); %2s
+
+
+
+
+
+
+
+
+
+
+
+%{
+geochron_out(27:stdsl,45) = geochron_out_temp_stds(:,1);
+geochron_out(27:stdsl,46) = geochron_out_temp_stds(:,51);
+geochron_out(27:stdsl,47) = geochron_out_temp_stds(:,53);
+geochron_out(27:stdsl,48) = geochron_out_temp_stds(:,55);
+geochron_out(27:stdsl,49:50) = geochron_out_temp_stds(:,13:14);
+geochron_out(27:stdsl,51:55) = geochron_out_temp_stds(:,60:64);
+geochron_out(27:stdsl,56:61) = geochron_out_temp_stds(:,65:70);
+geochron_out(27:stdsl,62:63) = geochron_out_temp_stds(:,73:74);
+
+for i = 1:length(geochron_out_temp_stds(:,1))
+	geochron_out(26+i,64) = {(cell2num(geochron_out_temp_stds(i,21))/cell2num(geochron_out_temp_stds(i,23)))*100};
+end
+%}
+
+geochron_out(1,23) = [{'Data Reduction Filters and Parameters'}];
+geochron_out(2,23) = [{'Acquisition Rate'}];
+geochron_out(2,24) = [{'Downhole Corrected'}];
+geochron_out(2,25) = [{'Standards Reject'}];
+geochron_out(2,26) = [{'Standards Reject 2s Filter'}];
+geochron_out(2,27) = [{'Standards Reject 6/8%'}];
+geochron_out(2,28) = [{'Standards Reject 6/7%'}];
+geochron_out(2,29) = [{'Best age Transition (Ma)'}];
+geochron_out(2,30) = [{'Discordance Transition (Ma)'}];
+geochron_out(2,31) = [{'206/238 Uncertainty Cutoff (%)'}];
+geochron_out(2,32) = [{'206/207 Uncertainty Cutoff (%)'}];
+geochron_out(2,33) = [{'Discordance Cutoff (%)'}];
+geochron_out(2,34) = [{'Reverse Discordance Cutoff (%)'}];
+geochron_out(2,35) = [{'204Pb Filter (cps)'}];
+geochron_out(2,36) = [{'206/204 Factor'}];
+geochron_out(2,37) = [{'U Concentration Filter (ppm)'}];
+geochron_out(2,38) = [{'Set Fractionation Corr. Window'}];
+geochron_out(2,39) = [{'Fractionation Corr. Window Number'}];
+
+method = get(H.method,'String');
+geochron_out(3,23) = method(get(H.method,'Value'));	%	Acquisition Rate
+if get(H.downhole,'Value') == 1
+	geochron_out(3,24) = {'yes'}; %	Downhole Corrected
+else
+	geochron_out(3,24) = {'no'};
+end
+if get(H.reject_yes,'Value') == 1
+	geochron_out(3,25) = {'yes'}; %	Standards Reject
+	if get(H.sigmafilt,'Value') == 1
+		geochron_out(3,26) 	= {'yes'}; %	Standards Reject 2s Filter
+	else
+		geochron_out(3,26) 	= {'no'}; 
+	end
+	geochron_out(3,27) = get(H.reject68);	%	Standards Reject 6/8%
+	geochron_out(3,28) = get(H.reject67);	%	Standards Reject 6/7%
+else
+	geochron_out(3,25) = {'no'}; %	Standards Reject
+	geochron_out(3,26) = {'N/A'};	%	Standards Reject 2s Filter
+	geochron_out(3,27) = {'N/A'};	%	Standards Reject 6/8%
+	geochron_out(3,28) = {'N/A'};	%	Standards Reject 6/7%
+end
+geochron_out(3,29) = {get(H.bestage_cutoff,'String')};	%	Best age Transition (Ma)
+geochron_out(3,30) = {get(H.filter_cutoff,'String')};	%	Discordance Transition (Ma)
+geochron_out(3,31) = {get(H.filter_err68,'String')};	%	206/238 Uncertainty Cutoff (%)
+geochron_out(3,32) = {get(H.filter_err67,'String')};	%	206/207 Uncertainty Cutoff (%)
+geochron_out(3,33) = {get(H.filter_disc,'String')};	%	Discordance Cutoff (%)
+geochron_out(3,34) = {get(H.filter_disc_rev,'String')};	%	Reverse Discordance Cutoff (%)
+geochron_out(3,35) = {get(H.filter_204,'String')};	%	204Pb Filter (cps)
+geochron_out(3,36) = {get(H.factor64,'String')};	%	206/204 Factor
+geochron_out(3,37) = {get(H.Ufilt,'String')};	%	U Concentration Filter (ppm)
+
+if get(H.largenigneous,'Value') == 1
+	geochron_out(3,38)	= {'yes'}; %	Set Fractionation Corr. Window 
+	geochron_out(3,39)	= get(H.igrun,'Value');%	Fractionation Corr. Window Number
+else
+	geochron_out(3,38)	= {'no'}; %	Set Fractionation Corr. Window 
+	geochron_out(3,39)	= {'N/A'};%	Fractionation Corr. Window Number
+end
+prim = get(H.primary,'String');
+geochron_out(24,45) = prim(get(H.primary,'Value'));
 
 [file,path] = uiputfile('*.xls','Save file');
 writetable(table(geochron_out),[path file], 'FileType', 'spreadsheet', 'WriteVariableNames', 0);

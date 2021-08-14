@@ -224,12 +224,14 @@ if TRA == 1
 			clear name_tmp name_tmp_idx
 		end
 		
-		
+		%{
 		if 50*length(sample)+firstline < length(Data(firstline:end,1))
 			rws = 50*length(sample)+firstline;
 		else
 			rws = length(Data(firstline:end,1));
 		end
+		%}
+		rws = length(Data(firstline:end,1));
 		
 		%rws = 50*length(sample)+firstline;
 		values_tmp1{rws,cols} = [];
