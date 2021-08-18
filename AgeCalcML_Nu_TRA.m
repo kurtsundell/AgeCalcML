@@ -684,7 +684,7 @@ waitbar(5/waitnum, h, 'Parsing the data. Please wait...');
 n = length(integration(:,1,1));
 
 if get(H.primary, 'Value') == 1
-	STD1 = 'FC-1';
+	STD1 = 'FC';
 	STD1_68 = 0.18588;
 	STD1_67  = 13.132;
 	STD1_82  = 0.05588;
