@@ -5513,8 +5513,8 @@ if get(H.reject_yes,'Value') == 1
 	else
 		geochron_out(3,26) 	= {'no'}; 
 	end
-	geochron_out(3,27) = get(H.reject68);	%	Standards Reject 6/8%
-	geochron_out(3,28) = get(H.reject67);	%	Standards Reject 6/7%
+	geochron_out(3,27) = {get(H.reject68,'String')};	%	Standards Reject 6/8%
+	geochron_out(3,28) = {get(H.reject67,'String')};	%	Standards Reject 6/7%
 else
 	geochron_out(3,25) = {'no'}; %	Standards Reject
 	geochron_out(3,26) = {'N/A'};	%	Standards Reject 2s Filter
