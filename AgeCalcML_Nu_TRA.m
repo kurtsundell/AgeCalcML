@@ -119,6 +119,12 @@ for i = 1:size(filenames,1)
 		filenames{i,1} = [];
 	elseif strcmp(filenames(i,1),'..') == 1
 		filenames{i,1} = [];
+	elseif strcmp(filenames(i,1),'.DS_Store') == 1
+		filenames{i,1} = [];
+	elseif strcmp(filenames(i,1),'._.DS_Store') == 1
+		filenames{i,1} = [];
+	elseif contains(filenames(i,1),'._') == 1
+		filenames{i,1} = [];
 	end
 end
 
