@@ -5303,6 +5303,7 @@ for i = 1:length(current_status_num)
 	end
 end
 
+export_num_rej = 0;
 for i = 1:length(current_status_num)
 	if current_status_num(i,1) == 0 && sample_idx(i,1) == 1
 		export_num_rej(i,1) = 1;
