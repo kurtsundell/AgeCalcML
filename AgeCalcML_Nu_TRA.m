@@ -5340,25 +5340,25 @@ end
 
 geochron_out_temp(all(cellfun('isempty',geochron_out_temp),2),:) = [];
 
-geochron_out(27:end,1) = geochron_out_temp(:,1);
-geochron_out(27:end,2) = geochron_out_temp(:,51);
-geochron_out(27:end,3) = geochron_out_temp(:,53);
-geochron_out(27:end,4) = geochron_out_temp(:,55);
-geochron_out(27:end,5) = geochron_out_temp(:,13);
-geochron_out(27:end,6) = num2cell(2*cell2num(geochron_out_temp(:,14))); %2s
-geochron_out(27:end,7) = geochron_out_temp(:,28);
-geochron_out(27:end,8) = num2cell(2*cell2num(geochron_out_temp(:,29))); %2s
-geochron_out(27:end,9) = geochron_out_temp(:,30);
-geochron_out(27:end,10) = num2cell(2*cell2num(geochron_out_temp(:,31))); %2s
-geochron_out(27:end,11) = geochron_out_temp(:,32);
-geochron_out(27:end,12) = geochron_out_temp(:,65);
-geochron_out(27:end,13) = num2cell(2*cell2num(geochron_out_temp(:,66))); %2s
-geochron_out(27:end,14) = geochron_out_temp(:,67);
-geochron_out(27:end,15) = num2cell(2*cell2num(geochron_out_temp(:,68))); %2s
-geochron_out(27:end,16) = geochron_out_temp(:,69);
-geochron_out(27:end,17) = num2cell(2*cell2num(geochron_out_temp(:,70))); %2s
-geochron_out(27:end,18) = geochron_out_temp(:,73);
-geochron_out(27:end,19) = num2cell(2*cell2num(geochron_out_temp(:,74))); %2s
+geochron_out(27:sum(export_num)+26,1) = geochron_out_temp(:,1);
+geochron_out(27:sum(export_num)+26,2) = geochron_out_temp(:,51);
+geochron_out(27:sum(export_num)+26,3) = geochron_out_temp(:,53);
+geochron_out(27:sum(export_num)+26,4) = geochron_out_temp(:,55);
+geochron_out(27:sum(export_num)+26,5) = geochron_out_temp(:,13);
+geochron_out(27:sum(export_num)+26,6) = num2cell(2*cell2num(geochron_out_temp(:,14))); %2s
+geochron_out(27:sum(export_num)+26,7) = geochron_out_temp(:,28);
+geochron_out(27:sum(export_num)+26,8) = num2cell(2*cell2num(geochron_out_temp(:,29))); %2s
+geochron_out(27:sum(export_num)+26,9) = geochron_out_temp(:,30);
+geochron_out(27:sum(export_num)+26,10) = num2cell(2*cell2num(geochron_out_temp(:,31))); %2s
+geochron_out(27:sum(export_num)+26,11) = geochron_out_temp(:,32);
+geochron_out(27:sum(export_num)+26,12) = geochron_out_temp(:,65);
+geochron_out(27:sum(export_num)+26,13) = num2cell(2*cell2num(geochron_out_temp(:,66))); %2s
+geochron_out(27:sum(export_num)+26,14) = geochron_out_temp(:,67);
+geochron_out(27:sum(export_num)+26,15) = num2cell(2*cell2num(geochron_out_temp(:,68))); %2s
+geochron_out(27:sum(export_num)+26,16) = geochron_out_temp(:,69);
+geochron_out(27:sum(export_num)+26,17) = num2cell(2*cell2num(geochron_out_temp(:,70))); %2s
+geochron_out(27:sum(export_num)+26,18) = geochron_out_temp(:,73);
+geochron_out(27:sum(export_num)+26,19) = num2cell(2*cell2num(geochron_out_temp(:,74))); %2s
 
 %geochron_out(27:end,5:6) = geochron_out_temp(:,13:14);
 %geochron_out(27:end,7:11) = geochron_out_temp(:,28:32);
