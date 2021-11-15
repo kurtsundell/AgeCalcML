@@ -1011,6 +1011,7 @@ for j = 1:length(sample)
 	end
 	if STD_MT_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282507) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
+		STD_MT_idx(j,1) = 0;
 		Ratio_STD_176_177_MT_mean(j,1) = 0;
 		Ratio_STD_176_177_MT_SE(j,1) = 0;
 		Yb_Lu_Hf_MT_mean(j,1) = 0;
@@ -1025,6 +1026,7 @@ for j = 1:length(sample)
 	end
 	if STD_R33_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282739) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
+		STD_R33_idx(j,1) = 0;
 		Ratio_STD_176_177_R33_mean(j,1) = 0;
 		Ratio_STD_176_177_R33_SE(j,1) = 0;
 		Yb_Lu_Hf_R33_mean(j,1) = 0;
@@ -1039,6 +1041,7 @@ for j = 1:length(sample)
 	end
 	if STD_PLES_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282484) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
+		STD_PLES_idx(j,1) = 0;
 		Ratio_STD_176_177_PLES_mean(j,1) = 0;
 		Ratio_STD_176_177_PLES_SE(j,1) = 0;
 		Yb_Lu_Hf_PLES_mean(j,1) = 0;
@@ -1053,6 +1056,7 @@ for j = 1:length(sample)
 	end 
 	if STD_FC_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282157) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
+		STD_FC_idx(j,1) = 0;
 		Ratio_STD_176_177_FC_mean(j,1) = 0;
 		Ratio_STD_176_177_FC_SE(j,1) = 0;
 		Yb_Lu_Hf_FC_mean(j,1) = 0;
@@ -1067,6 +1071,7 @@ for j = 1:length(sample)
 	end
 	if STD_TEM_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282686) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
+		STD_TEM_idx(j,1) = 0;
 		Ratio_STD_176_177_TEM_mean(j,1) =0;
 		Ratio_STD_176_177_TEM_SE(j,1) = 0;
 		Yb_Lu_Hf_TEM_mean(j,1) = 0;
@@ -1081,6 +1086,7 @@ for j = 1:length(sample)
 	end
 	if STD_91500_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282298) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
+		STD_91500_idx(j,1) = 0;
 		Ratio_STD_176_177_91500_mean(j,1) = 0;
 		Ratio_STD_176_177_91500_SE(j,1) = 0;
 		Yb_Lu_Hf_91500_mean(j,1) = 0;
@@ -1095,6 +1101,7 @@ for j = 1:length(sample)
 	end
 	if STD_SL_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.28170) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
+		STD_SL_idx(j,1) = 0;
 		Ratio_STD_176_177_SL_mean(j,1) = 0;
 		Ratio_STD_176_177_SL_SE(j,1) = 0;
 		Yb_Lu_Hf_SL_mean(j,1) = 0;
@@ -1766,43 +1773,43 @@ end
 name_tmp = (get(H.ind_listbox1,'String'));
 if H.STD_idx(get(H.ind_listbox1,'Value'),1) == 1
 	if H.STD_MT_idx(get(H.ind_listbox1,'Value'),1) == 1
-		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+		if contains(name_tmp(get(H.ind_listbox1,'Value')),'xx') == 0
 			idxs = sum(H.STD_MT_idx(1:get(H.ind_listbox1,'Value')));
 			scatter(H.Yb_Lu_Hf_MT_mean(idxs,1), H.Ratio_STD_176_177_MT_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 		end
 	end
 	if H.STD_SL_idx(get(H.ind_listbox1,'Value'),1) == 1
-		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+		if contains(name_tmp(get(H.ind_listbox1,'Value')),'xx') == 0
 			idxs = sum(H.STD_SL_idx(1:get(H.ind_listbox1,'Value')));
 			scatter(H.Yb_Lu_Hf_SL_mean(idxs,1), H.Ratio_STD_176_177_SL_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 		end
 	end
 	if H.STD_R33_idx(get(H.ind_listbox1,'Value'),1) == 1
-		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+		if contains(name_tmp(get(H.ind_listbox1,'Value')),'xx') == 0
 			idxs = sum(H.STD_R33_idx(1:get(H.ind_listbox1,'Value')));
 			scatter(H.Yb_Lu_Hf_R33_mean(idxs,1), H.Ratio_STD_176_177_R33_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 		end
 	end
 	if H.STD_TEM_idx(get(H.ind_listbox1,'Value'),1) == 1
-		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+		if contains(name_tmp(get(H.ind_listbox1,'Value')),'xx') == 0
 			idxs = sum(H.STD_TEM_idx(1:get(H.ind_listbox1,'Value')));
 			scatter(H.Yb_Lu_Hf_TEM_mean(idxs,1), H.Ratio_STD_176_177_TEM_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 		end
 	end
 	if H.STD_91500_idx(get(H.ind_listbox1,'Value'),1) == 1
-		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+		if contains(name_tmp(get(H.ind_listbox1,'Value')),'xx') == 0
 			idxs = sum(H.STD_91500_idx(1:get(H.ind_listbox1,'Value')));
 			scatter(H.Yb_Lu_Hf_91500_mean(idxs,1), H.Ratio_STD_176_177_91500_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 		end
 	end
 	if H.STD_PLES_idx(get(H.ind_listbox1,'Value'),1) == 1
-		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+		if contains(name_tmp(get(H.ind_listbox1,'Value')),'xx') == 0
 			idxs = sum(H.STD_PLES_idx(1:get(H.ind_listbox1,'Value')));
 			scatter(H.Yb_Lu_Hf_PLES_mean(idxs,1), H.Ratio_STD_176_177_PLES_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 		end
 	end
 	if H.STD_FC_idx(get(H.ind_listbox1,'Value'),1) == 1
-		if isempty(strfind(name_tmp(get(H.ind_listbox1,'Value')),'xx')) == 1
+		if contains(name_tmp(get(H.ind_listbox1,'Value')),'xx') == 0
 			idxs = sum(H.STD_FC_idx(1:get(H.ind_listbox1,'Value')));
 			scatter(H.Yb_Lu_Hf_FC_mean(idxs,1), H.Ratio_STD_176_177_FC_mean(idxs,1), 500, 's', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'y', 'LineWidth', 2);
 		end
