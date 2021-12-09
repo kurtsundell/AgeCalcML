@@ -1727,7 +1727,7 @@ end
 % Data Export %
 Macro1_Output(1:data_count+1,1:22) = {0}; % Preallocate
 Macro1_Output(1,1:end) = {'spotname', 'serial', 'Mode', '177 cps', '204 cps', '206 cps', '207 cps', '208 cps', '232 cps', '235 cps', '238 cps', '206/238', ...
-	'68 ± %', 'slope', '206/207', '67 ± %', '206/204', '64 ± %', '208/232', '82 ± %', '208/204', '84 ± %'};
+	'68 Â± %', 'slope', '206/207', '67 Â± %', '206/204', '64 Â± %', '208/232', '82 Â± %', '208/204', '84 Â± %'};
 Macro1_Output(2:end,1) = sample;
 Macro1_Output(2:end,2) = serial;
 Macro1_Output(2:end,3) = mode;
@@ -2285,7 +2285,7 @@ waitbar(10/waitnum, h, 'Reducing U-Th-Pb! Please wait...'); %%%%%%%%%%%%%%%%%% w
 %% CONCATENATE DATA FOR EXPORT AND PLOTTING %%
 
 AGES_OUT{data_count+1, 6} = [];
-AGES_OUT(1,:) = {'6/8 age', '± (Ma)', '6/7 age', '± (Ma)', '8/2 age', '± (Ma)'};
+AGES_OUT(1,:) = {'6/8 age', 'Â± (Ma)', '6/7 age', 'Â± (Ma)', '8/2 age', 'Â± (Ma)'};
 AGES_OUT(2:end,:) = Ages;
 
 REJECTED{data_count+1, 3} = [];
@@ -2301,7 +2301,7 @@ for i = 1:data_count
 end
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'errcorr', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'errcorr', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)', '8/2 age', 'Â±(Ma)'};
 for i = 1:data_count
 if STD1a_idx(i,1) == 0 && STD1b_idx(i,1) == 0 && STD2_idx(i,1) == 0 && isempty(comment{i,1}) == 1 
 SAMPLE_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75err(i,:)), num2cell(ratio68(i,:)), num2cell(merr68(i,:)), num2cell(errcorr(i,:)), ...
@@ -2310,14 +2310,14 @@ end
 end
 
 CORRECTED_CONC_RATIOS{data_count+1, 15} = [];
-CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '±(%)', '8/2 ratio', '±(%)', ...
-	'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'errcorr'};
+CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', 'Â±(%)', '8/2 ratio', 'Â±(%)', ...
+	'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'errcorr'};
 CORRECTED_CONC_RATIOS(2:end,:) = [sample, num2cell(Uppm), num2cell(Thppm), num2cell(CY), num2cell(UPB_reduced(:,17)), ...
 	num2cell(UTh), num2cell(fcbc67), num2cell(re67), num2cell(fcbc82), num2cell(re82), num2cell(ratio75), num2cell(ratio75err), num2cell(ratio68), ...
 	num2cell(merr68), num2cell(errcorr)];
 
 AGES_1SD_RANDOM_ERRORS{data_count+1, 10} = [];
-AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '±(Ma)', '7/5 age', '±(Ma)', '6/7 age', '±(Ma)', '8/2 age', '±(Ma)', 'BEST AGE', '±(Ma)'};
+AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', 'Â±(Ma)', '7/5 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', '8/2 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)'};
 AGES_1SD_RANDOM_ERRORS(2:end,:) = [num2cell(Age68), num2cell(Age68err), num2cell(Age75), num2cell(Age75err), Age67, Age67err, num2cell(Age82), num2cell(Age82err), ...
 	num2cell(Best_Age), num2cell(Best_Age_err)];
 
@@ -2857,7 +2857,7 @@ if TREE == 1 && get(H.tree,'Value') == 1
 	set(H.slider91500,'Visible','on')
 	set(H.sliderMAD559,'Visible','on')
 	set(H.calibslider,'Visible','on')
-	set(H.treeplotter,'Visible','on')
+	%set(H.treeplotter,'Visible','on')
 	
 	STD_NIST612pm = H.STD_NIST612pm;
 	STD_NIST612ps = H.STD_NIST612ps;
@@ -3700,7 +3700,7 @@ if H.reduced == 1
 					+6*th(i,1)*(exp(0.0000000000495*bestage(i,1)*1000000)-1);
 			end
 			s1 = scatter(raddos, bestage, 100, 'filled', 'b', 'd', 'LineWidth', 1.25, 'MarkerEdgeColor', 'k');
-			xlabel('Radiation Dosage (alpha decays/µg)')
+			xlabel('Radiation Dosage (alpha decays/Âµg)')
 			ylabel('Best Age (Ma)')
 		end
 
@@ -4404,7 +4404,7 @@ cla(H.axes_current_concordia,'reset');
 
 p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
 hold on
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age(name_idx,1))}, {' ± '},  {sprintf('%.1f',Best_Age_err(name_idx,1))}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age(name_idx,1))}, {' Â± '},  {sprintf('%.1f',Best_Age_err(name_idx,1))}, {' Ma'});
 
 concordia_data = [ratio75(name_idx,1), ratio75err(name_idx,1), ratio68(name_idx,1), merr68(name_idx,1)];
 center = [concordia_data(:,1),concordia_data(:,3)];
@@ -4554,7 +4554,7 @@ set(H.listbox1,'ListBoxTop',currView)
 clear SAMPLE_CONCORDIA
 
 H.SAMPLE_CONCORDIA{H.data_count+1, 13} = [];
-H.SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'errcorr', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+H.SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', 'Â±(%)', '6/8 ratio', 'Â±(%)', 'errcorr', '6/8 age', 'Â±(Ma)', '6/7 age', 'Â±(Ma)', 'BEST AGE', 'Â±(Ma)', '8/2 age', 'Â±(Ma)'};
 
 for i = 1:H.data_count
 	if H.STD1a_idx(i,1) == 0 && H.STD1b_idx(i,1) == 0 && H.STD2_idx(i,1) == 0 && H.current_status_num(i,1) == 1 && H.sample_idx(i,1) == 1
@@ -5161,7 +5161,7 @@ geochron_out(13,2) = [{'Arizona LaserChron Center'}];
 geochron_out(16,2) = [{'LA-ICPMS'}];
 geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
 	'Gehrels, G. and Pecha, M., 2014, Detrital zircon U-Pb geochronology and Hf isotope geochemistry of Paleozoic and Triassic passive margin strata of western North America: Geosphere, v. 10 (1), p. 49-65.'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','error','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','Best age','Â±','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
@@ -5342,7 +5342,7 @@ geochron_out(13,2) = [{'Arizona LaserChron Center'}];
 geochron_out(16,2) = [{'LA-ICPMS'}];
 geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
 	'Gehrels, G. and Pecha, M., 2014, Detrital zircon U-Pb geochronology and Hf isotope geochemistry of Paleozoic and Triassic passive margin strata of western North America: Geosphere, v. 10 (1), p. 49-65.'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','error','206Pb*','Â±','207Pb*','Â±','206Pb*','Â±','Best age','Â±','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
