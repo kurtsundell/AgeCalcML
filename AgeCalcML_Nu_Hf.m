@@ -53,6 +53,23 @@ STD_TEM = 'TEM';
 STD_91500 = '91500';
 STD_SL = 'SL';
 
+Age_MT = 731;
+Age_R33 = 419.3;
+Age_PLES = 337.1;
+Age_FC = 1099.5;
+Age_TEM = 416.78;
+Age_91500 = 1062.4;
+Age_SL = 563.2;
+
+%all 2s
+Age_MTs = 0.2;
+Age_R33s = 0.4;
+Age_PLESs = 0.2;
+Age_FCs = 0.5;
+Age_TEMs = 0.33;
+Age_91500s = 1.9;
+Age_SLs = 4.8;
+
 %if H.reduced == 0
 
 folder_name = H.folder_name;
@@ -632,6 +649,7 @@ for j = 1:data_count
 				BLS_176(i,j)/BLS_177(i,j) < median(BLS_176(:,j)./BLS_177(:,j)) - 2*std(BLS_176(:,j)./BLS_177(:,j))
 			BLS_176(i,j) = 0;
 			BLS_177(i,j) = 0;
+			BLS_178(i,j) = 0;
 		end
 	end
 end
@@ -1002,7 +1020,7 @@ for j = 1:length(sample)
 	ALL_176_177_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 	ALL_Yb_Lu_Hf_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 	ALL_v180(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
-	
+%{	
 	if STD_MT_idx(j,1) == 1
 		Ratio_STD_176_177_MT_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_MT_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
@@ -1092,18 +1110,194 @@ for j = 1:length(sample)
 		Yb_Lu_Hf_91500_mean(j,1) = 0;
 		v180_91500(j,1) = 0;
 	end
+%}	
+	
+	
+	if STD_R33_idx(j,1) == 1
+		Ratio_STD_176_177_R33_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+		Ratio_STD_176_177_R33_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		LuHf_R33(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_R33s(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_R33(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_R33s(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_R33(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_R33s(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		Yb_Lu_Hf_R33_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+		v180_R33(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
+	end
+	if STD_R33_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282739) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		STD_R33_idx(j,1) = 0;
+		Ratio_STD_176_177_R33_mean(j,1) = 0;
+		Ratio_STD_176_177_R33_SE(j,1) = 0;
+		LuHf_R33(j,1) = 0;
+		LuHf_R33s(j,1) = 0;		
+		YbHf_R33(j,1) = 0;
+		YbHf_R33s(j,1) = 0;		
+		Hf178_Hf177_R33(j,1) = 0;
+		Hf178_Hf177_R33s(j,1) = 0;		
+		Yb_Lu_Hf_R33_mean(j,1) = 0;
+		v180_R33(j,1) = 0;
+	end	
+	
+	if STD_TEM_idx(j,1) == 1
+		Ratio_STD_176_177_TEM_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+		Ratio_STD_176_177_TEM_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		LuHf_TEM(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_TEMs(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_TEM(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_TEMs(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_TEM(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_TEMs(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		Yb_Lu_Hf_TEM_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+		v180_TEM(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
+	end
+	if STD_TEM_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282686) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		STD_TEM_idx(j,1) = 0;
+		Ratio_STD_176_177_TEM_mean(j,1) = 0;
+		Ratio_STD_176_177_TEM_SE(j,1) = 0;
+		LuHf_TEM(j,1) = 0;
+		LuHf_TEMs(j,1) = 0;		
+		YbHf_TEM(j,1) = 0;
+		YbHf_TEMs(j,1) = 0;		
+		Hf178_Hf177_TEM(j,1) = 0;
+		Hf178_Hf177_TEMs(j,1) = 0;		
+		Yb_Lu_Hf_TEM_mean(j,1) = 0;
+		v180_TEM(j,1) = 0;
+	end	
+	
+	if STD_MT_idx(j,1) == 1
+		Ratio_STD_176_177_MT_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+		Ratio_STD_176_177_MT_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		LuHf_MT(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_MTs(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_MT(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_MTs(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_MT(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_MTs(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		Yb_Lu_Hf_MT_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+		v180_MT(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
+	end
+	if STD_MT_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282507) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		STD_MT_idx(j,1) = 0;
+		Ratio_STD_176_177_MT_mean(j,1) = 0;
+		Ratio_STD_176_177_MT_SE(j,1) = 0;
+		LuHf_MT(j,1) = 0;
+		LuHf_MTs(j,1) = 0;		
+		YbHf_MT(j,1) = 0;
+		YbHf_MTs(j,1) = 0;		
+		Hf178_Hf177_MT(j,1) = 0;
+		Hf178_Hf177_MTs(j,1) = 0;		
+		Yb_Lu_Hf_MT_mean(j,1) = 0;
+		v180_MT(j,1) = 0;
+	end	
+	
+	if STD_PLES_idx(j,1) == 1
+		Ratio_STD_176_177_PLES_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+		Ratio_STD_176_177_PLES_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		LuHf_PLES(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_PLESs(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_PLES(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_PLESs(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_PLES(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_PLESs(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		Yb_Lu_Hf_PLES_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+		v180_PLES(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
+	end
+	if STD_PLES_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282484) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		STD_PLES_idx(j,1) = 0;
+		Ratio_STD_176_177_PLES_mean(j,1) = 0;
+		Ratio_STD_176_177_PLES_SE(j,1) = 0;
+		LuHf_PLES(j,1) = 0;
+		LuHf_PLESs(j,1) = 0;		
+		YbHf_PLES(j,1) = 0;
+		YbHf_PLESs(j,1) = 0;		
+		Hf178_Hf177_PLES(j,1) = 0;
+		Hf178_Hf177_PLESs(j,1) = 0;		
+		Yb_Lu_Hf_PLES_mean(j,1) = 0;
+		v180_PLES(j,1) = 0;
+	end	
+	
+	if STD_91500_idx(j,1) == 1
+		Ratio_STD_176_177_91500_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+		Ratio_STD_176_177_91500_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		LuHf_91500(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_91500s(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_91500(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_91500s(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_91500(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_91500s(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		Yb_Lu_Hf_91500_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+		v180_91500(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
+	end
+	if STD_91500_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282298) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		STD_91500_idx(j,1) = 0;
+		Ratio_STD_176_177_91500_mean(j,1) = 0;
+		Ratio_STD_176_177_91500_SE(j,1) = 0;
+		LuHf_91500(j,1) = 0;
+		LuHf_91500s(j,1) = 0;		
+		YbHf_91500(j,1) = 0;
+		YbHf_91500s(j,1) = 0;		
+		Hf178_Hf177_91500(j,1) = 0;
+		Hf178_Hf177_91500s(j,1) = 0;		
+		Yb_Lu_Hf_91500_mean(j,1) = 0;
+		v180_91500(j,1) = 0;
+	end	
+	
+	if STD_FC_idx(j,1) == 1
+		Ratio_STD_176_177_FC_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
+		Ratio_STD_176_177_FC_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		LuHf_FC(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_FCs(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_FC(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_FCs(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_FC(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_FCs(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		Yb_Lu_Hf_FC_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
+		v180_FC(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
+	end
+	if STD_FC_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.282157) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+		sample(j,1) = {'xx'};
+		STD_FC_idx(j,1) = 0;
+		Ratio_STD_176_177_FC_mean(j,1) = 0;
+		Ratio_STD_176_177_FC_SE(j,1) = 0;
+		LuHf_FC(j,1) = 0;
+		LuHf_FCs(j,1) = 0;		
+		YbHf_FC(j,1) = 0;
+		YbHf_FCs(j,1) = 0;		
+		Hf178_Hf177_FC(j,1) = 0;
+		Hf178_Hf177_FCs(j,1) = 0;		
+		Yb_Lu_Hf_FC_mean(j,1) = 0;
+		v180_FC(j,1) = 0;
+	end	
 	
 	if STD_SL_idx(j,1) == 1
 		Ratio_STD_176_177_SL_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_SL_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		LuHf_SL(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_SLs(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_SL(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_SLs(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_SL(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_SLs(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
 		Yb_Lu_Hf_SL_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
-		v180_SL(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
+		v180_SL(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
 	end
 	if STD_SL_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.28170) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
 		sample(j,1) = {'xx'};
 		STD_SL_idx(j,1) = 0;
 		Ratio_STD_176_177_SL_mean(j,1) = 0;
 		Ratio_STD_176_177_SL_SE(j,1) = 0;
+		LuHf_SL(j,1) = 0;
+		LuHf_SLs(j,1) = 0;		
+		YbHf_SL(j,1) = 0;
+		YbHf_SLs(j,1) = 0;		
+		Hf178_Hf177_SL(j,1) = 0;
+		Hf178_Hf177_SLs(j,1) = 0;		
 		Yb_Lu_Hf_SL_mean(j,1) = 0;
 		v180_SL(j,1) = 0;
 	end
@@ -1115,11 +1309,16 @@ for j = 1:length(sample)
 		else
 			Ratio_UNKNOWN_176_177_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		end
+		LuHf_UNKNOWN(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		LuHf_UNKNOWNs(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		YbHf_UNKNOWN(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		YbHf_UNKNOWNs(j,1) = (std(nonzeros(Yb176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
+		Hf178_Hf177_UNKNOWN(j,1) = mean(nonzeros(BLS_178(:,j)))/mean(nonzeros(BLS_177(:,j)));
+		Hf178_Hf177_UNKNOWNs(j,1) = (std(nonzeros(BLS_178(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
 		Yb_Lu_Hf_UNKNOWN_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_UNKNOWN(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));
 		sample_UNKNOWN_idx(j,1) = 1;
 		sample_UNKNOWN_name(j,1) = sort(strtrim(sample(j,1)));
-		LuHf_UNKNOWN(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
 	end
 end
 
@@ -1127,36 +1326,93 @@ H.Ratio_STD_176_177_MT_mean = nonzeros(Ratio_STD_176_177_MT_mean);
 Ratio_STD_176_177_MT_SE = nonzeros(Ratio_STD_176_177_MT_SE);
 H.Yb_Lu_Hf_MT_mean = nonzeros(Yb_Lu_Hf_MT_mean);
 v180_MT = nonzeros(v180_MT);
+LuHf_MT = nonzeros(LuHf_MT);
+LuHf_MTs = nonzeros(LuHf_MTs);
+YbHf_MT = nonzeros(YbHf_MT);
+YbHf_MTs = nonzeros(YbHf_MTs);
+Hf178_Hf177_MT = nonzeros(Hf178_Hf177_MT);
+Hf178_Hf177_MTs = nonzeros(Hf178_Hf177_MTs);
 
 H.Ratio_STD_176_177_R33_mean = nonzeros(Ratio_STD_176_177_R33_mean);
 Ratio_STD_176_177_R33_SE = nonzeros(Ratio_STD_176_177_R33_SE);
 H.Yb_Lu_Hf_R33_mean = nonzeros(Yb_Lu_Hf_R33_mean);
 v180_R33 = nonzeros(v180_R33);
+LuHf_R33 = nonzeros(LuHf_R33);
+LuHf_R33s = nonzeros(LuHf_R33s);
+YbHf_R33 = nonzeros(YbHf_R33);
+YbHf_R33s = nonzeros(YbHf_R33s);
+Hf178_Hf177_R33 = nonzeros(Hf178_Hf177_R33);
+Hf178_Hf177_R33s = nonzeros(Hf178_Hf177_R33s);
 
 H.Ratio_STD_176_177_PLES_mean = nonzeros(Ratio_STD_176_177_PLES_mean);
 Ratio_STD_176_177_PLES_SE = nonzeros(Ratio_STD_176_177_PLES_SE);
 H.Yb_Lu_Hf_PLES_mean = nonzeros(Yb_Lu_Hf_PLES_mean);
 v180_PLES = nonzeros(v180_PLES);
+LuHf_PLES = nonzeros(LuHf_PLES);
+LuHf_PLESs = nonzeros(LuHf_PLESs);
+YbHf_PLES = nonzeros(YbHf_PLES);
+YbHf_PLESs = nonzeros(YbHf_PLESs);
+Hf178_Hf177_PLES = nonzeros(Hf178_Hf177_PLES);
+Hf178_Hf177_PLESs = nonzeros(Hf178_Hf177_PLESs);
 
 H.Ratio_STD_176_177_FC_mean = nonzeros(Ratio_STD_176_177_FC_mean);
 Ratio_STD_176_177_FC_SE = nonzeros(Ratio_STD_176_177_FC_SE);
 H.Yb_Lu_Hf_FC_mean = nonzeros(Yb_Lu_Hf_FC_mean);
 v180_FC = nonzeros(v180_FC);
+LuHf_FC = nonzeros(LuHf_FC);
+LuHf_FCs = nonzeros(LuHf_FCs);
+YbHf_FC = nonzeros(YbHf_FC);
+YbHf_FCs = nonzeros(YbHf_FCs);
+Hf178_Hf177_FC = nonzeros(Hf178_Hf177_FC);
+Hf178_Hf177_FCs = nonzeros(Hf178_Hf177_FCs);
 
 H.Ratio_STD_176_177_TEM_mean = nonzeros(Ratio_STD_176_177_TEM_mean);
 Ratio_STD_176_177_TEM_SE = nonzeros(Ratio_STD_176_177_TEM_SE);
 H.Yb_Lu_Hf_TEM_mean = nonzeros(Yb_Lu_Hf_TEM_mean);
 v180_TEM = nonzeros(v180_TEM);
+LuHf_TEM = nonzeros(LuHf_TEM);
+LuHf_TEMs = nonzeros(LuHf_TEMs);
+YbHf_TEM = nonzeros(YbHf_TEM);
+YbHf_TEMs = nonzeros(YbHf_TEMs);
+Hf178_Hf177_TEM = nonzeros(Hf178_Hf177_TEM);
+Hf178_Hf177_TEMs = nonzeros(Hf178_Hf177_TEMs);
 
 H.Ratio_STD_176_177_91500_mean = nonzeros(Ratio_STD_176_177_91500_mean);
 Ratio_STD_176_177_91500_SE = nonzeros(Ratio_STD_176_177_91500_SE);
 H.Yb_Lu_Hf_91500_mean = nonzeros(Yb_Lu_Hf_91500_mean);
 v180_91500 = nonzeros(v180_91500);
+LuHf_91500 = nonzeros(LuHf_91500);
+LuHf_91500s = nonzeros(LuHf_91500s);
+YbHf_91500 = nonzeros(YbHf_91500);
+YbHf_91500s = nonzeros(YbHf_91500s);
+Hf178_Hf177_91500 = nonzeros(Hf178_Hf177_91500);
+Hf178_Hf177_91500s = nonzeros(Hf178_Hf177_91500s);
 
 H.Ratio_STD_176_177_SL_mean = nonzeros(Ratio_STD_176_177_SL_mean);
 Ratio_STD_176_177_SL_SE = nonzeros(Ratio_STD_176_177_SL_SE);
 H.Yb_Lu_Hf_SL_mean = nonzeros(Yb_Lu_Hf_SL_mean);
 v180_SL = nonzeros(v180_SL);
+LuHf_SL = nonzeros(LuHf_SL);
+LuHf_SLs = nonzeros(LuHf_SLs);
+YbHf_SL = nonzeros(YbHf_SL);
+YbHf_SLs = nonzeros(YbHf_SLs);
+Hf178_Hf177_SL = nonzeros(Hf178_Hf177_SL);
+Hf178_Hf177_SLs = nonzeros(Hf178_Hf177_SLs);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 if sum(SAMPLES_idx) > 0
@@ -1168,6 +1424,11 @@ if sum(SAMPLES_idx) > 0
 	v180_UNKNOWN = nonzeros(v180_UNKNOWN);
 	sample_UNKNOWN_name = sample_UNKNOWN_name(~cellfun('isempty', sample_UNKNOWN_name'));
 	LuHf_UNKNOWN = nonzeros(LuHf_UNKNOWN);
+	LuHf_UNKNOWNs = nonzeros(LuHf_UNKNOWNs);
+	YbHf_UNKNOWN = nonzeros(YbHf_UNKNOWN);
+	YbHf_UNKNOWNs = nonzeros(YbHf_UNKNOWNs);
+	Hf178_Hf177_UNKNOWN = nonzeros(Hf178_Hf177_UNKNOWN);
+	Hf178_Hf177_UNKNOWNs = nonzeros(Hf178_Hf177_UNKNOWNs);
 end
 
 if sum(SAMPLES_idx) > 0
@@ -1246,6 +1507,8 @@ if sum(SAMPLES_idx) > 0
 	end
 	
 	Ages_ascribed( all(~Ages_ascribed,2), : ) = [];
+	Ages_uncert_ascribed( all(~Ages_uncert_ascribed,2), : ) = [];
+
 	
 end
 
@@ -1271,9 +1534,76 @@ waitbar(1)
 
 for i = 1:length(v180_UNKNOWN)
 	if v180_UNKNOWN(i,1) ~= 0
-		HfHfT(i,1) = Ratio_UNKNOWN_176_177_mean(i,1) - ( LuHf_UNKNOWN(i,1) * ( exp((1000000*Ages_ascribed(i,1)) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_UNKNOWN(i,1) = Ratio_UNKNOWN_176_177_mean(i,1) - ( LuHf_UNKNOWN(i,1) * ( exp((1000000*Ages_ascribed(i,1)) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_UNKNOWNs(i,1) = Ratio_UNKNOWN_176_177_mean(i,1) - ( LuHf_UNKNOWN(i,1) * ( exp((1000000*Ages_ascribed(i,1)) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (Ratio_UNKNOWN_176_177_mean(i,1) - Ratio_UNKNOWN_176_177_SE(i,1)) - ( (LuHf_UNKNOWN(i,1) - LuHf_UNKNOWNs(i,1)) * ...
+			( exp((1000000*Ages_ascribed(i,1)) * 1.87 * (10^-11) ) - 1 ) )  );
 	end
 end
+
+for i = 1:sum(STD_R33_idx)
+	if v180_R33(i,1) ~= 0
+		HfHfT_R33(i,1) = H.Ratio_STD_176_177_R33_mean(i,1) - ( LuHf_R33(i,1) * ( exp((1000000*Age_R33) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_R33s(i,1) = H.Ratio_STD_176_177_R33_mean(i,1) - ( LuHf_R33(i,1) * ( exp((1000000*Age_R33) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (H.Ratio_STD_176_177_R33_mean(i,1) - Ratio_STD_176_177_R33_SE(i,1)) - ( (LuHf_R33(i,1) - LuHf_R33s(i,1)) * ...
+			( exp((1000000*Age_R33) * 1.87 * (10^-11) ) - 1 ) )  );
+	end
+end
+
+for i = 1:sum(STD_TEM_idx)
+	if v180_TEM(i,1) ~= 0
+		HfHfT_TEM(i,1) = H.Ratio_STD_176_177_TEM_mean(i,1) - ( LuHf_TEM(i,1) * ( exp((1000000*Age_TEM) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_TEMs(i,1) = H.Ratio_STD_176_177_TEM_mean(i,1) - ( LuHf_TEM(i,1) * ( exp((1000000*Age_TEM) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (H.Ratio_STD_176_177_TEM_mean(i,1) - Ratio_STD_176_177_TEM_SE(i,1)) - ( (LuHf_TEM(i,1) - LuHf_TEMs(i,1)) * ...
+			( exp((1000000*Age_TEM) * 1.87 * (10^-11) ) - 1 ) )  );
+	end
+end
+
+for i = 1:sum(STD_MT_idx)
+	if v180_MT(i,1) ~= 0
+		HfHfT_MT(i,1) = H.Ratio_STD_176_177_MT_mean(i,1) - ( LuHf_MT(i,1) * ( exp((1000000*Age_MT) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_MTs(i,1) = H.Ratio_STD_176_177_MT_mean(i,1) - ( LuHf_MT(i,1) * ( exp((1000000*Age_MT) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (H.Ratio_STD_176_177_MT_mean(i,1) - Ratio_STD_176_177_MT_SE(i,1)) - ( (LuHf_MT(i,1) - LuHf_MTs(i,1)) * ...
+			( exp((1000000*Age_MT) * 1.87 * (10^-11) ) - 1 ) )  );
+	end
+end
+
+for i = 1:sum(STD_PLES_idx)
+	if v180_PLES(i,1) ~= 0
+		HfHfT_PLES(i,1) = H.Ratio_STD_176_177_PLES_mean(i,1) - ( LuHf_PLES(i,1) * ( exp((1000000*Age_PLES) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_PLESs(i,1) = H.Ratio_STD_176_177_PLES_mean(i,1) - ( LuHf_PLES(i,1) * ( exp((1000000*Age_PLES) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (H.Ratio_STD_176_177_PLES_mean(i,1) - Ratio_STD_176_177_PLES_SE(i,1)) - ( (LuHf_PLES(i,1) - LuHf_PLESs(i,1)) * ...
+			( exp((1000000*Age_PLES) * 1.87 * (10^-11) ) - 1 ) )  );
+	end
+end
+
+for i = 1:sum(STD_91500_idx)
+	if v180_91500(i,1) ~= 0
+		HfHfT_91500(i,1) = H.Ratio_STD_176_177_91500_mean(i,1) - ( LuHf_91500(i,1) * ( exp((1000000*Age_91500) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_91500s(i,1) = H.Ratio_STD_176_177_91500_mean(i,1) - ( LuHf_91500(i,1) * ( exp((1000000*Age_91500) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (H.Ratio_STD_176_177_91500_mean(i,1) - Ratio_STD_176_177_91500_SE(i,1)) - ( (LuHf_91500(i,1) - LuHf_91500s(i,1)) * ...
+			( exp((1000000*Age_91500) * 1.87 * (10^-11) ) - 1 ) )  );
+	end
+end
+
+for i = 1:sum(STD_FC_idx)
+	if v180_FC(i,1) ~= 0
+		HfHfT_FC(i,1) = H.Ratio_STD_176_177_FC_mean(i,1) - ( LuHf_FC(i,1) * ( exp((1000000*Age_FC) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_FCs(i,1) = H.Ratio_STD_176_177_FC_mean(i,1) - ( LuHf_FC(i,1) * ( exp((1000000*Age_FC) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (H.Ratio_STD_176_177_FC_mean(i,1) - Ratio_STD_176_177_FC_SE(i,1)) - ( (LuHf_FC(i,1) - LuHf_FCs(i,1)) * ...
+			( exp((1000000*Age_FC) * 1.87 * (10^-11) ) - 1 ) )  );
+	end
+end
+
+for i = 1:sum(STD_SL_idx)
+	if v180_SL(i,1) ~= 0
+		HfHfT_SL(i,1) = H.Ratio_STD_176_177_SL_mean(i,1) - ( LuHf_SL(i,1) * ( exp((1000000*Age_SL) * 1.87 * (10^-11) ) - 1 ) );
+		HfHfT_SLs(i,1) = H.Ratio_STD_176_177_SL_mean(i,1) - ( LuHf_SL(i,1) * ( exp((1000000*Age_SL) * 1.87 * (10^-11) ) - 1 ) ) - ...
+			(  (H.Ratio_STD_176_177_SL_mean(i,1) - Ratio_STD_176_177_SL_SE(i,1)) - ( (LuHf_SL(i,1) - LuHf_SLs(i,1)) * ...
+			( exp((1000000*Age_SL) * 1.87 * (10^-11) ) - 1 ) )  );
+	end
+end
+
 
 %{
 count = 1;
@@ -1282,8 +1612,8 @@ if sum(SAMPLES_idx) > 0
 		if SAMPLES_idx(i,1) == 1
 			if v180_UNKNOWN(count,1) ~= 0
 				%eHf_UNKNOWNS(count,1) = 10000*((Ratio_UNKNOWN_176_177_mean(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
-				eHf_UNKNOWNSf(i,1) = 10000*((HfHfT(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
-				eHf_UNKNOWNS(count,1) = 10000*((HfHfT(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNSf(i,1) = 10000*((HfHfT_UNKNOWN(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNS(count,1) = 10000*((HfHfT_UNKNOWN(i,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
 			end
 			count = count + 1;
 		else
@@ -1298,19 +1628,94 @@ if sum(SAMPLES_idx) > 0
 	for i = 1:length(SAMPLES_idx)
 		if SAMPLES_idx(i,1) == 1
 			if v180_UNKNOWN(count,1) ~= 0
-				eHf_UNKNOWNS(count,1) = 10000*((HfHfT(count,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNS(count,1) = 10000*((HfHfT_UNKNOWN(count,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNSs(count,1) = (10000*((HfHfT_UNKNOWN(count,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1)) - ...
+					10000*(((HfHfT_UNKNOWN(count,1) - HfHfT_UNKNOWNs(count,1))/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
 			end
 			count = count + 1;
 		end
 	end
 end
 
+for i = 1:sum(STD_R33_idx)
+	if v180_R33(i,1) ~= 0
+		eHf_R33(i,1) = 10000*((HfHfT_R33(i,1)/(0.282785-(0.0336*(exp((1000000*Age_R33)*1.867*10^-11)-1))))-1);
+		eHf_R33s(i,1) = (10000*((HfHfT_R33(i,1)/(0.282785-(0.0336*(exp((1000000*Age_R33)*1.867*10^-11)-1))))-1)) - ...
+			10000*(((HfHfT_R33(i,1) - HfHfT_R33s(i,1))/(0.282785-(0.0336*(exp((1000000*Age_R33)*1.867*10^-11)-1))))-1);
+	end
+end
+
+for i = 1:sum(STD_TEM_idx)
+	if v180_TEM(i,1) ~= 0
+		eHf_TEM(i,1) = 10000*((HfHfT_TEM(i,1)/(0.282785-(0.0336*(exp((1000000*Age_TEM)*1.867*10^-11)-1))))-1);
+		eHf_TEMs(i,1) = (10000*((HfHfT_TEM(i,1)/(0.282785-(0.0336*(exp((1000000*Age_TEM)*1.867*10^-11)-1))))-1)) - ...
+			10000*(((HfHfT_TEM(i,1) - HfHfT_TEMs(i,1))/(0.282785-(0.0336*(exp((1000000*Age_TEM)*1.867*10^-11)-1))))-1);
+	end
+end
+
+for i = 1:sum(STD_MT_idx)
+	if v180_MT(i,1) ~= 0
+		eHf_MT(i,1) = 10000*((HfHfT_MT(i,1)/(0.282785-(0.0336*(exp((1000000*Age_MT)*1.867*10^-11)-1))))-1);
+		eHf_MTs(i,1) = (10000*((HfHfT_MT(i,1)/(0.282785-(0.0336*(exp((1000000*Age_MT)*1.867*10^-11)-1))))-1)) - ...
+			10000*(((HfHfT_MT(i,1) - HfHfT_MTs(i,1))/(0.282785-(0.0336*(exp((1000000*Age_MT)*1.867*10^-11)-1))))-1);
+	end
+end
+
+for i = 1:sum(STD_PLES_idx)
+	if v180_PLES(i,1) ~= 0
+		eHf_PLES(i,1) = 10000*((HfHfT_PLES(i,1)/(0.282785-(0.0336*(exp((1000000*Age_PLES)*1.867*10^-11)-1))))-1);
+		eHf_PLESs(i,1) = (10000*((HfHfT_PLES(i,1)/(0.282785-(0.0336*(exp((1000000*Age_PLES)*1.867*10^-11)-1))))-1)) - ...
+			10000*(((HfHfT_PLES(i,1) - HfHfT_PLESs(i,1))/(0.282785-(0.0336*(exp((1000000*Age_PLES)*1.867*10^-11)-1))))-1);
+	end
+end
+
+for i = 1:sum(STD_91500_idx)
+	if v180_91500(i,1) ~= 0
+		eHf_91500(i,1) = 10000*((HfHfT_91500(i,1)/(0.282785-(0.0336*(exp((1000000*Age_91500)*1.867*10^-11)-1))))-1);
+		eHf_91500s(i,1) = (10000*((HfHfT_91500(i,1)/(0.282785-(0.0336*(exp((1000000*Age_91500)*1.867*10^-11)-1))))-1)) - ...
+			10000*(((HfHfT_91500(i,1) - HfHfT_91500s(i,1))/(0.282785-(0.0336*(exp((1000000*Age_91500)*1.867*10^-11)-1))))-1);
+	end
+end
+
+for i = 1:sum(STD_FC_idx)
+	if v180_FC(i,1) ~= 0
+		eHf_FC(i,1) = 10000*((HfHfT_FC(i,1)/(0.282785-(0.0336*(exp((1000000*Age_FC)*1.867*10^-11)-1))))-1);
+		eHf_FCs(i,1) = (10000*((HfHfT_FC(i,1)/(0.282785-(0.0336*(exp((1000000*Age_FC)*1.867*10^-11)-1))))-1)) - ...
+			10000*(((HfHfT_FC(i,1) - HfHfT_FCs(i,1))/(0.282785-(0.0336*(exp((1000000*Age_FC)*1.867*10^-11)-1))))-1);
+	end
+end
+
+for i = 1:sum(STD_SL_idx)
+	if v180_SL(i,1) ~= 0
+		eHf_SL(i,1) = 10000*((HfHfT_SL(i,1)/(0.282785-(0.0336*(exp((1000000*Age_SL)*1.867*10^-11)-1))))-1);
+		eHf_SLs(i,1) = (10000*((HfHfT_SL(i,1)/(0.282785-(0.0336*(exp((1000000*Age_SL)*1.867*10^-11)-1))))-1)) - ...
+			10000*(((HfHfT_SL(i,1) - HfHfT_SLs(i,1))/(0.282785-(0.0336*(exp((1000000*Age_SL)*1.867*10^-11)-1))))-1);
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 count = 1;
 if sum(SAMPLES_idx) > 0
 	for i = 1:length(SAMPLES_idx)
 		if SAMPLES_idx(i,1) == 1
 			if v180_UNKNOWN(count,1) ~= 0
-				eHf_UNKNOWNSf(i,1) = 10000*((HfHfT(count,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
+				eHf_UNKNOWNSf(i,1) = 10000*((HfHfT_UNKNOWN(count,1)/(0.282785-(0.0336*(exp((1000000*Ages_ascribed(count,1))*1.867*10^-11)-1))))-1);
 				count = count + 1;
 			else
 				eHf_UNKNOWNSf(i,1) = 0;
@@ -1319,15 +1724,9 @@ if sum(SAMPLES_idx) > 0
 	end
 end
 
-
-
-
-
-
-
 %for i = 1:length(v180_UNKNOWN)
 %	if v180_UNKNOWN(i,1) ~= 0
-%		eHf_UNKNOWNS3(i,1) = 10000 * (( HfHfT(i,1) / (0.282785 - ( 0.0336 * ( exp((1000000*Ages_ascribed(i,1))*1.867*10^-11)-1))))-1);
+%		eHf_UNKNOWNS3(i,1) = 10000 * (( HfHfT_UNKNOWN(i,1) / (0.282785 - ( 0.0336 * ( exp((1000000*Ages_ascribed(i,1))*1.867*10^-11)-1))))-1);
 %	end
 %end
 
@@ -1351,12 +1750,74 @@ end
 if sum(SAMPLES_idx) > 0
 	for i = 1:length(v180_UNKNOWN)
 		if v180_UNKNOWN(i,1) ~= 0
-			eHf0(i,1) = 10000 * ((Ratio_UNKNOWN_176_177_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
-			eHf0s(i,1) = 10000 * ((Ratio_UNKNOWN_176_177_mean(i,1)/0.282785)-1) - 10000 * ((( Ratio_UNKNOWN_176_177_mean(i,1) - Ratio_UNKNOWN_176_177_SE(i,1) ) /0.282785)-1);
+			eHf0_UNKNOWN(i,1) = 10000 * ((Ratio_UNKNOWN_176_177_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_UNKNOWNs(i,1) = 10000 * ((Ratio_UNKNOWN_176_177_mean(i,1)/0.282785)-1) - 10000 * ((( Ratio_UNKNOWN_176_177_mean(i,1) - Ratio_UNKNOWN_176_177_SE(i,1) ) /0.282785)-1);
 		end
 	end
 end
 
+if sum(STD_R33_idx) > 0
+	for i = 1:length(v180_R33)
+		if v180_R33(i,1) ~= 0
+			eHf0_R33(i,1) = 10000 * ((H.Ratio_STD_176_177_R33_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_R33s(i,1) = 10000 * ((H.Ratio_STD_176_177_R33_mean(i,1)/0.282785)-1) - 10000 * ((( H.Ratio_STD_176_177_R33_mean(i,1) - Ratio_STD_176_177_R33_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
+
+if sum(STD_TEM_idx) > 0
+	for i = 1:length(v180_TEM)
+		if v180_TEM(i,1) ~= 0
+			eHf0_TEM(i,1) = 10000 * ((H.Ratio_STD_176_177_TEM_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_TEMs(i,1) = 10000 * ((H.Ratio_STD_176_177_TEM_mean(i,1)/0.282785)-1) - 10000 * ((( H.Ratio_STD_176_177_TEM_mean(i,1) - Ratio_STD_176_177_TEM_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
+
+if sum(STD_MT_idx) > 0
+	for i = 1:length(v180_MT)
+		if v180_MT(i,1) ~= 0
+			eHf0_MT(i,1) = 10000 * ((H.Ratio_STD_176_177_MT_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_MTs(i,1) = 10000 * ((H.Ratio_STD_176_177_MT_mean(i,1)/0.282785)-1) - 10000 * ((( H.Ratio_STD_176_177_MT_mean(i,1) - Ratio_STD_176_177_MT_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
+
+if sum(STD_PLES_idx) > 0
+	for i = 1:length(v180_PLES)
+		if v180_PLES(i,1) ~= 0
+			eHf0_PLES(i,1) = 10000 * ((H.Ratio_STD_176_177_PLES_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_PLESs(i,1) = 10000 * ((H.Ratio_STD_176_177_PLES_mean(i,1)/0.282785)-1) - 10000 * ((( H.Ratio_STD_176_177_PLES_mean(i,1) - Ratio_STD_176_177_PLES_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
+
+if sum(STD_91500_idx) > 0
+	for i = 1:length(v180_91500)
+		if v180_91500(i,1) ~= 0
+			eHf0_91500(i,1) = 10000 * ((H.Ratio_STD_176_177_91500_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_91500s(i,1) = 10000 * ((H.Ratio_STD_176_177_91500_mean(i,1)/0.282785)-1) - 10000 * ((( H.Ratio_STD_176_177_91500_mean(i,1) - Ratio_STD_176_177_91500_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
+
+if sum(STD_FC_idx) > 0
+	for i = 1:length(v180_FC)
+		if v180_FC(i,1) ~= 0
+			eHf0_FC(i,1) = 10000 * ((H.Ratio_STD_176_177_FC_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_FCs(i,1) = 10000 * ((H.Ratio_STD_176_177_FC_mean(i,1)/0.282785)-1) - 10000 * ((( H.Ratio_STD_176_177_FC_mean(i,1) - Ratio_STD_176_177_FC_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
+
+if sum(STD_SL_idx) > 0
+	for i = 1:length(v180_SL)
+		if v180_SL(i,1) ~= 0
+			eHf0_SL(i,1) = 10000 * ((H.Ratio_STD_176_177_SL_mean(i,1)/0.282785)-1); %BSE Bouvier et al. 2008
+			eHf0_SLs(i,1) = 10000 * ((H.Ratio_STD_176_177_SL_mean(i,1)/0.282785)-1) - 10000 * ((( H.Ratio_STD_176_177_SL_mean(i,1) - Ratio_STD_176_177_SL_SE(i,1) ) /0.282785)-1);
+		end
+	end
+end
 
 %10000*( ( E4/K!$F$37)-1),"")
 %-10000*(((E4-F4)/K!$F$37)-1),"")
@@ -1563,15 +2024,19 @@ end
 
 current_status_num_orig = current_status_num;
 
-for i=1:length(sample)
-	name_char(i,1)=(sample(i,1));
+for i = 1:length(sample)
+	if contains(sample(i,1),'xx') == 1
+		name_char(i,1) = strcat('<html><BODY bgcolor="red">',sample(i,1),'</span></html>');
+	else
+		name_char(i,1)=(sample(i,1));
+	end
 end
 
 name_idx = length(sample); %automatically plot final sample run
 
 for i=1:length(sample)
 	if isempty(comment{i,1}) == 0 && get(H.flagunknowns,'Value') == 1 && STD_idx(i,1) == 0
-		name_char(i,1) = strcat('<html><BODY bgcolor="red">',name_char(i,1),'</span></html>');
+		name_char(i,1) = strcat('<html><BODY bgcolor="orange">',name_char(i,1),'</span></html>');
 	end
 end
 
@@ -1580,7 +2045,7 @@ for i=1:length(sample)
 		if offset_MT(i,1) > str2num(get(H.flag,'String')) || offset_SL(i,1) > str2num(get(H.flag,'String')) || offset_R33(i,1) > str2num(get(H.flag,'String')) ||...
 				offset_TEM(i,1) > str2num(get(H.flag,'String')) || offset_91500(i,1) > str2num(get(H.flag,'String')) || offset_PLES(i,1) > str2num(get(H.flag,'String')) ||...
 				offset_FC(i,1) > str2num(get(H.flag,'String'))
-			name_char(i,1) = strcat('<html><BODY bgcolor="green">',name_char(i,1),'</span></html>');
+			%name_char(i,1) = strcat('<html><BODY bgcolor="green">',name_char(i,1),'</span></html>');
 		end
 	end
 end
@@ -1608,31 +2073,57 @@ offset_FC = nonzeros(offset_FC);
 
 
 
-tab = {'Table-__ . Hf isotopic data.'};
-heads = {'Order'	'Sample'	'(176Yb + 176Lu) / 176Hf (%)'	'Volts Hf'	'176Hf/177Hf'	'± (1s)'	'176Lu/177Hf'	'176Hf/177Hf (T)'	'E-Hf (0)'...
-	'E-Hf (0) ± (1s)'	'E-Hf (T)'	'Age (Ma)'};
-EXPORT{sum(SAMPLES_idx)+2,12} = [];
-EXPORT(1,1) = tab;
-EXPORT(2,:) = heads;
+%tab = {'Table-__ . Hf isotopic data.'};
+%heads = {'Order'	'Sample'	'(176Yb + 176Lu) / 176Hf (%)'	'Volts Hf'	'176Hf/177Hf'	'± (1s)'	'176Lu/177Hf'	'176Hf/177Hf (T)'	'E-Hf (0)'...
+%	'E-Hf (0) ± (1s)'	'E-Hf (T)'	'Age (Ma)'};
 
-for i = 1:sum(SAMPLES_idx)
-	EXPORT(i+2,1) = {i};
-end
+
+
+
+heads1 = {'Table'};
+
+heads2 = {'LA-MC-ICPMS Lu-Hf isotopic analyses of zircon.'};
+
+heads3 = {'1)'	'2)'	'3)'	'4)'	'5)'	'6)'	'7)'	'8)'	'9)'	'10)'	'11)'	'12)'	'13)'	'14)'	'15)'	'16)'	'17)'	'18)'	'19)'	'20)'};
+
+heads4 = {'Sample' '176Hf/177Hf'	'± 2 SE'	'176Lu/177Hf'	'± 2 SE'	'176Yb/177Hf'	'± 2 SE'	'178Hf/177Hf'	'± 2 SE'	'EHf (0)'	'± 2 SE' ...
+	'176Hf/177Hf (i)'	'EHf (i)'	'± 2 SE'	'Age (Ma)'	'± 2 SE'	'(176Yb+176Lu)/176Hf (%)'	'Volts Hf'	'Correction (EHf)'	'Age (Ma)'	'EHf (i)'};
+
+EXPORT{sum(SAMPLES_idx)+sum(STD_idx)+30,21} = [];
+
+EXPORT(1,1) = heads1;
+EXPORT(2,1) = heads2;
+EXPORT(4,2:end) = heads3;
+EXPORT(5,:) = heads4;
+
+%for i = 1:sum(SAMPLES_idx)
+%	EXPORT(i+2,1) = {i};
+%end
 
 count = 1;
 for i = 1:length(SAMPLES_idx)
 	if SAMPLES_idx(i,1) == 1
-		EXPORT(count+2,2) = sample(i,1);
-		EXPORT{count+2,3} = Yb_Lu_Hf_UNKNOWN_mean(count,1);
-		EXPORT{count+2,4} = v180_UNKNOWN(count,1);
-		EXPORT{count+2,5} = Ratio_UNKNOWN_176_177_mean(count,1);
-		EXPORT{count+2,6} = Ratio_UNKNOWN_176_177_SE(count,1);
-		EXPORT{count+2,7} = LuHf_UNKNOWN(count,1);
-		EXPORT{count+2,8} = HfHfT(count,1);
-		EXPORT{count+2,9} = eHf0(count,1);
-		EXPORT{count+2,10} = eHf0s(count,1);
-		EXPORT{count+2,11} = eHf_UNKNOWNS(count,1);
-		EXPORT{count+2,12} = Ages_ascribed(count,1);
+		EXPORT(count+6,1) = sample(i,1);
+		EXPORT{count+6,2} = Ratio_UNKNOWN_176_177_mean(count,1); %176Hf/177Hf
+		EXPORT{count+6,3} = 2*Ratio_UNKNOWN_176_177_SE(count,1); %2 SE
+		EXPORT{count+6,4} = LuHf_UNKNOWN(count,1);
+		EXPORT{count+6,5} = 2*LuHf_UNKNOWNs(count,1); %2 SE
+		EXPORT{count+6,6} = YbHf_UNKNOWN(count,1);
+		EXPORT{count+6,7} = 2*YbHf_UNKNOWNs(count,1); %2 SE
+		EXPORT{count+6,8} = Hf178_Hf177_UNKNOWN(count,1);
+		EXPORT{count+6,9} = 2*Hf178_Hf177_UNKNOWNs(count,1); %2 SE
+		EXPORT{count+6,10} = eHf0_UNKNOWN(count,1);
+		EXPORT{count+6,11} = 2*eHf0_UNKNOWNs(count,1);%2 SE
+		EXPORT{count+6,12} = HfHfT_UNKNOWN(count,1);
+		EXPORT{count+6,13} = eHf_UNKNOWNS(count,1);
+		EXPORT{count+6,14} = eHf_UNKNOWNSs(count,1);
+		EXPORT{count+6,15} = Ages_ascribed(count,1);
+		EXPORT{count+6,16} = 2*Ages_uncert_ascribed(count,1);
+		EXPORT{count+6,17} = Yb_Lu_Hf_UNKNOWN_mean(count,1); %(176Lu+176Yb)/176Hf %)
+		EXPORT{count+6,18} = v180_UNKNOWN(count,1);
+		EXPORT{count+6,19} = (YbHf_UNKNOWN(count,1) + HfHfT_UNKNOWN(count,1)) / 0.000028;
+		EXPORT{count+6,20} = Ages_ascribed(count,1);
+		EXPORT{count+6,21} = eHf_UNKNOWNS(count,1);
 		count = count + 1;
 	end
 end
@@ -1642,9 +2133,351 @@ end
 
 
 
+
+%{
+
+		
+		
+		
+		
+		
+		
+		
+		
+%}
+
+
+
+
+
+%Append STDs with mean and 2 SD
+
+count = 1;
+loc_R33 = 7+length(nonzeros(SAMPLES_idx));
+for i = 1:length(STD_R33_idx)
+	if STD_R33_idx(i,1) == 1
+		EXPORT(count+loc_R33,1) = {STD_R33};
+		EXPORT{count+loc_R33,2} = H.Ratio_STD_176_177_R33_mean(count,1); %176Hf/177Hf
+ 		EXPORT{count+loc_R33,3} = 2*Ratio_STD_176_177_R33_SE(count,1); %2 SE
+ 		EXPORT{count+loc_R33,4} = LuHf_R33(count,1);
+ 		EXPORT{count+loc_R33,5} = 2*LuHf_R33s(count,1); %2 SE
+		EXPORT{count+loc_R33,6} = YbHf_R33(count,1);
+ 		EXPORT{count+loc_R33,7} = 2*YbHf_R33s(count,1); %2 SE
+ 		EXPORT{count+loc_R33,8} = Hf178_Hf177_R33(count,1);
+ 		EXPORT{count+loc_R33,9} = 2*Hf178_Hf177_R33s(count,1); %2 SE
+ 		EXPORT{count+loc_R33,10} = eHf0_R33(count,1);
+ 		EXPORT{count+loc_R33,11} = 2*eHf0_R33s(count,1);%2 SE
+ 		EXPORT{count+loc_R33,12} = HfHfT_R33(count,1);
+ 		EXPORT{count+loc_R33,13} = eHf_R33(count,1);
+		EXPORT{count+loc_R33,14} = 2*eHf_R33s(count,1);%2 SE
+ 		EXPORT{count+loc_R33,15} = Age_R33;
+ 		EXPORT{count+loc_R33,16} = Age_R33s;
+ 		EXPORT{count+loc_R33,17} = H.Yb_Lu_Hf_R33_mean(count,1); %(176Lu+176Yb)/176Hf %)
+ 		EXPORT{count+loc_R33,18} = v180_R33(count,1);
+ 		EXPORT{count+loc_R33,19} = (YbHf_R33(count,1) + HfHfT_R33(count,1)) / 0.000028;
+ 		EXPORT{count+loc_R33,20} = Age_R33;
+ 		EXPORT{count+loc_R33,21} = eHf_R33(count,1);
+		count = count + 1;
+	end
+end
+
+EXPORT(8+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx),1) = {'R33 Mean'};
+EXPORT(9+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx),1) = {'R33 2 SD'};
+EXPORT{loc_R33+sum(STD_R33_idx)+1,2} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),2)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,2} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),2)));
+EXPORT{loc_R33+sum(STD_R33_idx)+1,8} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),8)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,8} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),8)));
+EXPORT{loc_R33+sum(STD_R33_idx)+1,10} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),10)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,10} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),10)));
+EXPORT{loc_R33+sum(STD_R33_idx)+1,13} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),13)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,13} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),13)));
+
+count = 1;
+loc_TEM = 10+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx);
+for i = 1:length(STD_TEM_idx)
+	if STD_TEM_idx(i,1) == 1
+		EXPORT(count+loc_TEM,1) = {STD_TEM};
+		EXPORT{count+loc_TEM,2} = H.Ratio_STD_176_177_TEM_mean(count,1); %176Hf/177Hf
+ 		EXPORT{count+loc_TEM,3} = 2*Ratio_STD_176_177_TEM_SE(count,1); %2 SE
+ 		EXPORT{count+loc_TEM,4} = LuHf_TEM(count,1);
+ 		EXPORT{count+loc_TEM,5} = 2*LuHf_TEMs(count,1); %2 SE
+		EXPORT{count+loc_TEM,6} = YbHf_TEM(count,1);
+ 		EXPORT{count+loc_TEM,7} = 2*YbHf_TEMs(count,1); %2 SE
+ 		EXPORT{count+loc_TEM,8} = Hf178_Hf177_TEM(count,1);
+ 		EXPORT{count+loc_TEM,9} = 2*Hf178_Hf177_TEMs(count,1); %2 SE
+ 		EXPORT{count+loc_TEM,10} = eHf0_TEM(count,1);
+ 		EXPORT{count+loc_TEM,11} = 2*eHf0_TEMs(count,1);%2 SE
+ 		EXPORT{count+loc_TEM,12} = HfHfT_TEM(count,1);
+ 		EXPORT{count+loc_TEM,13} = eHf_TEM(count,1);
+		EXPORT{count+loc_TEM,14} = 2*eHf_TEMs(count,1);%2 SE
+ 		EXPORT{count+loc_TEM,15} = Age_TEM;
+ 		EXPORT{count+loc_TEM,16} = Age_TEMs;
+ 		EXPORT{count+loc_TEM,17} = H.Yb_Lu_Hf_TEM_mean(count,1); %(176Lu+176Yb)/176Hf %)
+ 		EXPORT{count+loc_TEM,18} = v180_TEM(count,1);
+ 		EXPORT{count+loc_TEM,19} = (YbHf_TEM(count,1) + HfHfT_TEM(count,1)) / 0.000028;
+ 		EXPORT{count+loc_TEM,20} = Age_TEM;
+ 		EXPORT{count+loc_TEM,21} = eHf_TEM(count,1);
+		count = count + 1;
+	end
+end
+
+EXPORT(11+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx),1) = {'TEM Mean'};
+EXPORT(12+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx),1) = {'TEM 2 SD'};
+EXPORT{loc_TEM+sum(STD_TEM_idx)+1,2} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),2)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,2} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),2)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+1,8} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),8)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,8} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),8)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+1,10} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),10)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,10} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),10)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+1,13} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),13)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,13} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),13)));
+
+count = 1;
+loc_MT = 13+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx);
+for i = 1:length(STD_MT_idx)
+	if STD_MT_idx(i,1) == 1
+		EXPORT(count+loc_MT,1) = {STD_MT};
+		EXPORT{count+loc_MT,2} = H.Ratio_STD_176_177_MT_mean(count,1); %176Hf/177Hf
+ 		EXPORT{count+loc_MT,3} = 2*Ratio_STD_176_177_MT_SE(count,1); %2 SE
+ 		EXPORT{count+loc_MT,4} = LuHf_MT(count,1);
+ 		EXPORT{count+loc_MT,5} = 2*LuHf_MTs(count,1); %2 SE
+		EXPORT{count+loc_MT,6} = YbHf_MT(count,1);
+ 		EXPORT{count+loc_MT,7} = 2*YbHf_MTs(count,1); %2 SE
+ 		EXPORT{count+loc_MT,8} = Hf178_Hf177_MT(count,1);
+ 		EXPORT{count+loc_MT,9} = 2*Hf178_Hf177_MTs(count,1); %2 SE
+ 		EXPORT{count+loc_MT,10} = eHf0_MT(count,1);
+ 		EXPORT{count+loc_MT,11} = 2*eHf0_MTs(count,1);%2 SE
+ 		EXPORT{count+loc_MT,12} = HfHfT_MT(count,1);
+ 		EXPORT{count+loc_MT,13} = eHf_MT(count,1);
+		EXPORT{count+loc_MT,14} = 2*eHf_MTs(count,1);%2 SE
+ 		EXPORT{count+loc_MT,15} = Age_MT;
+ 		EXPORT{count+loc_MT,16} = Age_MTs;
+ 		EXPORT{count+loc_MT,17} = H.Yb_Lu_Hf_MT_mean(count,1); %(176Lu+176Yb)/176Hf %)
+ 		EXPORT{count+loc_MT,18} = v180_MT(count,1);
+ 		EXPORT{count+loc_MT,19} = (YbHf_MT(count,1) + HfHfT_MT(count,1)) / 0.000028;
+ 		EXPORT{count+loc_MT,20} = Age_MT;
+ 		EXPORT{count+loc_MT,21} = eHf_MT(count,1);
+		count = count + 1;
+	end
+end
+
+EXPORT(14+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx),1) = {'MT Mean'};
+EXPORT(15+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx),1) = {'MT 2 SD'};
+EXPORT{loc_MT+sum(STD_MT_idx)+1,2} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),2)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,2} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),2)));
+EXPORT{loc_MT+sum(STD_MT_idx)+1,8} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),8)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,8} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),8)));
+EXPORT{loc_MT+sum(STD_MT_idx)+1,10} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),10)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,10} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),10)));
+EXPORT{loc_MT+sum(STD_MT_idx)+1,13} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),13)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,13} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),13)));
+
+count = 1;
+loc_PLES = 16+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx);
+for i = 1:length(STD_PLES_idx)
+	if STD_PLES_idx(i,1) == 1
+		EXPORT(count+loc_PLES,1) = {STD_PLES};
+		EXPORT{count+loc_PLES,2} = H.Ratio_STD_176_177_PLES_mean(count,1); %176Hf/177Hf
+ 		EXPORT{count+loc_PLES,3} = 2*Ratio_STD_176_177_PLES_SE(count,1); %2 SE
+ 		EXPORT{count+loc_PLES,4} = LuHf_PLES(count,1);
+ 		EXPORT{count+loc_PLES,5} = 2*LuHf_PLESs(count,1); %2 SE
+		EXPORT{count+loc_PLES,6} = YbHf_PLES(count,1);
+ 		EXPORT{count+loc_PLES,7} = 2*YbHf_PLESs(count,1); %2 SE
+ 		EXPORT{count+loc_PLES,8} = Hf178_Hf177_PLES(count,1);
+ 		EXPORT{count+loc_PLES,9} = 2*Hf178_Hf177_PLESs(count,1); %2 SE
+ 		EXPORT{count+loc_PLES,10} = eHf0_PLES(count,1);
+ 		EXPORT{count+loc_PLES,11} = 2*eHf0_PLESs(count,1);%2 SE
+ 		EXPORT{count+loc_PLES,12} = HfHfT_PLES(count,1);
+ 		EXPORT{count+loc_PLES,13} = eHf_PLES(count,1);
+		EXPORT{count+loc_PLES,14} = 2*eHf_PLESs(count,1);%2 SE
+ 		EXPORT{count+loc_PLES,15} = Age_PLES;
+ 		EXPORT{count+loc_PLES,16} = Age_PLESs;
+ 		EXPORT{count+loc_PLES,17} = H.Yb_Lu_Hf_PLES_mean(count,1); %(176Lu+176Yb)/176Hf %)
+ 		EXPORT{count+loc_PLES,18} = v180_PLES(count,1);
+ 		EXPORT{count+loc_PLES,19} = (YbHf_PLES(count,1) + HfHfT_PLES(count,1)) / 0.000028;
+ 		EXPORT{count+loc_PLES,20} = Age_PLES;
+ 		EXPORT{count+loc_PLES,21} = eHf_PLES(count,1);
+		count = count + 1;
+	end
+end
+
+EXPORT(17+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx),1) = {'PLES Mean'};
+EXPORT(18+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx),1) = {'PLES 2 SD'};
+EXPORT{loc_PLES+sum(STD_PLES_idx)+1,2} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),2)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,2} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),2)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+1,8} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),8)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,8} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),8)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+1,10} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),10)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,10} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),10)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+1,13} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),13)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,13} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),13)));
+
+count = 1;
+loc_91500 = 19+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx);
+for i = 1:length(STD_91500_idx)
+	if STD_91500_idx(i,1) == 1
+		EXPORT(count+loc_91500,1) = {STD_91500};
+		EXPORT{count+loc_91500,2} = H.Ratio_STD_176_177_91500_mean(count,1); %176Hf/177Hf
+ 		EXPORT{count+loc_91500,3} = 2*Ratio_STD_176_177_91500_SE(count,1); %2 SE
+ 		EXPORT{count+loc_91500,4} = LuHf_91500(count,1);
+ 		EXPORT{count+loc_91500,5} = 2*LuHf_91500s(count,1); %2 SE
+		EXPORT{count+loc_91500,6} = YbHf_91500(count,1);
+ 		EXPORT{count+loc_91500,7} = 2*YbHf_91500s(count,1); %2 SE
+ 		EXPORT{count+loc_91500,8} = Hf178_Hf177_91500(count,1);
+ 		EXPORT{count+loc_91500,9} = 2*Hf178_Hf177_91500s(count,1); %2 SE
+ 		EXPORT{count+loc_91500,10} = eHf0_91500(count,1);
+ 		EXPORT{count+loc_91500,11} = 2*eHf0_91500s(count,1);%2 SE
+ 		EXPORT{count+loc_91500,12} = HfHfT_91500(count,1);
+ 		EXPORT{count+loc_91500,13} = eHf_91500(count,1);
+		EXPORT{count+loc_91500,14} = 2*eHf_91500s(count,1);%2 SE
+ 		EXPORT{count+loc_91500,15} = Age_91500;
+ 		EXPORT{count+loc_91500,16} = Age_91500s;
+ 		EXPORT{count+loc_91500,17} = H.Yb_Lu_Hf_91500_mean(count,1); %(176Lu+176Yb)/176Hf %)
+ 		EXPORT{count+loc_91500,18} = v180_91500(count,1);
+ 		EXPORT{count+loc_91500,19} = (YbHf_91500(count,1) + HfHfT_91500(count,1)) / 0.000028;
+ 		EXPORT{count+loc_91500,20} = Age_91500;
+ 		EXPORT{count+loc_91500,21} = eHf_91500(count,1);
+		count = count + 1;
+	end
+end
+
+EXPORT(20+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx),1) = {'91500 Mean'};
+EXPORT(21+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx),1) = {'91500 2 SD'};
+EXPORT{loc_91500+sum(STD_91500_idx)+1,2} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),2)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,2} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),2)));
+EXPORT{loc_91500+sum(STD_91500_idx)+1,8} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),8)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,8} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),8)));
+EXPORT{loc_91500+sum(STD_91500_idx)+1,10} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),10)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,10} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),10)));
+EXPORT{loc_91500+sum(STD_91500_idx)+1,13} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),13)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,13} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),13)));
+
+count = 1;
+loc_FC = 22+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx);
+for i = 1:length(STD_FC_idx)
+	if STD_FC_idx(i,1) == 1
+		EXPORT(count+loc_FC,1) = {STD_FC};
+		EXPORT{count+loc_FC,2} = H.Ratio_STD_176_177_FC_mean(count,1); %176Hf/177Hf
+ 		EXPORT{count+loc_FC,3} = 2*Ratio_STD_176_177_FC_SE(count,1); %2 SE
+ 		EXPORT{count+loc_FC,4} = LuHf_FC(count,1);
+ 		EXPORT{count+loc_FC,5} = 2*LuHf_FCs(count,1); %2 SE
+		EXPORT{count+loc_FC,6} = YbHf_FC(count,1);
+ 		EXPORT{count+loc_FC,7} = 2*YbHf_FCs(count,1); %2 SE
+ 		EXPORT{count+loc_FC,8} = Hf178_Hf177_FC(count,1);
+ 		EXPORT{count+loc_FC,9} = 2*Hf178_Hf177_FCs(count,1); %2 SE
+ 		EXPORT{count+loc_FC,10} = eHf0_FC(count,1);
+ 		EXPORT{count+loc_FC,11} = 2*eHf0_FCs(count,1);%2 SE
+ 		EXPORT{count+loc_FC,12} = HfHfT_FC(count,1);
+ 		EXPORT{count+loc_FC,13} = eHf_FC(count,1);
+		EXPORT{count+loc_FC,14} = 2*eHf_FCs(count,1);%2 SE
+ 		EXPORT{count+loc_FC,15} = Age_FC;
+ 		EXPORT{count+loc_FC,16} = Age_FCs;
+ 		EXPORT{count+loc_FC,17} = H.Yb_Lu_Hf_FC_mean(count,1); %(176Lu+176Yb)/176Hf %)
+ 		EXPORT{count+loc_FC,18} = v180_FC(count,1);
+ 		EXPORT{count+loc_FC,19} = (YbHf_FC(count,1) + HfHfT_FC(count,1)) / 0.000028;
+ 		EXPORT{count+loc_FC,20} = Age_FC;
+ 		EXPORT{count+loc_FC,21} = eHf_FC(count,1);
+		count = count + 1;
+	end
+end
+
+EXPORT(23+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx),1) = {'FC Mean'};
+EXPORT(24+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx),1) = {'FC 2 SD'};
+EXPORT{loc_FC+sum(STD_FC_idx)+1,2} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),2)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,2} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),2)));
+EXPORT{loc_FC+sum(STD_FC_idx)+1,8} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),8)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,8} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),8)));
+EXPORT{loc_FC+sum(STD_FC_idx)+1,10} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),10)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,10} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),10)));
+EXPORT{loc_FC+sum(STD_FC_idx)+1,13} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),13)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,13} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),13)));
+
+count = 1;
+loc_SL = 25+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx);
+for i = 1:length(STD_SL_idx)
+	if STD_SL_idx(i,1) == 1
+		EXPORT(count+loc_SL,1) = {STD_SL};
+		EXPORT{count+loc_SL,2} = H.Ratio_STD_176_177_SL_mean(count,1); %176Hf/177Hf
+ 		EXPORT{count+loc_SL,3} = 2*Ratio_STD_176_177_SL_SE(count,1); %2 SE
+ 		EXPORT{count+loc_SL,4} = LuHf_SL(count,1);
+ 		EXPORT{count+loc_SL,5} = 2*LuHf_SLs(count,1); %2 SE
+		EXPORT{count+loc_SL,6} = YbHf_SL(count,1);
+ 		EXPORT{count+loc_SL,7} = 2*YbHf_SLs(count,1); %2 SE
+ 		EXPORT{count+loc_SL,8} = Hf178_Hf177_SL(count,1);
+ 		EXPORT{count+loc_SL,9} = 2*Hf178_Hf177_SLs(count,1); %2 SE
+ 		EXPORT{count+loc_SL,10} = eHf0_SL(count,1);
+ 		EXPORT{count+loc_SL,11} = 2*eHf0_SLs(count,1);%2 SE
+ 		EXPORT{count+loc_SL,12} = HfHfT_SL(count,1);
+ 		EXPORT{count+loc_SL,13} = eHf_SL(count,1);
+		EXPORT{count+loc_SL,14} = 2*eHf_SLs(count,1);%2 SE
+ 		EXPORT{count+loc_SL,15} = Age_SL;
+ 		EXPORT{count+loc_SL,16} = Age_SLs;
+ 		EXPORT{count+loc_SL,17} = H.Yb_Lu_Hf_SL_mean(count,1); %(176Lu+176Yb)/176Hf %)
+ 		EXPORT{count+loc_SL,18} = v180_SL(count,1);
+ 		EXPORT{count+loc_SL,19} = (YbHf_SL(count,1) + HfHfT_SL(count,1)) / 0.000028;
+ 		EXPORT{count+loc_SL,20} = Age_SL;
+ 		EXPORT{count+loc_SL,21} = eHf_SL(count,1);
+		count = count + 1;
+	end
+end
+
+EXPORT(26+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx)+sum(STD_SL_idx),1) = {'SL Mean'};
+EXPORT(27+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_SL_idx)+sum(STD_SL_idx),1) = {'SL 2 SD'};
+EXPORT{loc_SL+sum(STD_SL_idx)+1,2} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),2)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,2} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),2)));
+EXPORT{loc_SL+sum(STD_SL_idx)+1,8} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),8)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,8} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),8)));
+EXPORT{loc_SL+sum(STD_SL_idx)+1,10} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),10)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,10} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),10)));
+EXPORT{loc_SL+sum(STD_SL_idx)+1,13} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),13)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,13} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),13)));
+
+EXPORT(29+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx)+sum(STD_SL_idx):...
+	52+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx)+sum(STD_SL_idx),1) = ...
+{'1) Corrected 176Hf/177Hf ratio.';
+'2) Uncertainty in corrected 176Hf/177Hf ratio (expressed at the 95% confidence interval)';...
+'3) Corrected 176Lu/177Hf ratio.';...
+'4) Uncertainty in corrected 176Lu//177Hf ratio (expressed at the 95% confidence interval).';...
+'5) Corrected 176Yb/177Hf ratio.';...
+'6) Uncertainty in corrected 176Yb/177Hf ratio (expressed at the 95% confidence interval.';...
+'7) Corrected 178Hf/177Hf ratio.';...
+'8) Uncertainty in corrected 178Hf/177Hf ratio (expressed at the 95% confidence interval.';...
+'9) Present day EHf value (EHf(0))';...
+'10) Uncertainty in present day EHf value (expressed at the 95% confidence interval) expressed in epsilon notation.';...
+'11) Initial 176Hf/177Hf ratio (i).';...
+'12) The calculated initial EHf (EHf(i)) or calculated EHf value at some time, t.';...
+'decay constant of Soderlund et al. (2004) was used (1.867*10-11 year-1).';...
+'13) Uncertainty in initial EHf value (expressed at the 95% confidence interval) expressed in epsilon notation.';...
+'14) Crystallization age used for determining initial 176Hf/177Hf and initial EHf.';...
+'15) Uncertainty in age used for determining initial 176Hf/177Hf and initial EHf (expressed at the 95% confidence interval).';...
+'16) Mass bias (in %) calculated as (176Yb + 176Lu)/176Hf.';...
+'17) The total Hf voltage of the analysis.';...
+'18) Interference correction expressed in EHf units, estimated as ((176Yb/177Hf + 176Lu/177Hf)/(0.000028)).';...
+'19) Age (Ma).';...
+'20) Initial EHf, EHf(i).';...
+'Reference for Lu-Hf Methods: Ibanez-Mejia, M., Gehrels, G.E., Ruiz, J., Vervoort, J.D., Eddy, M.P. and Li, C., 2014. Small-volume baddeleyite (ZrO2) U-Pb geochronology and Lu-Hf isotope geochemistry by LA-ICP-MS. Techniques and applications. Chemical Geology, 384, pp.149-167.';...
+'Reference for Arizona LaserChron Center: Gehrels, G.E., Valencia, V.A. and Ruiz, J., 2008. Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry. Geochemistry, Geophysics, Geosystems, 9(3), pp. 1-13.';...
+'Reference for data reduction software (AgeCalcML): Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 H.EXPORT = EXPORT;
 
-%sample	Yb_Lu_Hf_UNKNOWN_mean	v180_UNKNOWN	Ratio_UNKNOWN_176_177_mean	Ratio_UNKNOWN_176_177_SE	LuHf_UNKNOWN	HfHfT	eHf0	eHf0s	eHf_UNKNOWNS	Ages_mean
+%sample	Yb_Lu_Hf_UNKNOWN_mean	v180_UNKNOWN	Ratio_UNKNOWN_176_177_mean	Ratio_UNKNOWN_176_177_SE	LuHf_UNKNOWN	HfHfT_UNKNOWN	eHf0_UNKNOWN	eHf0_UNKNOWNs	eHf_UNKNOWNS	Ages_mean
 
 
 H.samp_length = samp_length;
