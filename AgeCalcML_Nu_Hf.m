@@ -2184,13 +2184,13 @@ end
 EXPORT(8+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx),1) = {'R33 Mean'};
 EXPORT(9+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx),1) = {'R33 2 SD'};
 EXPORT{loc_R33+sum(STD_R33_idx)+1,2} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),2)));
-EXPORT{loc_R33+sum(STD_R33_idx)+2,2} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),2)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,2} = 2*std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),2)));
 EXPORT{loc_R33+sum(STD_R33_idx)+1,8} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),8)));
-EXPORT{loc_R33+sum(STD_R33_idx)+2,8} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),8)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,8} = 2*std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),8)));
 EXPORT{loc_R33+sum(STD_R33_idx)+1,10} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),10)));
-EXPORT{loc_R33+sum(STD_R33_idx)+2,10} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),10)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,10} = 2*std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),10)));
 EXPORT{loc_R33+sum(STD_R33_idx)+1,13} = mean(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),13)));
-EXPORT{loc_R33+sum(STD_R33_idx)+2,13} = std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),13)));
+EXPORT{loc_R33+sum(STD_R33_idx)+2,13} = 2*std(cell2num(EXPORT(loc_R33+1:loc_R33+sum(STD_R33_idx),13)));
 
 count = 1;
 loc_TEM = 10+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx);
@@ -2224,13 +2224,13 @@ end
 EXPORT(11+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx),1) = {'TEM Mean'};
 EXPORT(12+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx),1) = {'TEM 2 SD'};
 EXPORT{loc_TEM+sum(STD_TEM_idx)+1,2} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),2)));
-EXPORT{loc_TEM+sum(STD_TEM_idx)+2,2} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),2)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,2} = 2*std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),2)));
 EXPORT{loc_TEM+sum(STD_TEM_idx)+1,8} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),8)));
-EXPORT{loc_TEM+sum(STD_TEM_idx)+2,8} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),8)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,8} = 2*std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),8)));
 EXPORT{loc_TEM+sum(STD_TEM_idx)+1,10} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),10)));
-EXPORT{loc_TEM+sum(STD_TEM_idx)+2,10} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),10)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,10} = 2*std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),10)));
 EXPORT{loc_TEM+sum(STD_TEM_idx)+1,13} = mean(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),13)));
-EXPORT{loc_TEM+sum(STD_TEM_idx)+2,13} = std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),13)));
+EXPORT{loc_TEM+sum(STD_TEM_idx)+2,13} = 2*std(cell2num(EXPORT(loc_TEM+1:loc_TEM+sum(STD_TEM_idx),13)));
 
 count = 1;
 loc_MT = 13+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx);
@@ -2264,13 +2264,13 @@ end
 EXPORT(14+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx),1) = {'MT Mean'};
 EXPORT(15+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx),1) = {'MT 2 SD'};
 EXPORT{loc_MT+sum(STD_MT_idx)+1,2} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),2)));
-EXPORT{loc_MT+sum(STD_MT_idx)+2,2} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),2)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,2} = 2*std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),2)));
 EXPORT{loc_MT+sum(STD_MT_idx)+1,8} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),8)));
-EXPORT{loc_MT+sum(STD_MT_idx)+2,8} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),8)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,8} = 2*std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),8)));
 EXPORT{loc_MT+sum(STD_MT_idx)+1,10} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),10)));
-EXPORT{loc_MT+sum(STD_MT_idx)+2,10} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),10)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,10} = 2*std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),10)));
 EXPORT{loc_MT+sum(STD_MT_idx)+1,13} = mean(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),13)));
-EXPORT{loc_MT+sum(STD_MT_idx)+2,13} = std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),13)));
+EXPORT{loc_MT+sum(STD_MT_idx)+2,13} = 2*std(cell2num(EXPORT(loc_MT+1:loc_MT+sum(STD_MT_idx),13)));
 
 count = 1;
 loc_PLES = 16+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx);
@@ -2304,13 +2304,13 @@ end
 EXPORT(17+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx),1) = {'PLES Mean'};
 EXPORT(18+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx),1) = {'PLES 2 SD'};
 EXPORT{loc_PLES+sum(STD_PLES_idx)+1,2} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),2)));
-EXPORT{loc_PLES+sum(STD_PLES_idx)+2,2} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),2)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,2} = 2*std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),2)));
 EXPORT{loc_PLES+sum(STD_PLES_idx)+1,8} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),8)));
-EXPORT{loc_PLES+sum(STD_PLES_idx)+2,8} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),8)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,8} = 2*std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),8)));
 EXPORT{loc_PLES+sum(STD_PLES_idx)+1,10} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),10)));
-EXPORT{loc_PLES+sum(STD_PLES_idx)+2,10} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),10)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,10} = 2*std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),10)));
 EXPORT{loc_PLES+sum(STD_PLES_idx)+1,13} = mean(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),13)));
-EXPORT{loc_PLES+sum(STD_PLES_idx)+2,13} = std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),13)));
+EXPORT{loc_PLES+sum(STD_PLES_idx)+2,13} = 2*std(cell2num(EXPORT(loc_PLES+1:loc_PLES+sum(STD_PLES_idx),13)));
 
 count = 1;
 loc_91500 = 19+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx);
@@ -2344,13 +2344,13 @@ end
 EXPORT(20+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx),1) = {'91500 Mean'};
 EXPORT(21+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx),1) = {'91500 2 SD'};
 EXPORT{loc_91500+sum(STD_91500_idx)+1,2} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),2)));
-EXPORT{loc_91500+sum(STD_91500_idx)+2,2} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),2)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,2} = 2*std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),2)));
 EXPORT{loc_91500+sum(STD_91500_idx)+1,8} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),8)));
-EXPORT{loc_91500+sum(STD_91500_idx)+2,8} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),8)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,8} = 2*std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),8)));
 EXPORT{loc_91500+sum(STD_91500_idx)+1,10} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),10)));
-EXPORT{loc_91500+sum(STD_91500_idx)+2,10} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),10)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,10} = 2*std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),10)));
 EXPORT{loc_91500+sum(STD_91500_idx)+1,13} = mean(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),13)));
-EXPORT{loc_91500+sum(STD_91500_idx)+2,13} = std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),13)));
+EXPORT{loc_91500+sum(STD_91500_idx)+2,13} = 2*std(cell2num(EXPORT(loc_91500+1:loc_91500+sum(STD_91500_idx),13)));
 
 count = 1;
 loc_FC = 22+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx);
@@ -2384,13 +2384,13 @@ end
 EXPORT(23+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx),1) = {'FC Mean'};
 EXPORT(24+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx),1) = {'FC 2 SD'};
 EXPORT{loc_FC+sum(STD_FC_idx)+1,2} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),2)));
-EXPORT{loc_FC+sum(STD_FC_idx)+2,2} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),2)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,2} = 2*std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),2)));
 EXPORT{loc_FC+sum(STD_FC_idx)+1,8} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),8)));
-EXPORT{loc_FC+sum(STD_FC_idx)+2,8} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),8)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,8} = 2*std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),8)));
 EXPORT{loc_FC+sum(STD_FC_idx)+1,10} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),10)));
-EXPORT{loc_FC+sum(STD_FC_idx)+2,10} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),10)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,10} = 2*std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),10)));
 EXPORT{loc_FC+sum(STD_FC_idx)+1,13} = mean(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),13)));
-EXPORT{loc_FC+sum(STD_FC_idx)+2,13} = std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),13)));
+EXPORT{loc_FC+sum(STD_FC_idx)+2,13} = 2*std(cell2num(EXPORT(loc_FC+1:loc_FC+sum(STD_FC_idx),13)));
 
 count = 1;
 loc_SL = 25+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx);
@@ -2422,15 +2422,15 @@ for i = 1:length(STD_SL_idx)
 end
 
 EXPORT(26+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx)+sum(STD_SL_idx),1) = {'SL Mean'};
-EXPORT(27+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_SL_idx)+sum(STD_SL_idx),1) = {'SL 2 SD'};
+EXPORT(27+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx)+sum(STD_SL_idx),1) = {'SL 2 SD'};
 EXPORT{loc_SL+sum(STD_SL_idx)+1,2} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),2)));
-EXPORT{loc_SL+sum(STD_SL_idx)+2,2} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),2)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,2} = 2*std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),2)));
 EXPORT{loc_SL+sum(STD_SL_idx)+1,8} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),8)));
-EXPORT{loc_SL+sum(STD_SL_idx)+2,8} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),8)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,8} = 2*std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),8)));
 EXPORT{loc_SL+sum(STD_SL_idx)+1,10} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),10)));
-EXPORT{loc_SL+sum(STD_SL_idx)+2,10} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),10)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,10} = 2*std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),10)));
 EXPORT{loc_SL+sum(STD_SL_idx)+1,13} = mean(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),13)));
-EXPORT{loc_SL+sum(STD_SL_idx)+2,13} = std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),13)));
+EXPORT{loc_SL+sum(STD_SL_idx)+2,13} = 2*std(cell2num(EXPORT(loc_SL+1:loc_SL+sum(STD_SL_idx),13)));
 
 EXPORT(29+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx)+sum(STD_SL_idx):...
 	52+length(nonzeros(SAMPLES_idx))+sum(STD_R33_idx)+sum(STD_TEM_idx)+sum(STD_MT_idx)+sum(STD_PLES_idx)+sum(STD_91500_idx)+sum(STD_FC_idx)+sum(STD_SL_idx),1) = ...
