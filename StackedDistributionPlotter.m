@@ -24,30 +24,79 @@ guidata(hObject,H);
 
 %% STACKED DISTRIBUTION PLOTTER %%
 function load_Callback(hObject, eventdata, H)
-[filename pathname] = uigetfile({'*'},'File Selector');
-data = readtable(char(strcat(pathname, filename)));
-data = table2array(data);
+% [filename pathname] = uigetfile({'*'},'File Selector');
+% data = readtable(char(strcat(pathname, filename)));
+% 
+% get(t,'columnname')
+% 
+% data = table2array(data);
 
-if iscell(data) == 0 
-	data = num2cell(data);
+
+[filename pathname] = uigetfile({'*'},'File Selector'); %load the supplemental file with zircon age eHfT data
+
+if ispc == 1
+	fullpathname = char(strcat(pathname, '\', filename));
+end
+if ismac == 1
+	fullpathname = char(strcat(pathname, '/', filename));
 end
 
-for i = 1:length(data(:,1))
-	for j = 1:length(data(1,:))
-		if cellfun('isempty', data(i,j)) == 0
-			if cellfun(@isnan, data(i,j)) == 1
-				data(i,j) = {[]};
-			end	
+[numbers text1, data] = xlsread(fullpathname);
+numbers = num2cell(numbers);
+
+for i = 1:size(numbers,1)
+	for j = 1:size(numbers,2)
+		if cellfun('isempty', numbers(i,j)) == 0
+			if cellfun(@isnan, numbers(i,j)) == 1
+				numbers(i,j) = {[]};
+			end
 		end
 	end
 end
 
-set(H.uitable1, 'Data', data);
+% pull the names from the headers
+for i = 1:(size(data,2)+1)/2
+	Name(i,1) = data(1,i*2-1);
+end
+
+for i = 1:size(data,2)/2
+	headers(1,i*2-1) = Name(i,1);
+	if get(H.input1s,'Value') == 1
+		headers(1,i*2) = {'1s'};
+	end
+	if get(H.input2s,'Value') == 1
+		headers(1,i*2) = {'2s'};
+	end
+end
+
+
+% if iscell(data) == 0 
+% 	data = num2cell(data);
+% end
+% 
+% for i = 1:length(data(:,1))
+% 	for j = 1:length(data(1,:))
+% 		if cellfun('isempty', data(i,j)) == 0
+% 			if cellfun(@isnan, data(i,j)) == 1
+% 				data(i,j) = {[]};
+% 			end	
+% 		end
+% 	end
+% end
+
+set(H.uitable1, 'columnname', headers);
+set(H.uitable1, 'Data', numbers);
 data = get(H.uitable1, 'Data');
+H.Name = Name;
+H.headers = headers;
 set(H.filepath,'String',[strcat(pathname, filename)])
 plot_distribution(hObject, eventdata, H)
+guidata(hObject,H);
+
 
 function plot_distribution(hObject, eventdata, H)
+
+Name = H.Name;
 
 	if H.export_dist == 1
 		figure;
@@ -75,21 +124,24 @@ x=xmin:xint:xmax;
 	
 N = length(data(1,:))/2;
 
-	if get(H.input1s,'Value') == 1
-		columnname =   {'Age', '±1s'};
-		set(H.uitable1, 'ColumnName', columnname);
-	end
-
-	if get(H.input2s,'Value') == 1
-		columnname =   {'Age', '±2s'};
-		set(H.uitable1, 'ColumnName', columnname);
-	end
+% 	if get(H.input1s,'Value') == 1
+% 		columnname =   {'Age', '±1s'};
+% 		set(H.uitable1, 'ColumnName', columnname);
+% 	end
+% 
+% 	if get(H.input2s,'Value') == 1
+% 		columnname =   {'Age', '±2s'};
+% 		set(H.uitable1, 'ColumnName', columnname);
+% 	end
 
 gap = 15; % in percent
 binset = 0;
 pdpmax = 0;
 kdemax = 0;
 
+colors = jet(N);
+
+base = 0;
 for k = 1:N
 	data_tmp = data(:,k*2-1:k*2);
 	
@@ -119,18 +171,21 @@ for k = 1:N
 		ylabel('Number')
 	end
 	
+	
+	
+	
+	
 	if get(H.radio_pdp, 'Value') == 1
 		pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-		pdp = pdp + pdpmax;
-		p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
-		plot([xmin xmax], [pdpmax pdpmax],'k')
-		pdpmax = max(pdp);
+		patch([x,xmax,xmin], [pdp+base,min(pdp)+base,min(pdp)+base],colors(k,:))
+		p = plot(x, pdp+base, 'Color', 'k', 'LineWidth', 2);	
+		text(xmax, base + max(pdp)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
+		base = base + max(pdp);
 		lgnd=legend(p, 'Probability Density Plot');
 		set(lgnd,'Color','w');
-		%legend boxoff
 		xlabel('Age (Ma)','Color','k')
 		ylabel('Probability','Color','k')
-		axis([xmin xmax 0 pdpmax])
+		axis([xmin xmax 0 base])
 	end
 
 	if get(H.radio_kde, 'Value') == 1
@@ -139,10 +194,16 @@ for k = 1:N
 			n = length(dist_data(:,1));
 			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
 			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			kdeA = kdeA + kdemax;
-			hl1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);
-			plot([xmin xmax], [kdemax kdemax],'k')
-			kdemax = max(kdeA);
+			
+			
+			patch([x,xmax,xmin], [kdeA+base,min(kdeA)+base,min(kdeA)+base],colors(k,:))
+			hl1 = plot(x,kdeA+base,'Color','k','LineWidth',2);
+			text(xmax, base + max(kdeA)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
+			
+			
+			base = base + max(kdeA);
+			
+	
 			set(hl1,'linewidth',2)
 			set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
 		end
@@ -150,10 +211,10 @@ for k = 1:N
 			kernel = str2num(get(H.Myr_Kernel_text,'String'));
 			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
 			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-			kde1 = kde1 + kdemax;
-			hl1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);
-			plot([xmin xmax], [kdemax kdemax],'k')
-			kdemax = max(kde1);
+			patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],colors(k,:))
+			hl1 = plot(x,kde1+base,'Color','k','LineWidth',2);
+			text(xmax, base + max(kde1)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
+			base = base + max(kde1);			
 			set(hl1,'linewidth',2)
 			set(gca,'box','off')
 		end	
@@ -162,7 +223,7 @@ for k = 1:N
 		%legend boxoff
 		xlabel('Age (Ma)','Color','k')
 		ylabel('Probability','Color','k')
-		axis([xmin xmax 0 kdemax])
+		axis([xmin xmax 0 base])
 	end
 
 	if get(H.radio_pdp_kde, 'Value') == 1
@@ -520,7 +581,23 @@ FIG = figure('visible', 'off');
 %%%%%%% plot code
 
 
+Name = H.Name;
+
+	if H.export_dist == 1
+		figure;
+	end
+	if H.export_dist == 0
+		cla(H.axes_comp,'reset');
+		axes(H.axes_comp);	
+	end
+	H.export_dist = 0;
+	guidata(hObject,H);
+	
 data = get(H.uitable1, 'Data');
+
+if iscell(data) == 0
+	data = num2cell(data);
+end
 
 hold on
 	
@@ -532,21 +609,24 @@ x=xmin:xint:xmax;
 	
 N = length(data(1,:))/2;
 
-	if get(H.input1s,'Value') == 1
-		columnname =   {'Age', '±1s'};
-		set(H.uitable1, 'ColumnName', columnname);
-	end
-
-	if get(H.input2s,'Value') == 1
-		columnname =   {'Age', '±2s'};
-		set(H.uitable1, 'ColumnName', columnname);
-	end
+% 	if get(H.input1s,'Value') == 1
+% 		columnname =   {'Age', '±1s'};
+% 		set(H.uitable1, 'ColumnName', columnname);
+% 	end
+% 
+% 	if get(H.input2s,'Value') == 1
+% 		columnname =   {'Age', '±2s'};
+% 		set(H.uitable1, 'ColumnName', columnname);
+% 	end
 
 gap = 15; % in percent
 binset = 0;
 pdpmax = 0;
 kdemax = 0;
 
+colors = jet(N);
+
+base = 0;
 for k = 1:N
 	data_tmp = data(:,k*2-1:k*2);
 	
@@ -576,18 +656,21 @@ for k = 1:N
 		ylabel('Number')
 	end
 	
+	
+	
+	
+	
 	if get(H.radio_pdp, 'Value') == 1
 		pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-		pdp = pdp + pdpmax;
-		p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
-		plot([xmin xmax], [pdpmax pdpmax],'k')
-		pdpmax = max(pdp);
+		patch([x,xmax,xmin], [pdp+base,min(pdp)+base,min(pdp)+base],colors(k,:))
+		p = plot(x, pdp+base, 'Color', 'k', 'LineWidth', 2);	
+		text(xmax, base + max(pdp)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
+		base = base + max(pdp);
 		lgnd=legend(p, 'Probability Density Plot');
 		set(lgnd,'Color','w');
-		%legend boxoff
 		xlabel('Age (Ma)','Color','k')
 		ylabel('Probability','Color','k')
-		axis([xmin xmax 0 pdpmax])
+		axis([xmin xmax 0 base])
 	end
 
 	if get(H.radio_kde, 'Value') == 1
@@ -596,10 +679,16 @@ for k = 1:N
 			n = length(dist_data(:,1));
 			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
 			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			kdeA = kdeA + kdemax;
-			hl1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);
-			plot([xmin xmax], [kdemax kdemax],'k')
-			kdemax = max(kdeA);
+			
+			
+			patch([x,xmax,xmin], [kdeA+base,min(kdeA)+base,min(kdeA)+base],colors(k,:))
+			hl1 = plot(x,kdeA+base,'Color','k','LineWidth',2);
+			text(xmax, base + max(kdeA)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
+			
+			
+			base = base + max(kdeA);
+			
+	
 			set(hl1,'linewidth',2)
 			set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
 		end
@@ -607,10 +696,10 @@ for k = 1:N
 			kernel = str2num(get(H.Myr_Kernel_text,'String'));
 			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
 			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-			kde1 = kde1 + kdemax;
-			hl1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);
-			plot([xmin xmax], [kdemax kdemax],'k')
-			kdemax = max(kde1);
+			patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],colors(k,:))
+			hl1 = plot(x,kde1+base,'Color','k','LineWidth',2);
+			text(xmax, base + max(kde1)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
+			base = base + max(kde1);			
 			set(hl1,'linewidth',2)
 			set(gca,'box','off')
 		end	
@@ -619,7 +708,7 @@ for k = 1:N
 		%legend boxoff
 		xlabel('Age (Ma)','Color','k')
 		ylabel('Probability','Color','k')
-		axis([xmin xmax 0 kdemax])
+		axis([xmin xmax 0 base])
 	end
 
 	if get(H.radio_pdp_kde, 'Value') == 1
@@ -788,8 +877,8 @@ for k = 1:N
 		xlabel('Age (Ma)','Color','k')
 		ylabel('Number','Color','k')
 	end	
-end		
-
+	clear data_tmp dist_data
+end
 %%%%%%% save code
 
 [file,path] = uiputfile('*.eps','Save file');
