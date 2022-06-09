@@ -1451,6 +1451,10 @@ if get(H.primary, 'Value') == 5
 	age_label2 = {'1099 Ma'};
 end
 
+if get(H.primary, 'Value') == 7
+	age_label2 = {'417 Ma'};
+end
+
 plot(xc,yc,'k','LineWidth',1.4)
 hold on
 p1 = scatter(age_label2_x, age_label2_y,50,'MarkerEdgeColor','k','MarkerFaceColor','g','LineWidth',1.5);
@@ -13434,6 +13438,10 @@ age_label2_y = STD1_68;
 
 if get(H.primary, 'Value') == 1
 	age_label2 = {'564 Ma'};
+end
+
+if get(H.primary, 'Value') == 7
+	age_label2 = {'417 Ma'};
 end
 
 plot(xc,yc,'k','LineWidth',1.4)
