@@ -1257,20 +1257,25 @@ end
 
 if get(H.largenigneous, 'Value') == 1
 	
+	
+	STD_NUM = sum(STD1_idx)
+	
+	
+	
 	ff68n = ff68;
 	ff68n(ff68n == 0) = NaN;
 	ffsw68 = movmean(ff68n,str2num(get(H.igrun,'String')),'omitnan');
-	ffse68 = movstd(ff68n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(str2num(get(H.igrun,'String')));
+	ffse68 = movstd(ff68n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(STD_NUM);
 	
 	ff67n = stdfc67;
 	ff67n(ff67n == 0) = NaN;
 	stdfcsw67 = movmean(ff67n,str2num(get(H.igrun,'String')),'omitnan');
-	stdswse67 = movstd(ff67n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(str2num(get(H.igrun,'String')));
+	stdswse67 = movstd(ff67n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(STD_NUM);
 	
 	ff82n = stdfc82;
 	ff82n(ff82n == 0) = NaN;
 	stdfcsw82 = movmean(ff82n,str2num(get(H.igrun,'String')),'omitnan');
-	stdswse82 = movstd(ff82n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(str2num(get(H.igrun,'String')));
+	stdswse82 = movstd(ff82n,str2num(get(H.igrun,'String')),'omitnan')./sqrt(STD_NUM);
 	
 	
 	
@@ -2525,10 +2530,15 @@ H.samp_length = samp_length;
 for i = 1:length(STD1_idx)
 	if STD1_idx(i,1) ~= 1 && BLS_68_err(i,1) < 20 && isnan(ffse68(i,1)) == 0 && isnan(ffsw68(i,1)) == 0 && isnan(pbcerr68(i,1)) == 0
 		syst_err_68(i,1) = sqrt(100*ffse68(i,1)/ffsw68(i,1)*100*ffse68(i,1)/ffsw68(i,1)+pbcerr68(i,1)*pbcerr68(i,1)+0.053*0.053+0.033*0.033); %.35 SL(?) --> .33 FC Mattinson (2010)
+		syst_err_68_drift_only(i,1) = 100*ffse68(i,1)/ffsw68(i,1);
+		syst_err_68_pbc_only(i,1) = pbcerr68(i,1);
 	else
 		syst_err_68(i,1) = 0;
 	end
 end
+
+syst_err_68_drift_only_m = median(nonzeros(syst_err_68_drift_only))
+syst_err_68_pbc_only_m = median(nonzeros(syst_err_68_pbc_only))
 
 %if length(syst_err_68) >= 126
 %	systerr68 = 2*mean(nonzeros(syst_err_68(1:126,1)));
@@ -2539,8 +2549,17 @@ systerr68 = 2*median(nonzeros(syst_err_68));
 for i = 1:length(STD1_idx)
 	if STD1_idx(i,1) ~= 1 && BLS_67_err(i,1) < 20 && cell2num(Age68(i,1)) > 400 && isnan(stdswse67(i,1)) == 0 && isnan(stdfcsw67(i,1)) == 0 && isnan(pbcerr67(i,1)) == 0
 		syst_err_67(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1)+(pbcerr67(i,1))*(pbcerr67(i,1))+0.053*0.053+0.069*0.069+0.035*0.035);
+		syst_err_67_drift_only(i,1) = sqrt(100*stdswse67(i,1)/stdfcsw67(i,1)*100*stdswse67(i,1)/stdfcsw67(i,1));
+		syst_err_67_pbc_only(i,1) = sqrt((pbcerr67(i,1))*(pbcerr67(i,1)));
 	end
 end
+
+syst_err_67_drift_only_m = median(nonzeros(syst_err_67_drift_only))
+syst_err_67_pbc_only_m = median(nonzeros(syst_err_67_pbc_only))
+
+
+
+
 
 %if length(syst_err_67) >= 126
 %	systerr67 = 2*mean(nonzeros(syst_err_67(1:126,1)));
