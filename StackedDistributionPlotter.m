@@ -100,10 +100,12 @@ Name = H.Name;
 
 	if H.export_dist == 1
 		figure;
+		set(gca,'FontSize',str2num(get(H.fontsize_n,'String')));
 	end
 	if H.export_dist == 0
 		cla(H.axes_comp,'reset');
 		axes(H.axes_comp);	
+		set(H.axes_comp,'FontSize',str2num(get(H.fontsize_n,'String')));
 	end
 	H.export_dist = 0;
 	guidata(hObject,H);
@@ -125,12 +127,12 @@ x=xmin:xint:xmax;
 N = length(data(1,:))/2;
 
 % 	if get(H.input1s,'Value') == 1
-% 		columnname =   {'Age', '±1s'};
+% 		columnname =   {'Age', 'Â±1s'};
 % 		set(H.uitable1, 'ColumnName', columnname);
 % 	end
 % 
 % 	if get(H.input2s,'Value') == 1
-% 		columnname =   {'Age', '±2s'};
+% 		columnname =   {'Age', 'Â±2s'};
 % 		set(H.uitable1, 'ColumnName', columnname);
 % 	end
 
@@ -145,256 +147,289 @@ base = 0;
 for k = 1:N
 	data_tmp = data(:,k*2-1:k*2);
 	
-	for i = 1:length(data_tmp(:,1)) 
-		if cellfun('isempty', data_tmp(i,1)) == 0 && cellfun('isempty', data_tmp(i,2)) == 0 
+	dist_data = [];
+	
+	for i = 1:length(data_tmp(:,1))
+		if cellfun('isempty', data_tmp(i,1)) == 0 && cellfun('isempty', data_tmp(i,2)) == 0
 			if cell2num(data_tmp(i,1)) >= xmin && cell2num(data_tmp(i,1)) <= xmax
 				dist_data(i,1:2) = cell2num(data_tmp(i,1:2));
 			end
 		end
 	end
-	dist_data = dist_data(any(dist_data ~= 0,2),:);
-	if get(H.input2s,'Value') == 1
-		dist_data(:,2) = dist_data(:,2)./2;
-	end
 	
-	if get(H.radio_hist, 'Value') == 1
-		[counts bincenters] = hist(dist_data(:,1), bins);
-		bindiff = bincenters(1,2) - bincenters(1,1);
-		for i = 1:length(bincenters)
-			rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
-		end
-		binset = max(counts) + binset + 1;
-		plot([xmin xmax], [binset binset],'k')
-		clear data_tmp dist_data counts bincenters bindiff
-		axis([xmin xmax 0 binset+1])
-		xlabel('Age (Ma)')
-		ylabel('Number')
-	end
-	
-	
-	
-	
-	
-	if get(H.radio_pdp, 'Value') == 1
-		pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-		patch([x,xmax,xmin], [pdp+base,min(pdp)+base,min(pdp)+base],colors(k,:))
-		p = plot(x, pdp+base, 'Color', 'k', 'LineWidth', 2);	
-		text(xmax, base + max(pdp)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
-		base = base + max(pdp);
-		lgnd=legend(p, 'Probability Density Plot');
-		set(lgnd,'Color','w');
-		xlabel('Age (Ma)','Color','k')
-		ylabel('Probability','Color','k')
-		axis([xmin xmax 0 base])
-	end
-
-	if get(H.radio_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			xA = transpose(x);
-			n = length(dist_data(:,1));
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			
-			
-			patch([x,xmax,xmin], [kdeA+base,min(kdeA)+base,min(kdeA)+base],colors(k,:))
-			hl1 = plot(x,kdeA+base,'Color','k','LineWidth',2);
-			text(xmax, base + max(kdeA)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
-			
-			
-			base = base + max(kdeA);
-			
-	
-			set(hl1,'linewidth',2)
-			set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
-		end
-		if get(H.Myr_kernel,'Value') == 1
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-			patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],colors(k,:))
-			hl1 = plot(x,kde1+base,'Color','k','LineWidth',2);
-			text(xmax, base + max(kde1)/2, Name(k,1),'fontsize',16, 'horizontalAlignment', 'right')
-			base = base + max(kde1);			
-			set(hl1,'linewidth',2)
-			set(gca,'box','off')
-		end	
-		lgnd=legend('Kernel Density Estimate');
-		set(lgnd,'Color','w');
-		%legend boxoff
-		xlabel('Age (Ma)','Color','k')
-		ylabel('Probability','Color','k')
-		axis([xmin xmax 0 base])
-	end
-
-	if get(H.radio_pdp_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			xA = transpose(x);
-			n = length(dist_data(:,1));
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			kde_adj = kdeA*(1/(max(kdeA)/max(pdp)));
-			pdp = pdp + pdpmax;
-			kdeA = kde_adj + kdemax;
-			p1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);
-			p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
-			plot([xmin xmax], [pdpmax pdpmax],'k')
-			pdpmax = max(pdp);
-			kdemax = max(pdp);			
-			set(p1,'linewidth',2)
-			lgnd=legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
-			axis([xmin xmax 0 pdpmax+0.2*pdpmax])
-		end
-		if get(H.Myr_kernel,'Value') == 1
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;	
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint); 
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data	
-			kde_adj = kde1*(1/(max(kde1)/max(pdp)));	
-			pdp = pdp + pdpmax;
-			kde1 = kde_adj + kdemax;		
-			p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
-			p1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);
-			plot([xmin xmax], [pdpmax pdpmax],'k')
-			pdpmax = max(pdp);
-			kdemax = max(pdp);
-			set(p1,'linewidth',2)
-			axis([xmin xmax 0 pdpmax+0.2*pdpmax])
-			lgnd=legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
-			set(p1,'linewidth',2)
-		end
-		set(lgnd,'Color','w');
-		%legend boxoff
-		xlabel('Age (Ma)','Color','k')
-		ylabel('Probability','Color','k')
-		axis([xmin xmax 0 pdpmax])
-	end
-	
-	if get(H.radio_hist_pdp, 'Value') == 1
-		pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-		[counts bincenters] = hist(dist_data(:,1), bins);
-		bindiff = bincenters(1,2) - bincenters(1,1);
-		for i = 1:length(bincenters)
-			rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
-		end	
-		pdp_adj = pdp*(1/(max(pdp)/max(counts)));	
-		pdp = pdp_adj + binset;	
-		p = plot(x, pdp, 'Color', [0.1 0.8 0.1], 'LineWidth', 2);	
-		plot([xmin xmax], [binset binset],'k')	
-		binset = max(counts) + binset + 1;
-		%clear data_tmp dist_data counts bincenters bindiff
-		axis([xmin xmax 0 binset+1])
-		lgnd=legend(p, 'Probability Density Plot');
-		set(lgnd,'color','w');
-		%legend boxoff
-		xlabel('Age (Ma)','Color','k')
-		ylabel('Number','Color','k')
+	if isempty(dist_data) == 0
+		
+		dist_data = dist_data(any(dist_data ~= 0,2),:);
+		if get(H.input2s,'Value') == 1
+			dist_data(:,2) = dist_data(:,2)./2;
 		end
 		
-	if get(H.radio_hist_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			xA = transpose(x);
+		if get(H.radio_hist, 'Value') == 1
 			[counts bincenters] = hist(dist_data(:,1), bins);
 			bindiff = bincenters(1,2) - bincenters(1,1);
 			for i = 1:length(bincenters)
 				rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
-			end	
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			kde_adj = kdeA*(1/(max(kdeA)/max(counts)));
-			kdeA = kde_adj + binset;	
-			p1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);
-			plot([xmin xmax], [binset binset],'k')	
-			binset = max(counts) + binset + 1;
-			lgnd=legend(p1,'Kernel Density Estimate');
-			set(p1,'linewidth',2)
-			set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
-			xlabel('Age (Ma)','Color','k')
-			ylabel('Number','Color','k')
-			axis([xmin xmax 0 binset])
-		end
-		if get(H.Myr_kernel,'Value') == 1
-			[counts bincenters] = hist(dist_data(:,1), bins);
-			bindiff = bincenters(1,2) - bincenters(1,1);
-			for i = 1:length(bincenters)
-				rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
-			end					
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);	
-			kde_adj = kde1*(1/(max(kde1)/max(counts)));
-			kde1 = kde_adj + binset;	
-			p1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);
-			plot([xmin xmax], [binset binset],'k')	
-			binset = max(counts) + binset + 1;	
-			axis([xmin xmax 0 binset+1])
-			lgnd=legend(p1,'Kernel Density Estimate');
-			set(p1,'linewidth',2)
-		end
-		set(lgnd,'color','w');
-		%legend boxoff
-		xlabel('Age (Ma)','Color','k')
-		ylabel('Number','Color','k')
-	end
-		
-	if get(H.radio_hist_pdp_kde, 'Value') == 1
-		if get(H.optimize,'Value') == 1
-			[counts bincenters] = hist(dist_data(:,1), bins);
-			bindiff = bincenters(1,2) - bincenters(1,1);
-			for i = 1:length(bincenters)
-				rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
-			end				
-			xA = transpose(x);
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));	
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			pdp_adj = pdp*(1/(max(pdp)/max(counts)));	
-			pdp = pdp_adj + binset;		
-			p = plot(x, pdp, 'Color', [0.1 0.8 0.1], 'LineWidth', 2);		
-			[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
-			kdeA=transpose(interp1(xmesh1, kdeA, xA));
-			kde_adj = kdeA*(1/(max(kdeA)/max(counts)));
-			kdeA = kde_adj + binset;				
-			p1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);	
-			plot([xmin xmax], [binset binset],'k')				
-			binset = max(counts) + binset + 1;	
-			axis([xmin xmax 0 binset])
-			lgnd=legend([p,p1],'Probability Density Plot','Kernel Density Estimate');
-			set(p1,'linewidth',2)
-			set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
-			xlabel('Age (Ma)','Color','k')
-			ylabel('Number','Color','k')
 			end
-		if get(H.Myr_kernel,'Value') == 1	
+			binset = max(counts) + binset + 1;
+			n_tmp = length(dist_data(:,1));
+			text(xmax, base + max(counts)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+			base = base + max(counts);				
+			plot([xmin xmax], [binset binset],'k')
+			clear data_tmp dist_data counts bincenters bindiff
+			axis([xmin xmax 0 binset+1])
+			xlabel('Age (Ma)')
+			ylabel('Number')
+		end
+		
+		
+		
+		
+		
+		if get(H.radio_pdp, 'Value') == 1
+			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+			patch([x,xmax,xmin], [pdp+base,min(pdp)+base,min(pdp)+base],colors(k,:))
+			p = plot(x, pdp+base, 'Color', 'k', 'LineWidth', 2);
+			n_tmp = length(dist_data(:,1));
+			text(xmax, base + max(pdp)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+			base = base + max(pdp);
+			lgnd=legend(p, 'Probability Density Plot');
+			set(lgnd,'Color','w');
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Probability','Color','k')
+			axis([xmin xmax 0 base])
+		end
+		
+		if get(H.radio_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				xA = transpose(x);
+				n = length(dist_data(:,1));
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				patch([x,xmax,xmin], [kdeA+base,min(kdeA)+base,min(kdeA)+base],colors(k,:))
+				hl1 = plot(x,kdeA+base,'Color','k','LineWidth',2);
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + max(kdeA)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + max(kdeA);	
+				set(hl1,'linewidth',2)
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],colors(k,:))
+				hl1 = plot(x,kde1+base,'Color','k','LineWidth',2);
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + max(kde1)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + max(kde1);
+				set(hl1,'linewidth',2)
+				set(gca,'box','off')
+			end
+			%lgnd=legend('Kernel Density Estimate');
+			%set(lgnd,'Color','w');
+			%legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Probability','Color','k')
+			axis([xmin xmax 0 base])
+		end
+		
+		if get(H.radio_pdp_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				xA = transpose(x);
+				n = length(dist_data(:,1));
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				pdpm = max(pdp);
+				kde_adj = kdeA*(1/(max(kdeA)/max(pdp)));
+				pdp = pdp + pdpmax;
+				kdeA = kde_adj + kdemax;
+				p1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);
+				p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
+				plot([xmin xmax], [pdpmax pdpmax],'k')
+				pdpmax = max(pdp);
+				kdemax = max(pdp);
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + pdpm/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + pdpm;	
+				set(p1,'linewidth',2)
+				lgnd=legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
+				axis([xmin xmax 0 pdpmax+0.2*pdpmax])
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				pdpm = max(pdp);
+				kde_adj = kde1*(1/(max(kde1)/max(pdp)));
+				pdp = pdp + pdpmax;
+				kde1 = kde_adj + kdemax;
+				p = plot(x, pdp, 'Color', 'b', 'LineWidth', 2);
+				p1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);
+				plot([xmin xmax], [pdpmax pdpmax],'k')
+				pdpmax = max(pdp);
+				kdemax = max(pdp);
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + pdpm/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + pdpm;	
+				set(p1,'linewidth',2)
+				axis([xmin xmax 0 pdpmax+0.2*pdpmax])
+				lgnd=legend([p, p1], 'Probability Density Plot', 'Kernel Density Estimate');
+				set(p1,'linewidth',2)
+			end
+			set(lgnd,'Color','w');
+			%legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Probability','Color','k')
+			axis([xmin xmax 0 pdpmax])
+		end
+		
+		if get(H.radio_hist_pdp, 'Value') == 1
+			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
 			[counts bincenters] = hist(dist_data(:,1), bins);
 			bindiff = bincenters(1,2) - bincenters(1,1);
 			for i = 1:length(bincenters)
 				rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
-			end					
-			kernel = str2num(get(H.Myr_Kernel_text,'String'));
-			kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
-			kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);	
-			kde_adj = kde1*(1/(max(kde1)/max(counts)));
-			kde1 = kde_adj + binset;	
-			p1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);	
-			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			pdp_adj = pdp*(1/(max(pdp)/max(counts)));	
-			pdp = pdp_adj + binset;		
-			p = plot(x, pdp, 'Color', [0.1 0.8 0.1], 'LineWidth', 2);				
-			plot([xmin xmax], [binset binset],'k')				
-			binset = max(counts) + binset + 1;				
-			axis([xmin xmax 0 binset])
-			lgnd=legend([p,p1], 'Probability Density Plot','Kernel Density Estimate');
+			end
+			pdp_adj = pdp*(1/(max(pdp)/max(counts)));
+			pdp = pdp_adj + binset;
+			p = plot(x, pdp, 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
+			plot([xmin xmax], [binset binset],'k')
+			binset = max(counts) + binset + 1;
+			%clear data_tmp dist_data counts bincenters bindiff
+			n_tmp = length(dist_data(:,1));
+			text(xmax, base + max(counts)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+			base = base + max(counts);	
+			axis([xmin xmax 0 binset+1])
+			lgnd=legend(p, 'Probability Density Plot');
+			set(lgnd,'color','w');
+			%legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Number','Color','k')
 		end
-		set(lgnd,'Color','w');
-		%legend boxoff
-		xlabel('Age (Ma)','Color','k')
-		ylabel('Number','Color','k')
-	end	
-	clear data_tmp dist_data
+		
+		if get(H.radio_hist_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				xA = transpose(x);
+				[counts bincenters] = hist(dist_data(:,1), bins);
+				bindiff = bincenters(1,2) - bincenters(1,1);
+				for i = 1:length(bincenters)
+					rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
+				end
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				kde_adj = kdeA*(1/(max(kdeA)/max(counts)));
+				kdeA = kde_adj + binset;
+				p1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);
+				plot([xmin xmax], [binset binset],'k')
+				binset = max(counts) + binset + 1;
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + max(counts)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + max(counts);					
+				lgnd=legend(p1,'Kernel Density Estimate');
+				set(p1,'linewidth',2)
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+				xlabel('Age (Ma)','Color','k')
+				ylabel('Number','Color','k')
+				axis([xmin xmax 0 binset])
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				[counts bincenters] = hist(dist_data(:,1), bins);
+				bindiff = bincenters(1,2) - bincenters(1,1);
+				for i = 1:length(bincenters)
+					rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
+				end
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				kde_adj = kde1*(1/(max(kde1)/max(counts)));
+				kde1 = kde_adj + binset;
+				p1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);
+				plot([xmin xmax], [binset binset],'k')
+				binset = max(counts) + binset + 1;
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + max(counts)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + max(counts);					
+				axis([xmin xmax 0 binset+1])
+				lgnd=legend(p1,'Kernel Density Estimate');
+				set(p1,'linewidth',2)
+			end
+			set(lgnd,'color','w');
+			%legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Number','Color','k')
+		end
+		
+		if get(H.radio_hist_pdp_kde, 'Value') == 1
+			if get(H.optimize,'Value') == 1
+				[counts bincenters] = hist(dist_data(:,1), bins);
+				bindiff = bincenters(1,2) - bincenters(1,1);
+				for i = 1:length(bincenters)
+					rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
+				end
+				xA = transpose(x);
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				pdp_adj = pdp*(1/(max(pdp)/max(counts)));
+				pdp = pdp_adj + binset;
+				p = plot(x, pdp, 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
+				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
+				kdeA=transpose(interp1(xmesh1, kdeA, xA));
+				kde_adj = kdeA*(1/(max(kdeA)/max(counts)));
+				kdeA = kde_adj + binset;
+				p1 = plot(x,kdeA,'Color',[1 0 0],'LineWidth',2);
+				plot([xmin xmax], [binset binset],'k')
+				binset = max(counts) + binset + 1;
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + max(counts)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + max(counts);					
+				axis([xmin xmax 0 binset])
+				lgnd=legend([p,p1],'Probability Density Plot','Kernel Density Estimate');
+				set(p1,'linewidth',2)
+				set(H.Myr_Kernel_text, 'String', round(bandwidth, 2));
+				xlabel('Age (Ma)','Color','k')
+				ylabel('Number','Color','k')
+			end
+			if get(H.Myr_kernel,'Value') == 1
+				[counts bincenters] = hist(dist_data(:,1), bins);
+				bindiff = bincenters(1,2) - bincenters(1,1);
+				for i = 1:length(bincenters)
+					rectangle('Position',[bincenters(1,i)-bindiff+bindiff*gap*.01 binset bindiff-bindiff*gap*.01 counts(1,i)],'FaceColor','b','EdgeColor','k')
+				end
+				kernel = str2num(get(H.Myr_Kernel_text,'String'));
+				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
+				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
+				kde_adj = kde1*(1/(max(kde1)/max(counts)));
+				kde1 = kde_adj + binset;
+				p1 = plot(x,kde1,'Color',[1 0 0],'LineWidth',2);
+				pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
+				pdp_adj = pdp*(1/(max(pdp)/max(counts)));
+				pdp = pdp_adj + binset;
+				p = plot(x, pdp, 'Color', [0.1 0.8 0.1], 'LineWidth', 2);
+				plot([xmin xmax], [binset binset],'k')
+				binset = max(counts) + binset + 1;
+				n_tmp = length(dist_data(:,1));
+				text(xmax, base + max(counts)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
+				base = base + max(counts);				
+				axis([xmin xmax 0 binset])
+				lgnd=legend([p,p1], 'Probability Density Plot','Kernel Density Estimate');
+			end
+			set(lgnd,'Color','w');
+			%legend boxoff
+			xlabel('Age (Ma)','Color','k')
+			ylabel('Number','Color','k')
+		end
+		clear data_tmp dist_data
+	end
 	
-end		
+	
+	
+	
+	
+end
 		
 function radio_hist_Callback(hObject, eventdata, H)
 set(H.radio_hist, 'Value', 1);
@@ -610,12 +645,12 @@ x=xmin:xint:xmax;
 N = length(data(1,:))/2;
 
 % 	if get(H.input1s,'Value') == 1
-% 		columnname =   {'Age', '±1s'};
+% 		columnname =   {'Age', 'Â±1s'};
 % 		set(H.uitable1, 'ColumnName', columnname);
 % 	end
 % 
 % 	if get(H.input2s,'Value') == 1
-% 		columnname =   {'Age', '±2s'};
+% 		columnname =   {'Age', 'Â±2s'};
 % 		set(H.uitable1, 'ColumnName', columnname);
 % 	end
 
@@ -896,3 +931,10 @@ plot_distribution(hObject, eventdata, H)
 
 function Myr_kernel_text_Callback(hObject, eventdata, handles)
 plot_distribution(hObject, eventdata, H)
+
+function fontsize_n_Callback(hObject, eventdata, H)
+plot_distribution(hObject, eventdata, H)
+
+function font_anot_Callback(hObject, eventdata, H)
+plot_distribution(hObject, eventdata, H)
+
