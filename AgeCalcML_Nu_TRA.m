@@ -263,7 +263,7 @@ waitbar(3/waitnum,h,'Calculating. Please wait...');
 if mean(diff(t0_idx)) > 140 && mean(diff(t0_idx)) < 160
 	set(H.method,'Value',1)
 	%	set(H.intg,'String','15 s')
-elseif mean(diff(t0_idx)) > 50 && mean(diff(t0_idx)) < 70
+elseif mean(diff(t0_idx)) > 50 && mean(diff(t0_idx)) < 75
 	set(H.method,'Value',2)
 	%	set(H.intg,'String','12 s')
 	set(H.downhole,'Value',0)
