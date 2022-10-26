@@ -1275,7 +1275,7 @@ for j = 1:length(sample)
 		v180_FC(j,1) = 0;
 	end	
 	
-	if STD_SL_idx(j,1) == 1
+	if STD_SL_idx(j,1) == 1 && length(nonzeros(Filter_95(:,j))) > 1
 		Ratio_STD_176_177_SL_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
 		Ratio_STD_176_177_SL_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
 		LuHf_SL(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
@@ -1287,7 +1287,8 @@ for j = 1:length(sample)
 		Yb_Lu_Hf_SL_mean(j,1) = mean(nonzeros(Yb_Lu_Hf(:,j)));
 		v180_SL(j,1) = mean(nonzeros(BLS_177(:,j)./0.186));	
 	end
-	if STD_SL_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.28170) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1
+	if STD_SL_idx(j,1) == 1 && abs(mean(nonzeros(Filter_95(:,j))) + Hf_bias - 0.28170) > str2num(get(H.flag,'String')) && get(H.filterstandards,'Value') == 1 || ...
+			length(nonzeros(Filter_95(:,j))) <= 1
 		sample(j,1) = {'xx'};
 		STD_SL_idx(j,1) = 0;
 		Ratio_STD_176_177_SL_mean(j,1) = 0;
