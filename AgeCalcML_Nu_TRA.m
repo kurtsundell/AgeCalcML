@@ -1366,7 +1366,7 @@ UTh = ppm238./ppm232; %Column BC
 
 for i = 1:data_count
 	ratio68(i,1) = fcbc68(i,1)-((0.000000000155/0.0000092)*(((1/UTh(i,1))/2.3)-1)); %Column BJ
-	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.82; %Column BH
+	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.818; %Column BH
 end
 
 for i = 1:data_count
@@ -1857,7 +1857,7 @@ for i = 1:length(sigx_sq_STD1)
 end
 
 %age_label2_x = 0.742701185586296;
-age_label2_x = STD1_68*(1/STD1_67)*137.88;
+age_label2_x = STD1_68*(1/STD1_67)*137.818;
 %age_label2_y = 0.0912660713153783;
 age_label2_y = STD1_68;
 
@@ -2216,7 +2216,7 @@ th = nonzeros(th);
 bestage = nonzeros(bestage);
 
 for i = 1:length(u)
-	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.82)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
+	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.818)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
 		+6*th(i,1)*(exp(0.0000000000495*bestage(i,1)*1000000)-1);
 end
 
@@ -3114,7 +3114,7 @@ for i = 1:length(sigx_sq_STD1)
 end
 
 %age_label2_x = 0.742701185586296;
-age_label2_x = STD1_68*(1/STD1_67)*137.88;
+age_label2_x = STD1_68*(1/STD1_67)*137.818;
 %age_label2_y = 0.0912660713153783;
 age_label2_y = STD1_68;
 
@@ -3693,7 +3693,7 @@ th = nonzeros(th);
 bestage = nonzeros(bestage);
 
 for i = 1:length(u)
-	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.82)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
+	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.818)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
 		+6*th(i,1)*(exp(0.0000000000495*bestage(i,1)*1000000)-1);
 end
 
@@ -5363,8 +5363,8 @@ geochron_out(27:sum(export_num)+26,1) = geochron_out_temp(:,1);
 geochron_out(27:sum(export_num)+26,2) = geochron_out_temp(:,51);
 geochron_out(27:sum(export_num)+26,3) = geochron_out_temp(:,53);
 geochron_out(27:sum(export_num)+26,4) = geochron_out_temp(:,55);
-geochron_out(27:sum(export_num)+26,5) = geochron_out_temp(:,13);
-geochron_out(27:sum(export_num)+26,6) = num2cell(2*cell2num(geochron_out_temp(:,14))); %2s
+geochron_out(27:sum(export_num)+26,5) = geochron_out_temp(:,56);
+geochron_out(27:sum(export_num)+26,6) = num2cell(2*cell2num(geochron_out_temp(:,57))); %2s
 geochron_out(27:sum(export_num)+26,7) = geochron_out_temp(:,28);
 geochron_out(27:sum(export_num)+26,8) = num2cell(2*cell2num(geochron_out_temp(:,29))); %2s
 geochron_out(27:sum(export_num)+26,9) = geochron_out_temp(:,30);
@@ -5411,8 +5411,8 @@ geochron_out(27:rejl,23) = geochron_out_temp_rej(:,1);
 geochron_out(27:rejl,24) = geochron_out_temp_rej(:,51);
 geochron_out(27:rejl,25) = geochron_out_temp_rej(:,53);
 geochron_out(27:rejl,26) = geochron_out_temp_rej(:,55);
-geochron_out(27:rejl,27) = geochron_out_temp_rej(:,13);
-geochron_out(27:rejl,28) = num2cell(2*cell2num(geochron_out_temp_rej(:,14))); %2s
+geochron_out(27:rejl,27) = geochron_out_temp_rej(:,56);
+geochron_out(27:rejl,28) = num2cell(2*cell2num(geochron_out_temp_rej(:,57))); %2s
 geochron_out(27:rejl,29) = geochron_out_temp_rej(:,60);
 geochron_out(27:rejl,30) = num2cell(2*cell2num(geochron_out_temp_rej(:,61))); %2s
 geochron_out(27:rejl,31) = geochron_out_temp_rej(:,62);
@@ -5465,8 +5465,8 @@ geochron_out(27:stdsl,45) = geochron_out_temp_stds(:,1);
 geochron_out(27:stdsl,46) = geochron_out_temp_stds(:,51);
 geochron_out(27:stdsl,47) = geochron_out_temp_stds(:,53);
 geochron_out(27:stdsl,48) = geochron_out_temp_stds(:,55);
-geochron_out(27:stdsl,49) = geochron_out_temp_stds(:,13);
-geochron_out(27:stdsl,50) = num2cell(2*cell2num(geochron_out_temp_stds(:,14))); %2s
+geochron_out(27:stdsl,49) = geochron_out_temp_stds(:,56);
+geochron_out(27:stdsl,50) = num2cell(2*cell2num(geochron_out_temp_stds(:,57))); %2s
 geochron_out(27:stdsl,51) = geochron_out_temp_stds(:,60);
 geochron_out(27:stdsl,52) = num2cell(2*cell2num(geochron_out_temp_stds(:,61))); %2s
 geochron_out(27:stdsl,53) = geochron_out_temp_stds(:,62);
@@ -5981,8 +5981,8 @@ geochron_out(27:end,1) = geochron_out_temp(:,1);
 geochron_out(27:end,2) = geochron_out_temp(:,51);
 geochron_out(27:end,3) = geochron_out_temp(:,53);
 geochron_out(27:end,4) = geochron_out_temp(:,55);
-geochron_out(27:end,5) = geochron_out_temp(:,13);
-geochron_out(27:end,6) = num2cell(2*cell2num(geochron_out_temp(:,14))); %2s
+geochron_out(27:end,5) = geochron_out_temp(:,56);
+geochron_out(27:end,6) = num2cell(2*cell2num(geochron_out_temp(:,57))); %2s
 geochron_out(27:end,7) = geochron_out_temp(:,28);
 geochron_out(27:end,8) = num2cell(2*cell2num(geochron_out_temp(:,29))); %2s
 geochron_out(27:end,9) = geochron_out_temp(:,30);
@@ -6029,8 +6029,8 @@ geochron_out(27:rejl,23) = geochron_out_temp_rej(:,1);
 geochron_out(27:rejl,24) = geochron_out_temp_rej(:,51);
 geochron_out(27:rejl,25) = geochron_out_temp_rej(:,53);
 geochron_out(27:rejl,26) = geochron_out_temp_rej(:,55);
-geochron_out(27:rejl,27) = geochron_out_temp_rej(:,13);
-geochron_out(27:rejl,28) = num2cell(2*cell2num(geochron_out_temp_rej(:,14))); %2s
+geochron_out(27:rejl,27) = geochron_out_temp_rej(:,56);
+geochron_out(27:rejl,28) = num2cell(2*cell2num(geochron_out_temp_rej(:,57))); %2s
 geochron_out(27:rejl,29) = geochron_out_temp_rej(:,60);
 geochron_out(27:rejl,30) = num2cell(2*cell2num(geochron_out_temp_rej(:,61))); %2s
 geochron_out(27:rejl,31) = geochron_out_temp_rej(:,62);
@@ -6083,8 +6083,8 @@ geochron_out(27:stdsl,45) = geochron_out_temp_stds(:,1);
 geochron_out(27:stdsl,46) = geochron_out_temp_stds(:,51);
 geochron_out(27:stdsl,47) = geochron_out_temp_stds(:,53);
 geochron_out(27:stdsl,48) = geochron_out_temp_stds(:,55);
-geochron_out(27:stdsl,49) = geochron_out_temp_stds(:,13);
-geochron_out(27:stdsl,50) = num2cell(2*cell2num(geochron_out_temp_stds(:,14))); %2s
+geochron_out(27:stdsl,49) = geochron_out_temp_stds(:,56);
+geochron_out(27:stdsl,50) = num2cell(2*cell2num(geochron_out_temp_stds(:,57))); %2s
 geochron_out(27:stdsl,51) = geochron_out_temp_stds(:,60);
 geochron_out(27:stdsl,52) = num2cell(2*cell2num(geochron_out_temp_stds(:,61))); %2s
 geochron_out(27:stdsl,53) = geochron_out_temp_stds(:,62);

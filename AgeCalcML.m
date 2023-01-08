@@ -28,20 +28,23 @@ AgeCalcML_Nu_TRA
 function nu_hf_Callback(hObject, eventdata, H)
 AgeCalcML_Nu_Hf
 
-function e2_upb_Callback(hObject, eventdata, H)
+function e2_upb_tree_Callback(hObject, eventdata, H)
 AgeCalcML_E2
 
-function e2_tree_Callback(hObject, eventdata, H)
-AgeCalcML_E2
+function e2_upb_tra_Callback(hObject, eventdata, H)
+AgeCalcML_E2_TRA
 
-function scanlistnu_Callback(hObject, eventdata, H)
-Scanlist_Nu
+function e2_tree_tra_Callback(hObject, eventdata, H)
 
-function pushbutton60_Callback(hObject, eventdata, H)
-Scanlist_Nu_Large_n_Igneous
 
-function scanliste2_Callback(hObject, eventdata, H)
-Scanlist_E2
+function e2_monazite_upb_Callback(hObject, eventdata, H)
+
+
+function e2_monazite_tree_Callback(hObject, eventdata, H)
+
+
+function scanlist_Callback(hObject, eventdata, H)
+Scanlist
 
 function zirconspotfinder_Callback(hObject, eventdata, H)
 ZirconSpotFinder

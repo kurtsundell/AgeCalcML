@@ -141,7 +141,47 @@ binset = 0;
 pdpmax = 0;
 kdemax = 0;
 
-colors = jet(N);
+
+if get(H.s_color, 'Value') == 1
+	face = 'r';
+elseif get(H.s_color, 'Value') == 2
+	face = 'g';
+elseif get(H.s_color, 'Value') == 3
+	face = 'b';
+elseif get(H.s_color, 'Value') == 4
+	face = 'y';
+elseif get(H.s_color, 'Value') == 5
+	face = 'm';
+elseif get(H.s_color, 'Value') == 6
+	face = 'c';	
+elseif get(H.s_color, 'Value') == 7
+	face = 'w';
+elseif get(H.s_color, 'Value') == 8
+	face = 'k';
+elseif get(H.s_color, 'Value') == 9
+	face = 'none';	
+end
+
+if get(H.s_edge, 'Value') == 1
+	edge = 'r';
+elseif get(H.s_edge, 'Value') == 2
+	edge = 'g';
+elseif get(H.s_edge, 'Value') == 3
+	edge = 'b';
+elseif get(H.s_edge, 'Value') == 4
+	edge = 'y';
+elseif get(H.s_edge, 'Value') == 5
+	edge = 'm';
+elseif get(H.s_edge, 'Value') == 6
+	edge = 'c';	
+elseif get(H.s_edge, 'Value') == 7
+	edge = 'w';
+elseif get(H.s_edge, 'Value') == 8
+	edge = 'k';
+elseif get(H.s_edge, 'Value') == 9
+	edge = 'none';	
+end
+
 
 base = 0;
 for k = 1:N
@@ -187,8 +227,8 @@ for k = 1:N
 		
 		if get(H.radio_pdp, 'Value') == 1
 			pdp=pdp5(dist_data(:,1),dist_data(:,2),xmin,xmax,xint); %1 sigma pdp input data
-			patch([x,xmax,xmin], [pdp+base,min(pdp)+base,min(pdp)+base],colors(k,:))
-			p = plot(x, pdp+base, 'Color', 'k', 'LineWidth', 2);
+			patch([x,xmax,xmin], [pdp+base,min(pdp)+base,min(pdp)+base],face)
+			p = plot(x, pdp+base, 'Color', edge, 'LineWidth', 2);
 			n_tmp = length(dist_data(:,1));
 			text(xmax, base + max(pdp)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
 			base = base + max(pdp);
@@ -205,8 +245,8 @@ for k = 1:N
 				n = length(dist_data(:,1));
 				[bandwidth,kdeA,xmesh1,cdf]=kde(dist_data(:,1),length(x),xmin,xmax);
 				kdeA=transpose(interp1(xmesh1, kdeA, xA));
-				patch([x,xmax,xmin], [kdeA+base,min(kdeA)+base,min(kdeA)+base],colors(k,:))
-				hl1 = plot(x,kdeA+base,'Color','k','LineWidth',2);
+				patch([x,xmax,xmin], [kdeA+base,min(kdeA)+base,min(kdeA)+base],face)
+				hl1 = plot(x,kdeA+base,'Color', edge,'LineWidth',2);
 				n_tmp = length(dist_data(:,1));
 				text(xmax, base + max(kdeA)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
 				base = base + max(kdeA);	
@@ -217,8 +257,8 @@ for k = 1:N
 				kernel = str2num(get(H.Myr_Kernel_text,'String'));
 				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
 				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-				patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],colors(k,:))
-				hl1 = plot(x,kde1+base,'Color','k','LineWidth',2);
+				patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],face)
+				hl1 = plot(x,kde1+base,'Color',edge,'LineWidth',2);
 				n_tmp = length(dist_data(:,1));
 				text(xmax, base + max(kde1)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
 				base = base + max(kde1);
@@ -938,3 +978,8 @@ plot_distribution(hObject, eventdata, H)
 function font_anot_Callback(hObject, eventdata, H)
 plot_distribution(hObject, eventdata, H)
 
+function s_edge_Callback(hObject, eventdata, H)
+plot_distribution(hObject, eventdata, H)
+
+function s_color_Callback(hObject, eventdata, H)
+plot_distribution(hObject, eventdata, H)

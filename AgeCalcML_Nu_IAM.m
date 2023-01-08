@@ -661,7 +661,7 @@ Macro1_Output(1:data_count+1,1:20) = {0}; % Preallocate
 Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 ± %', 'm68', ...
 	'206207', '67 ± %', '206204', '64 ± %', '208232', '82 ± %', '208204', '84 ± %'};
 Macro1_Output(2:end,1) = sample;
-Macro1_Output(2:end,2) = {serial};
+Macro1_Output(2:end,2) = serial;
 if FAR == 1
 	Macro1_Output(2:end,3) = num2cell(CPS_202);
 else
@@ -930,7 +930,7 @@ UTh = ppm238./ppm232; %Column BC
 
 for i = 1:data_count
 ratio68(i,1) = fcbc68(i,1)-((0.000000000155/0.0000092)*(((1/UTh(i,1))/2.3)-1)); %Column BJ
-ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.88; %Column BH
+ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.818; %Column BH
 end
 
 for i = 1:data_count
@@ -1431,7 +1431,7 @@ hold on
 end
 
 %age_label2_x = 0.742701185586296;
-age_label2_x = STD1_68*(1/STD1_67)*137.88;
+age_label2_x = STD1_68*(1/STD1_67)*137.818;
 %age_label2_y = 0.0912660713153783;
 age_label2_y = STD1_68;
 
@@ -1835,7 +1835,7 @@ th = nonzeros(th);
 bestage = nonzeros(bestage);
 
 for i = 1:length(u)
-	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.82)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
+	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.818)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
 		+6*th(i,1)*(exp(0.0000000000495*bestage(i,1)*1000000)-1);
 end
 
@@ -6233,7 +6233,7 @@ geochron_out(27:end,1) = geochron_out_temp(:,1);
 geochron_out(27:end,2) = geochron_out_temp(:,51);
 geochron_out(27:end,3) = geochron_out_temp(:,53);
 geochron_out(27:end,4) = geochron_out_temp(:,55);
-geochron_out(27:end,5:6) = geochron_out_temp(:,13:14);
+geochron_out(27:end,5:6) = geochron_out_temp(:,56:57);
 geochron_out(27:end,7:11) = geochron_out_temp(:,28:32);
 geochron_out(27:end,12:17) = geochron_out_temp(:,65:70);
 geochron_out(27:end,18:19) = geochron_out_temp(:,73:74);
@@ -6688,7 +6688,7 @@ hold on
 end
 
 %age_label2_x = 0.742701185586296;
-age_label2_x = STD1_68*(1/STD1_67)*137.88;
+age_label2_x = STD1_68*(1/STD1_67)*137.818;
 %age_label2_y = 0.0912660713153783;
 age_label2_y = STD1_68;
 
@@ -13432,7 +13432,7 @@ hold on
 end
 
 %age_label2_x = 0.742701185586296;
-age_label2_x = STD1_68*(1/STD1_67)*137.88;
+age_label2_x = STD1_68*(1/STD1_67)*137.818;
 %age_label2_y = 0.0912660713153783;
 age_label2_y = STD1_68;
 
@@ -13722,7 +13722,7 @@ th = nonzeros(th);
 bestage = nonzeros(bestage);
 
 for i = 1:length(u)
-	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.82)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
+	raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.818)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
 		+6*th(i,1)*(exp(0.0000000000495*bestage(i,1)*1000000)-1);
 end
 
