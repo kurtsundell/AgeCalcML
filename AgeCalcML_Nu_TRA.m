@@ -2403,13 +2403,20 @@ for i = 1:length(time3)
 		labelpoints(x3(i,1), y3(i,1), age_label3(i,1), 'SE', .0002);
 	end
 end
-axis([min(min(elpt_out(:,1,:))) - min(min(elpt_out(:,1,:)))*.01 max(max(elpt_out(:,1,:))) + max(max(elpt_out(:,1,:)))*.01 ...
-	min(min(elpt_out(:,2,:))) - min(min(elpt_out(:,2,:)))*.01 max(max(elpt_out(:,2,:))) + max(max(elpt_out(:,2,:)))*.01]);
-xlabel('207Pb/235U');
-ylabel('206Pb/238U');
+
+if sum(sum(elpt_out)) > 0
+	
+	axis([min(min(elpt_out(:,1,:))) - min(min(elpt_out(:,1,:)))*.01 max(max(elpt_out(:,1,:))) + max(max(elpt_out(:,1,:)))*.01 ...
+		min(min(elpt_out(:,2,:))) - min(min(elpt_out(:,2,:)))*.01 max(max(elpt_out(:,2,:))) + max(max(elpt_out(:,2,:)))*.01]);
+
+
+end
+
+
 
 p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
-
+xlabel('207Pb/235U');
+ylabel('206Pb/238U');
 legend([p3], bestage,  'Location', 'northwest');
 
 % DISTRIBUTION PLOT %%
