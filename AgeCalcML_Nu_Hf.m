@@ -380,7 +380,7 @@ if TRA == 1
 		for i = 1:data_count
 			values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
 			baseline(1:6,1:cols,i) = values_all(1:6,1:cols,i);
-			integration(1:30,1:cols,i) = values_all(10:39,1:cols,i);
+			integration(1:10,1:cols,i) = values_all(10:19,1:cols,i);
 		end
 		
 		for j = 1:data_count
@@ -1169,7 +1169,11 @@ for j = 1:length(sample)
 	
 	if STD_MT_idx(j,1) == 1
 		Ratio_STD_176_177_MT_mean(j,1) = mean(nonzeros(Filter_95(:,j))) + Hf_bias;
-		Ratio_STD_176_177_MT_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		if length(nonzeros(Filter_95(:,j))) > 1
+			Ratio_STD_176_177_MT_SE(j,1) = std(nonzeros(Filter_95(:,j)))/sqrt(length(nonzeros(Filter_95(:,j))));
+		elseif length(nonzeros(Filter_95(:,j))) == 1
+			Ratio_STD_176_177_MT_SE(j,1) = 0.0000000001;
+		end
 		LuHf_MT(j,1) = mean(nonzeros(Lu176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
 		LuHf_MTs(j,1) = (std(nonzeros(Lu176V(:,j))./nonzeros(BLS_177(:,j))))/length(nonzeros(BLS_177(:,j)));		
 		YbHf_MT(j,1) = mean(nonzeros(Yb176V(:,j)))/mean(nonzeros(BLS_177(:,j)));
