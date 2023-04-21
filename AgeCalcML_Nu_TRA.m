@@ -1103,7 +1103,7 @@ STD1_232_mean = mean(nonzeros(STD1_232));
 
 if get(H.largenigneous, 'Value') == 0
 	
-	if length(nonzeros(ff68(:,1))) > 10 && data_count > 30
+	if length(nonzeros(ff68(:,1))) > 10 && data_count > 32
 		
 		for i = 1:5
 			ffsw68(i,1) = mean(nonzeros([ff68(1:15+i,1)]));
