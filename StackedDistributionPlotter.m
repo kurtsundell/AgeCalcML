@@ -141,6 +141,7 @@ binset = 0;
 pdpmax = 0;
 kdemax = 0;
 
+spac = str2num(get(H.spacing,'String'));
 
 if get(H.s_color, 'Value') == 1
 	face = 'r';
@@ -187,6 +188,8 @@ base = 0;
 for k = 1:N
 	data_tmp = data(:,k*2-1:k*2);
 	
+	
+	
 	dist_data = [];
 	
 	for i = 1:length(data_tmp(:,1))
@@ -197,7 +200,7 @@ for k = 1:N
 		end
 	end
 	
-	if isempty(dist_data) == 0
+	if isempty(dist_data) == 0 && sum(length(nonzeros(dist_data(:,1)))) > 1
 		
 		dist_data = dist_data(any(dist_data ~= 0,2),:);
 		if get(H.input2s,'Value') == 1
@@ -231,7 +234,7 @@ for k = 1:N
 			p = plot(x, pdp+base, 'Color', edge, 'LineWidth', 2);
 			n_tmp = length(dist_data(:,1));
 			text(xmax, base + max(pdp)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
-			base = base + max(pdp);
+			base = base + max(pdp) + spac;
 			lgnd=legend(p, 'Probability Density Plot');
 			set(lgnd,'Color','w');
 			xlabel('Age (Ma)','Color','k')
@@ -257,7 +260,13 @@ for k = 1:N
 				kernel = str2num(get(H.Myr_Kernel_text,'String'));
 				kernel_dist_data(1:length(dist_data(:,1)),1) = kernel;
 				kde1=pdp5(dist_data(:,1),kernel_dist_data,xmin,xmax,xint);
-				patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],face)
+				
+				if get(H.yeq,'Value') == 1
+					kde1 = kde1*(1/(max(kde1)/(1/N)));
+				end
+				if get(H.s_color,'Value') < 9
+					patch([x,xmax,xmin], [kde1+base,min(kde1)+base,min(kde1)+base],face)
+				end
 				hl1 = plot(x,kde1+base,'Color',edge,'LineWidth',2);
 				n_tmp = length(dist_data(:,1));
 				text(xmax, base + max(kde1)/2, strcat(Name(k,1),'{ }','(n =','{ }',num2str(n_tmp),')'),'fontsize',str2num(get(H.font_anot,'String')), 'horizontalAlignment', 'right')
@@ -701,6 +710,8 @@ kdemax = 0;
 
 colors = jet(N);
 
+
+
 base = 0;
 for k = 1:N
 	data_tmp = data(:,k*2-1:k*2);
@@ -982,4 +993,12 @@ function s_edge_Callback(hObject, eventdata, H)
 plot_distribution(hObject, eventdata, H)
 
 function s_color_Callback(hObject, eventdata, H)
+plot_distribution(hObject, eventdata, H)
+
+
+function yeq_Callback(hObject, eventdata, H)
+plot_distribution(hObject, eventdata, H)
+
+
+function spacing_Callback(hObject, eventdata, H)
 plot_distribution(hObject, eventdata, H)
