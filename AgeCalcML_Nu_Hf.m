@@ -380,7 +380,7 @@ if TRA == 1
 		for i = 1:data_count
 			values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
 			baseline(1:6,1:cols,i) = values_all(1:6,1:cols,i);
-			integration(1:10,1:cols,i) = values_all(10:19,1:cols,i);
+			integration(1:30,1:cols,i) = values_all(10:39,1:cols,i);
 		end
 		
 		for j = 1:data_count
