@@ -2079,8 +2079,8 @@ offset_FC = nonzeros(offset_FC);
 
 
 %tab = {'Table-__ . Hf isotopic data.'};
-%heads = {'Order'	'Sample'	'(176Yb + 176Lu) / 176Hf (%)'	'Volts Hf'	'176Hf/177Hf'	'± (1s)'	'176Lu/177Hf'	'176Hf/177Hf (T)'	'E-Hf (0)'...
-%	'E-Hf (0) ± (1s)'	'E-Hf (T)'	'Age (Ma)'};
+%heads = {'Order'	'Sample'	'(176Yb + 176Lu) / 176Hf (%)'	'Volts Hf'	'176Hf/177Hf'	'Â± (1s)'	'176Lu/177Hf'	'176Hf/177Hf (T)'	'E-Hf (0)'...
+%	'E-Hf (0) Â± (1s)'	'E-Hf (T)'	'Age (Ma)'};
 
 
 
@@ -2091,8 +2091,8 @@ heads2 = {'LA-MC-ICPMS Lu-Hf isotopic analyses of zircon.'};
 
 heads3 = {'1)'	'2)'	'3)'	'4)'	'5)'	'6)'	'7)'	'8)'	'9)'	'10)'	'11)'	'12)'	'13)'	'14)'	'15)'	'16)'	'17)'	'18)'	'19)'	'20)'};
 
-heads4 = {'Sample' '176Hf/177Hf'	'± 2 SE'	'176Lu/177Hf'	'± 2 SE'	'176Yb/177Hf'	'± 2 SE'	'178Hf/177Hf'	'± 2 SE'	'EHf (0)'	'± 2 SE' ...
-	'176Hf/177Hf (i)'	'EHf (i)'	'± 2 SE'	'Age (Ma)'	'± 2 SE'	'(176Yb+176Lu)/176Hf (%)'	'Volts Hf'	'Correction (EHf)'	'Age (Ma)'	'EHf (i)'};
+heads4 = {'Sample' '176Hf/177Hf'	'Â± 2 SE'	'176Lu/177Hf'	'Â± 2 SE'	'176Yb/177Hf'	'Â± 2 SE'	'178Hf/177Hf'	'Â± 2 SE'	'EHf (0)'	'Â± 2 SE' ...
+	'176Hf/177Hf (i)'	'EHf (i)'	'Â± 2 SE'	'Age (Ma)'	'Â± 2 SE'	'(176Yb+176Lu)/176Hf (%)'	'Volts Hf'	'Correction (EHf)'	'Age (Ma)'	'EHf (i)'};
 
 EXPORT{sum(SAMPLES_idx)+sum(STD_idx)+30,21} = [];
 
@@ -2523,6 +2523,10 @@ H.offset_91500 = offset_91500;
 H.offset_PLES = offset_PLES;
 H.offset_FC = offset_FC;
 
+H.values_tmp = values_tmp;
+H.t0_180 = t0_180;
+H.t0_idx = t0_idx;
+H.data_count = data_count;
 
 if sum(SAMPLES_idx) > 0
 	H.eHf_UNKNOWNS = eHf_UNKNOWNS;
@@ -3049,3 +3053,66 @@ function filterstandards_Callback(hObject, eventdata, H)
 
 
 function flagunknowns_Callback(hObject, eventdata, H)
+
+
+function tzero_Callback(hObject, eventdata, H)
+
+data_count = H.data_count;
+
+figure
+hold on
+plot(H.values_tmp(:,12),H.values_tmp(:,1))
+scatter(H.t0_180,0.1*ones(length(H.t0_180)),'filled')
+xlabel('Time (s)')
+ylabel('180Hf')
+dim = [.2 .5 .3 .3];
+str = strcat('sample n = ', {' '}, mat2str(data_count), {'   '}, 't zeros = ',{' '}, mat2str(length(H.t0_180)));
+annotation('textbox',dim,'String',str,'FitBoxToText','on');
+if data_count == length(H.t0_180)
+	labelpoints (H.t0_180,zeros(length(H.t0_180),1), H.sample);
+else
+	labelpoints (H.t0_180,zeros(length(H.t0_180),1), [1:1:length(H.t0_180)]);
+end
+
+figure
+hold on
+plot(H.values_tmp(:,11),H.values_tmp(:,1))
+scatter(H.t0_idx,0.1*ones(length(H.t0_idx)),'filled')
+xlabel('Index')
+ylabel('180Hf')
+dim = [.2 .5 .3 .3];
+str = strcat('sample n = ', {' '}, mat2str(data_count), {'   '}, 't zeros = ',{' '}, mat2str(length(H.t0_idx)));
+annotation('textbox',dim,'String',str,'FitBoxToText','on');
+if data_count == length(H.t0_idx)
+	labelpoints (H.t0_180,zeros(length(H.t0_idx),1), H.sample);
+else
+	labelpoints (H.t0_idx,zeros(length(H.t0_idx),1), [1:1:length(H.t0_idx)]);
+end
+
+% 
+% plot(values_tmp(:,11),80000000.*values_tmp(:,1),'b','Linewidth',1)
+% scatter(values_tmp(:,11),80000000.*values_tmp(:,1),10,'filled','MarkerFaceColor','k')
+% scatter(t0_238,zeros(length(t0_238),1),'filled','MarkerFaceColor','r')
+% xlabel('Time (seconds)')
+% ylabel('238U Counts per Second (CPS)')
+% dim = [.2 .5 .3 .3];
+% str = strcat('sample n = ', {' '}, mat2str(data_count), {'   '}, 't zeros = ',{' '}, mat2str(length(t0_idx)))
+% annotation('textbox',dim,'String',str,'FitBoxToText','on');
+% 
+% if data_count == length(t0_idx)
+% 	labelpoints (t0_238,zeros(length(t0_238),1), sample);
+% else
+% 	labelpoints (t0_238,zeros(length(t0_238),1), [1:1:length(t0_238)]);
+% end
+
+
+
+
+
+
+
+
+
+
+
+
