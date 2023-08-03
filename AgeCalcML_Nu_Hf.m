@@ -33,6 +33,8 @@ guidata(hObject,H);
 
 function reduce_data_Callback(hObject, eventdata, H)
 
+
+
 cla(H.STDS_plot,'reset');
 cla(H.SingleAnalysis_plot,'reset');
 cla(H.Results_plot,'reset');
@@ -120,6 +122,10 @@ end
 filename_data(all(cellfun('isempty',filename_data),2),:) = [];
 
 h = waitbar(0,'Reducing data. Please wait...');
+
+
+
+
 
 if TRA == 0
 	
@@ -210,9 +216,23 @@ if TRA == 0
 	data_count = length(sample);
 end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 if TRA == 1
 	firstline = 74;
 	cols = 13;
+	
 	
 	if length(filename_scancsv) == 1
 		if ispc == 1
@@ -229,51 +249,81 @@ if TRA == 1
 			fullpathname_names = char(strcat(folder_name, '/', filename_scancsv{1,1}));
 		end
 		
-		Data = importdata(char(fullpathname_data),',',500000);
-		Names = importdata(fullpathname_names);
-		Names = Names(2:end,1);
-		data_count = length(Names);
 		
-		for i = 1:data_count
-			name_tmp = char(Names(i,1));
-			name_tmp_idx = strfind(name_tmp, '"');
-			sample{i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
-			clear name_tmp name_tmp_idx
+		
+		
+		
+		Data = importdata(char(fullpathname_data),',',500000);
+		
+		if H.reduced == 0
+			Names = importdata(fullpathname_names);
+			Names = Names(2:end,1);
+		end
+
+		
+		if H.reduced == 1
+			Names = H.Names;
 		end
 		
-		%{
+		
+		data_count = length(Names);
+		
+		
+		
+		
+		
+		if H.reduced == 0
+			for i = 1:data_count
+				name_tmp = char(Names(i,1));
+				name_tmp_idx = strfind(name_tmp, '"');
+				sample{i,:} = name_tmp(1,(name_tmp_idx(1,1)+1):(name_tmp_idx(1,2)-1));
+				clear name_tmp name_tmp_idx
+			end
+		end
+		
+		if H.reduced == 1
+			sample = H.sample;
+		end		
+		
+		
+		
+	end
+	
+	
+	
+	%{
 		if 50*length(sample)+firstline < length(Data(firstline:end,1))
 			rws = 50*length(sample)+firstline;
 		else
 			rws = length(Data(firstline:end,1));
 		end
-		%}
-		rws = length(Data(firstline:end,1));
-		
-		%rws = 50*length(sample)+firstline;
-		values_tmp1{rws,cols} = [];
-		for j = 1:rws
-			values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
-			values_tmp1(j,1:13) = values_all_cell{j,1}(1,1:13);
+	%}
+	rws = length(Data(firstline:end,1));
+	
+	%rws = 50*length(sample)+firstline;
+	values_tmp1{rws,cols} = [];
+	for j = 1:rws
+		values_all_cell(j,:) = regexp(Data(j+firstline-1), ',', 'split');
+		values_tmp1(j,1:13) = values_all_cell{j,1}(1,1:13);
+	end
+	% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
+	% with the 2021a update
+	if verLessThan('matlab', '9.6') == 1
+		for k = 1:cols
+			values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
 		end
-		% patch for MATLAB versions earlier than 2018b, cell #11 has weirdness
-		% with the 2021a update
-		if verLessThan('matlab', '9.6') == 1
-			for k = 1:cols
+	else
+		for k = 1:cols
+			if k ~= 12
 				values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
 			end
-		else
-			for k = 1:cols
-				if k ~= 12
-					values_tmp(:,k) = str2num(str2mat(values_tmp1(:,k)));
-				end
-			end
-			for j = 1:rws
-				values_tmp(j,12) = str2num(strrep(cell2mat(values_all_cell{j,1}(1,12)),'"',''));
-			end
 		end
-		
-		%{
+		for j = 1:rws
+			values_tmp(j,12) = str2num(strrep(cell2mat(values_all_cell{j,1}(1,12)),'"',''));
+		end
+	end
+	
+	%{
 			values_tmp = zeros(length(Data(firstline:end,1)),cols);
 			for j = 1:length(Data(firstline:end,1))
 				values_all_cell = regexp(Data(j+firstline-1), ',', 'split');
@@ -281,121 +331,123 @@ if TRA == 1
 					values_tmp(j,k) = str2num(cell2mat(values_all_cell{1,1}(1,k)));
 				end
 			end
-		%}
-		
-		
-		thresh = 0;
-		
-		for i = 1:rws
-			if values_tmp(i,1) > thresh
-				thresh180(i,1) = 1;
-			else
-				thresh180(i,1) = 0;
-			end
+	%}
+	
+	
+	thresh = 0;
+	
+	for i = 1:rws
+		if values_tmp(i,1) > thresh
+			thresh180(i,1) = 1;
+		else
+			thresh180(i,1) = 0;
 		end
-		
-		for i = 2:rws-2
-			if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
-					values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh
-				t0_180(i,1) = values_tmp(i,cols-1);
-				t0_idx(i,1) = values_tmp(i,cols-2);
-			else
-				t0_180(i,1) = 0;
-			end
+	end
+	
+	for i = 2:rws-2
+		if thresh180(i,1) == 1 && thresh180(i-1) == 0 && values_tmp(i+1,1) > thresh && values_tmp(i+2,1) > thresh && values_tmp(i+3,1) > thresh && values_tmp(i+4,1) > thresh && ...
+				values_tmp(i-1,1) < thresh && values_tmp(i-2,1) < thresh && values_tmp(i-3,1) < thresh && values_tmp(i-4,1) < thresh
+			t0_180(i,1) = values_tmp(i,cols-1);
+			t0_idx(i,1) = values_tmp(i,cols-2);
+		else
+			t0_180(i,1) = 0;
 		end
-		
-		t0_180 = nonzeros(t0_180);
-		t0_idx = nonzeros(t0_idx);
-		diff_idx = diff(t0_idx);
-		diff_ch =  median(diff_idx) < diff_idx - 10;
-		%{
+	end
+	
+	t0_180 = nonzeros(t0_180);
+	t0_idx = nonzeros(t0_idx);
+	diff_idx = diff(t0_idx);
+	diff_ch =  median(diff_idx) < diff_idx - 10;
+	%{
 		figure
 		hold on
 		plot(1:1:length(values_tmp(:,1)),values_tmp(:,1))
 		scatter(t0_idx,zeros(length(t0_idx),1),'filled')
 		hold off
-		%}
-		
-		
-		
-		
-		%T Zero Find by Medians
-		% Missing t0s (singles)
-		if data_count > length(t0_idx) && sum(diff_ch) > 0
-			for i = 1:length(diff_ch)
-				if diff_ch(i,1) == 1
-					t0_adj = t0_idx(1:i,1);
-					t0_adj(i+1,1) = 0;
-					t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-					t0_idx_bf = t0_adj(i,1);
-					t0_idx_af = t0_adj(i+2,1);
-					t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);
-					t0_idx = t0_adj;
-					diff_idx = diff(nonzeros(t0_adj));
-					diff_ch =  median(diff_idx) < diff_idx - 10;
-					clear t0_adj
-				end
-			end
-			for i = 1:length(t0_idx)
-				t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-				t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
-			end
-		else
-			t0 = t0_180;
-		end
-		
-		% Missing t0s (multiples)
-		if data_count > length(t0_idx) && sum(diff_ch) > 0
-			for i = 1:length(diff_ch)
-				if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
-					t0_adj = t0_idx(1:i,1);
-					t0_div = round(diff_idx(i,1)/median(diff_idx),0);
-					t0_adj(i+1:i+t0_div-1,1) = 0;
-					t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
-					t0_idx_bf = t0_adj(i,1);
-					t0_idx_af = t0_adj(i+t0_div,1);
-					t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);
-					for j = 1:t0_div - 1
-						t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
-					end
-					t0_idx = t0_adj;
-					diff_idx = diff(nonzeros(t0_adj));
-					diff_ch =  median(diff_idx) < diff_idx - 50;
-					clear t0_adj
-				end
-			end
-			for i = 1:length(t0_idx)
-				t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
-				t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
-			end
-		else
-			t0 = t0_180;
-		end
-		
-		start_idx = t0_idx - 7;
-		end_idx = t0_idx + 38;
-		sampl_length = end_idx(1,1)-start_idx(1,1)+1;
-		
-		%%% Indexes
-		for i = 1:data_count
-			values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
-			baseline(1:6,1:cols,i) = values_all(1:6,1:cols,i);
-			integration(1:30,1:cols,i) = values_all(10:39,1:cols,i);
-		end
-		
-		for j = 1:data_count
-			for i = 1:length(baseline(:,j))
-				if baseline(i,j) > median(baseline(:,j)) + 2*std(baseline(:,j)) || baseline(i,j) < median(baseline(:,j)) - 2*std(baseline(:,j))
-					baseline(i,j) = 0;
-				else
-					baseline(i,j) = baseline(i,j);
-				end
+	%}
+	
+	
+	
+	
+	%T Zero Find by Medians
+	% Missing t0s (singles)
+	if data_count > length(t0_idx) && sum(diff_ch) > 0
+		for i = 1:length(diff_ch)
+			if diff_ch(i,1) == 1
+				t0_adj = t0_idx(1:i,1);
+				t0_adj(i+1,1) = 0;
+				t0_adj(i+2:i+2+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+2,1);
+				t0_adj(i+1,1) = round(t0_idx_bf + (t0_idx_af - t0_idx_bf)/2);
+				t0_idx = t0_adj;
+				diff_idx = diff(nonzeros(t0_adj));
+				diff_ch =  median(diff_idx) < diff_idx - 10;
+				clear t0_adj
 			end
 		end
-		
-		samp_length = length(integration(:,1,1));
-		
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end
+	else
+		t0 = t0_180;
 	end
+	
+	% Missing t0s (multiples)
+	if data_count > length(t0_idx) && sum(diff_ch) > 0
+		for i = 1:length(diff_ch)
+			if diff_ch(i,1) == 1 && diff_idx(i,1) > 2*median(diff_idx)
+				t0_adj = t0_idx(1:i,1);
+				t0_div = round(diff_idx(i,1)/median(diff_idx),0);
+				t0_adj(i+1:i+t0_div-1,1) = 0;
+				t0_adj(i+t0_div:i+t0_div+length(t0_idx(i+2:end,1)),1) = t0_idx(i+1:end,1);
+				t0_idx_bf = t0_adj(i,1);
+				t0_idx_af = t0_adj(i+t0_div,1);
+				t0_add = round((t0_idx_af - t0_idx_bf)/t0_div);
+				for j = 1:t0_div - 1
+					t0_adj(i+j,1) = t0_adj(i,1) + t0_add*j;
+				end
+				t0_idx = t0_adj;
+				diff_idx = diff(nonzeros(t0_adj));
+				diff_ch =  median(diff_idx) < diff_idx - 50;
+				clear t0_adj
+			end
+		end
+		for i = 1:length(t0_idx)
+			t0(i,1) = values_tmp(t0_idx(i,1),cols-1);
+			t0_180(i,1) = values_tmp(t0_idx(i,1),cols-1);
+		end
+	else
+		t0 = t0_180;
+	end
+	
+	start_idx = t0_idx - 7;
+	end_idx = t0_idx + 38;
+	sampl_length = end_idx(1,1)-start_idx(1,1)+1;
+	
+	%%% Indexes
+	for i = 1:data_count
+		values_all(1:sampl_length,1:cols,i) = values_tmp(start_idx(i,1):end_idx(i,1),1:cols);
+		baseline(1:6,1:cols,i) = values_all(1:6,1:cols,i);
+		integration(1:30,1:cols,i) = values_all(10:39,1:cols,i);
+	end
+	
+	for j = 1:data_count
+		for i = 1:length(baseline(:,j))
+			if baseline(i,j) > median(baseline(:,j)) + 2*std(baseline(:,j)) || baseline(i,j) < median(baseline(:,j)) - 2*std(baseline(:,j))
+				baseline(i,j) = 0;
+			else
+				baseline(i,j) = baseline(i,j);
+			end
+		end
+	end
+	
+	samp_length = length(integration(:,1,1));
+	
+	
+
+	
 	
 	if length(filename_scancsv) > 1
 		for p = 1:length(filename_data)
@@ -582,8 +634,6 @@ if TRA == 1
 	end
 	
 	
-	
-	
 	for i = 1:data_count
 		mean180BL(i,1) = mean(nonzeros(baseline(:,1,i)));
 		mean179BL(i,1) = mean(nonzeros(baseline(:,2,i)));
@@ -626,6 +676,30 @@ if TRA == 1
 	end
 	
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %end
 
@@ -683,6 +757,55 @@ INT_cutoff_unknowns = str2num(get(H.results_intcutoff,'String'))/100;
 
 
 
+
+
+
+
+
+
+
+if data_count ~= length(t0_idx)
+	close(h)
+	f = errordlg('T zero identification failed! Have a quick look at the Hf180 time series....','File Error');
+	
+	
+	figure
+	hold on
+	plot(values_tmp(:,12),values_tmp(:,1))
+	scatter(t0_180,0.1*ones(length(t0_180)),'filled')
+	xlabel('Time (s)')
+	ylabel('180Hf')
+	dim = [.2 .5 .3 .3];
+	str = strcat('sample n = ', {' '}, mat2str(data_count), {'   '}, 't zeros = ',{' '}, mat2str(length(H.t0_180)));
+	annotation('textbox',dim,'String',str,'FitBoxToText','on');
+	if data_count == length(t0_180)
+		labelpoints (t0_180,zeros(length(t0_180),1), sample);
+	else
+		labelpoints (t0_180,zeros(length(t0_180),1), [1:1:length(t0_180)]);
+	end
+	
+	figure
+	hold on
+	plot(values_tmp(:,11),values_tmp(:,1))
+	scatter(t0_idx,0.1*ones(length(t0_idx)),'filled')
+	xlabel('Index')
+	ylabel('180Hf')
+	dim = [.2 .5 .3 .3];
+	str = strcat('sample n = ', {' '}, mat2str(data_count), {'   '}, 't zeros = ',{' '}, mat2str(length(t0_idx)));
+	annotation('textbox',dim,'String',str,'FitBoxToText','on');
+	if data_count == length(t0_idx)
+		labelpoints (t0_180,zeros(length(t0_idx),1), sample);
+	else
+		labelpoints (t0_idx,zeros(length(t0_idx),1), [1:1:length(t0_idx)]);
+	end
+	
+	
+	return
+	
+	
+	
+	
+end
 
 
 
@@ -2030,8 +2153,10 @@ end
 current_status_num_orig = current_status_num;
 
 for i = 1:length(sample)
-	if contains(sample(i,1),'xx') == 1
+	if contains(sample(i,1),'xx') == 1 || contains(sample(i,1),'Rejected Standard')
 		name_char(i,1) = strcat('<html><BODY bgcolor="red">',sample(i,1),'</span></html>');
+	elseif contains(sample(i,1),'Burn through') == 1
+		name_char(i,1) = strcat('<html><BODY bgcolor="lime">',sample(i,1),'</span></html>');
 	else
 		name_char(i,1)=(sample(i,1));
 	end
@@ -2059,11 +2184,11 @@ set(H.ind_listbox1, 'String', name_char);
 set(H.ind_listbox1,'Value',length(sample));
 
 
-if current_status_num(name_idx,1) == 1
-	set(H.status, 'String', current_status{name_idx,1},'ForegroundColor','blue');
-elseif current_status_num(name_idx,1) == 0
-	set(H.status, 'String', current_status{name_idx,1},'ForegroundColor','red');
-end
+% if current_status_num(name_idx,1) == 1
+% 	set(H.status, 'String', current_status{name_idx,1},'ForegroundColor','blue');
+% elseif current_status_num(name_idx,1) == 0
+% 	set(H.status, 'String', current_status{name_idx,1},'ForegroundColor','red');
+% end
 
 
 
@@ -2503,7 +2628,8 @@ H.match2 = match2;
 
 H.SAMPLES_idx = SAMPLES_idx;
 
-
+H.Data = Data;
+H.Names = Names;
 
 H.STD_MT_idx = STD_MT_idx;
 H.STD_SL_idx = STD_SL_idx;
@@ -2947,8 +3073,27 @@ ind_PLOT_Callback(hObject, eventdata, H)
 
 function AccRej_Callback(hObject, eventdata, H)
 
-function EditSampleName_Callback(hObject, eventdata, H)
+H.currView = get(H.ind_listbox1,'ListBoxTop');
+analysis_num = get(H.ind_listbox1,'Value');
+names_tmp = get(H.ind_listbox1,'String');
+names_tmp(analysis_num,1) = strcat('<html><BODY bgcolor="red">',{'xx'},'</span></html>');
+H.sample = names_tmp;
+set(H.ind_listbox1,'String',H.sample)
+set(H.ind_listbox1,'ListBoxTop',H.currView)
+H.Names = get(H.ind_listbox1,'String');
+guidata(hObject,H);
 
+
+function EditSampleName_Callback(hObject, eventdata, H)
+H.currView = get(H.ind_listbox1,'ListBoxTop');
+analysis_num = get(H.ind_listbox1,'Value');
+names_tmp = get(H.ind_listbox1,'String');
+names_tmp(analysis_num,1) = strcat('<html><BODY bgcolor="lime">',{'Burn through'},'</span></html>');
+H.sample = names_tmp;
+set(H.ind_listbox1,'String',H.sample)
+set(H.ind_listbox1,'ListBoxTop',H.currView)
+H.Names = get(H.ind_listbox1,'String');
+guidata(hObject,H);
 
 
 function results_data_Callback(hObject, eventdata, H)
@@ -3088,27 +3233,6 @@ if data_count == length(H.t0_idx)
 else
 	labelpoints (H.t0_idx,zeros(length(H.t0_idx),1), [1:1:length(H.t0_idx)]);
 end
-
-% 
-% plot(values_tmp(:,11),80000000.*values_tmp(:,1),'b','Linewidth',1)
-% scatter(values_tmp(:,11),80000000.*values_tmp(:,1),10,'filled','MarkerFaceColor','k')
-% scatter(t0_238,zeros(length(t0_238),1),'filled','MarkerFaceColor','r')
-% xlabel('Time (seconds)')
-% ylabel('238U Counts per Second (CPS)')
-% dim = [.2 .5 .3 .3];
-% str = strcat('sample n = ', {' '}, mat2str(data_count), {'   '}, 't zeros = ',{' '}, mat2str(length(t0_idx)))
-% annotation('textbox',dim,'String',str,'FitBoxToText','on');
-% 
-% if data_count == length(t0_idx)
-% 	labelpoints (t0_238,zeros(length(t0_238),1), sample);
-% else
-% 	labelpoints (t0_238,zeros(length(t0_238),1), [1:1:length(t0_238)]);
-% end
-
-
-
-
-
 
 
 
