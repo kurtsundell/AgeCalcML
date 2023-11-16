@@ -970,8 +970,8 @@ end
 waitbar(7/waitnum,h,'Calculating. Please wait...');
 
 Macro1_Output(1:data_count+1,1:20) = {0}; % Preallocate
-Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 ± %', 'm68', ...
-	'206207', '67 ± %', '206204', '64 ± %', '208232', '82 ± %', '208204', '84 ± %'};
+Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 1s %', 'm68', ...
+	'206207', '67 1s %', '206204', '64 1s %', '208232', '82 1s %', '208204', '84 1s %'};
 Macro1_Output(2:end,1) = sample;
 Macro1_Output(2:end,2) = serial;
 Macro1_Output(2:end,3) = num2cell(CPS_202);
@@ -1603,11 +1603,11 @@ comment = strcat(comment1, comment2, comment3, comment4, comment5, comment6, com
 % CONCATENATE DATA FOR EXPORT AND PLOTTING %%
 
 AGES_OUT{data_count+1, 6} = [];
-AGES_OUT(1,:) = {'6/8 age', '± (Ma)', '6/7 age', '± (Ma)', '8/2 age', '± (Ma)'};
+AGES_OUT(1,:) = {'6/8 age', '1s (Ma)', '6/7 age', '1s (Ma)', '8/2 age', '1s (Ma)'};
 AGES_OUT(2:end,:) = [Age68, Age68_err, Age67, Age67_err, Age82, Age82_err];
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)', 'BEST AGE', '1s(Ma)', '8/2 age', '1s(Ma)'};
 for i = 1:data_count
 	if sample_idx(i,1) == 1 && isempty(comment{i,1}) == 1
 		SAMPLE_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1619,7 +1619,7 @@ for i = 1:data_count
 end
 
 STD_CONCORDIA{data_count+1, 9} = [];
-STD_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)'};
+STD_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)'};
 for i = 1:data_count
 	if STD1_idx(i,1) == 1
 		STD_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1628,14 +1628,14 @@ for i = 1:data_count
 end
 
 CORRECTED_CONC_RATIOS{data_count+1, 15} = [];
-CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '±(%)', '8/2 ratio', '±(%)', ...
-	'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho'};
+CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '1s(%)', '8/2 ratio', '1s(%)', ...
+	'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho'};
 CORRECTED_CONC_RATIOS(2:end,:) = [sample, num2cell(ppm238), num2cell(ppm232), num2cell(BLS_64_corr.*factor64), num2cell(BLS_84_corr), ...
 	num2cell(UTh), num2cell(fcbc67), num2cell(re67), num2cell(fcbc82), num2cell(re82), num2cell(ratio75), num2cell(ratio75_err), num2cell(ratio68), ...
 	num2cell(err68m), num2cell(rho)];
 
 AGES_1SD_RANDOM_ERRORS{data_count+1, 10} = [];
-AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '±(Ma)', '7/5 age', '±(Ma)', '6/7 age', '±(Ma)', '8/2 age', '±(Ma)', 'BEST AGE', '±(Ma)'};
+AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '1s(Ma)', '7/5 age', '1s(Ma)', '6/7 age', '1s(Ma)', '8/2 age', '1s(Ma)', 'BEST AGE', '1s(Ma)'};
 AGES_1SD_RANDOM_ERRORS(2:end,:) = [Age68, Age68_err, Age75, Age75_err, Age67, Age67_err, Age82, Age82_err, Best_Age, Best_Age_err];
 
 Macro_1_2_Output = [Macro1_Output, AGES_OUT, [{'comment'};comment], SAMPLE_CONCORDIA, STD_CONCORDIA, CORRECTED_CONC_RATIOS, AGES_1SD_RANDOM_ERRORS];
@@ -3777,7 +3777,7 @@ set(H.listbox1,'ListBoxTop',currView)
 clear SAMPLE_CONCORDIA
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)', 'BEST AGE', '1s(Ma)', '8/2 age', '1s(Ma)'};
 
 for i = 1:data_count
 	if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
@@ -5199,7 +5199,7 @@ geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced
 	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
 
 geochron_out(22,1) = [{'Accepted'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','2s','207Pb*','2s','206Pb*','2s','error','206Pb*','2s','207Pb*','2s','206Pb*','2s','Best age','2s','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
@@ -5246,7 +5246,7 @@ end
 %%%%%%%%%%%%% rejected analyses %%%%%%%%%%%%%
 
 geochron_out(22,23) = [{'Rejected (filtered data)'}];
-geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','2s','207Pb*','2s','206Pb*','2s','error','206Pb*','2s','207Pb*','2s','206Pb*','2s','Best age','2s','Conc'}];
 geochron_out(24,24:42) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,30) = [{'Isotope ratios'}];
 geochron_out(21,36) = [{'Apparent ages (Ma)'}];
@@ -5300,7 +5300,7 @@ end
 %%%%%%%%%%%%% standard analyses %%%%%%%%%%%%%
 
 geochron_out(22,45) = {'Standards (primary and secondary reference materials)'};
-geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','2s','207Pb*','2s','206Pb*','2s','error','206Pb*','2s','207Pb*','2s','206Pb*','2s','Best age','2s','Conc'}];
 geochron_out(24,46:64) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,52) = [{'Isotope ratios'}];
 geochron_out(21,58) = [{'Apparent ages (Ma)'}];
@@ -5817,7 +5817,7 @@ geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced
 	'Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U-Pb Geochronology by Laser Ablation Multi-Collector ICP-MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.'}];
 
 geochron_out(22,1) = [{'Accepted'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','2s','207Pb*','2s','206Pb*','2s','error','206Pb*','2s','207Pb*','2s','206Pb*','2s','Best age','2s','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
@@ -5864,7 +5864,7 @@ end
 %%%%%%%%%%%%% rejected analyses %%%%%%%%%%%%%
 
 geochron_out(22,23) = [{'Rejected (filtered data)'}];
-geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(23,23:42) = [{'Analysis','U','206Pb','U/Th','206Pb*','2s','207Pb*','2s','206Pb*','2s','error','206Pb*','2s','207Pb*','2s','206Pb*','2s','Best age','2s','Conc'}];
 geochron_out(24,24:42) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,30) = [{'Isotope ratios'}];
 geochron_out(21,36) = [{'Apparent ages (Ma)'}];
@@ -5918,7 +5918,7 @@ end
 %%%%%%%%%%%%% standard analyses %%%%%%%%%%%%%
 
 geochron_out(22,45) = {'Standards (primary and secondary reference materials)'};
-geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','error','206Pb*','±2s','207Pb*','±2s','206Pb*','±2s','Best age','±2s','Conc'}];
+geochron_out(23,45:64) = [{'Analysis','U','206Pb','U/Th','206Pb*','2s','207Pb*','2s','206Pb*','2s','error','206Pb*','2s','207Pb*','2s','206Pb*','2s','Best age','2s','Conc'}];
 geochron_out(24,46:64) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,52) = [{'Isotope ratios'}];
 geochron_out(21,58) = [{'Apparent ages (Ma)'}];
@@ -6060,3 +6060,18 @@ copyobj(H.axes_distribution,f4);
 
 
 function tertiary_Callback(hObject, eventdata, H)
+
+
+if get(H.tertiary,'Value') < 4
+	set(H.ptype_Tertiary_STDs,
+
+
+
+
+
+
+
+
+
+
+

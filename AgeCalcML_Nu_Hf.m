@@ -2250,8 +2250,8 @@ heads2 = {'LA-MC-ICPMS Lu-Hf isotopic analyses of zircon.'};
 
 heads3 = {'1)'	'2)'	'3)'	'4)'	'5)'	'6)'	'7)'	'8)'	'9)'	'10)'	'11)'	'12)'	'13)'	'14)'	'15)'	'16)'	'17)'	'18)'	'19)'	'20)'};
 
-heads4 = {'Sample' '176Hf/177Hf'	'± 2 SE'	'176Lu/177Hf'	'± 2 SE'	'176Yb/177Hf'	'± 2 SE'	'178Hf/177Hf'	'± 2 SE'	'EHf (0)'	'± 2 SE' ...
-	'176Hf/177Hf (i)'	'EHf (i)'	'± 2 SE'	'Age (Ma)'	'± 2 SE'	'(176Yb+176Lu)/176Hf (%)'	'Volts Hf'	'Correction (EHf)'	'Age (Ma)'	'EHf (i)'};
+heads4 = {'Sample' '176Hf/177Hf'	'2 SE'	'176Lu/177Hf'	'2 SE'	'176Yb/177Hf'	'2 SE'	'178Hf/177Hf'	'2 SE'	'EHf (0)'	'2 SE' ...
+	'176Hf/177Hf (i)'	'EHf (i)'	'2 SE'	'Age (Ma)'	'2 SE'	'(176Yb+176Lu)/176Hf (%)'	'Volts Hf'	'Correction (EHf)'	'Age (Ma)'	'EHf (i)'};
 
 EXPORT{sum(SAMPLES_idx)+sum(STD_idx)+30,21} = [];
 
@@ -2282,7 +2282,7 @@ for i = 1:length(SAMPLES_idx)
 		EXPORT{count+6,13} = eHf_UNKNOWNS(count,1);
 		EXPORT{count+6,14} = eHf_UNKNOWNSs(count,1);
 		EXPORT{count+6,15} = Ages_ascribed(count,1);
-		EXPORT{count+6,16} = 2*Ages_uncert_ascribed(count,1);
+		EXPORT{count+6,16} = Ages_uncert_ascribed(count,1);
 		EXPORT{count+6,17} = Yb_Lu_Hf_UNKNOWN_mean(count,1); %(176Lu+176Yb)/176Hf %)
 		EXPORT{count+6,18} = v180_UNKNOWN(count,1);
 		EXPORT{count+6,19} = (YbHf_UNKNOWN(count,1) + HfHfT_UNKNOWN(count,1)) / 0.000028;

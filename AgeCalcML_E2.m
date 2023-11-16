@@ -735,7 +735,7 @@ if TREE == 1
 		end
 	end
 
-	M238 = M235*137.82;
+	M238 = M235*137.818;
 
 	M_All = [M027,M029,M031,M045,M049,M089,M093,M139,M140,M141,M146,M152,M153,M157,M159,M164,M165,M166,M169,M174,M175,M177,M181,M202,M204,M206,M207,M208,M232,M232,M235,M238];
 
@@ -1436,10 +1436,10 @@ for i = 1:data_count
 		UPBdata(j,5,i) = (values_all(j+16,5,i)-UPB_pre(i,5))/(1-(values_all(j+16,5,i)-UPB_pre(i,5))*deadtime/1000000000);
 		UPBdata(j,6,i) = (values_all(j+16,6,i)-UPB_pre(i,6))/(1-(values_all(j+16,6,i)-UPB_pre(i,6))*deadtime/1000000000);
 		UPBdata(j,7,i) = (values_all(j+16,7,i)-UPB_pre(i,7))/(1-(values_all(j+16,7,i)-UPB_pre(i,7))*deadtime/1000000000);
-		if UPBdata(j,7,i)*137.82 > 5000000
-			UPBdata(j,8,i) = UPBdata(j,7,i)*(1+(0.3*lin68*((137.82*UPBdata(j,7,i))^1.5)/100000000000));
+		if UPBdata(j,7,i)*137.818 > 5000000
+			UPBdata(j,8,i) = UPBdata(j,7,i)*(1+(0.3*lin68*((137.818*UPBdata(j,7,i))^1.5)/100000000000));
 		else
-			UPBdata(j,8,i) = UPBdata(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata(j,7,i)*137.82)));
+			UPBdata(j,8,i) = UPBdata(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata(j,7,i)*137.818)));
 		end
 		UPBdata(j,9,i) = (values_all(j+16,8,i)-UPB_pre(i,8))/(1-(values_all(j+16,8,i)-UPB_pre(i,8))*deadtime/1000000000);
 		if UPBdata(j,9,i) > 5000000
@@ -1480,7 +1480,7 @@ for i = 1:data_count
 		elseif strcmp(mode{i,1}, 'IC') == 1
 			UPBdata(j,11,i) = UPBdata(j,3,i)/UPBdata(j,10,i);
 		else
-			UPBdata(j,11,i) = UPBdata(j,3,i)/(UPBdata(j,8,i)*137.82);
+			UPBdata(j,11,i) = UPBdata(j,3,i)/(UPBdata(j,8,i)*137.818);
 		end
 	end
 end
@@ -1610,7 +1610,7 @@ for i = 1:data_count
 	if strcmp(mode{i,1}, 'bad') == 1
 		UPB_reduced(i,8) = 1.3;
 	elseif use_235 == 1
-		UPB_reduced(i,8) = sum(UPBdata(:,3,i))./(137.82*sum(UPBdata(:,8,i)));
+		UPB_reduced(i,8) = sum(UPBdata(:,3,i))./(137.818*sum(UPBdata(:,8,i)));
 	else
 		UPB_reduced(i,8) = sum(UPBdata(:,3,i))./sum(UPBdata(:,10,i));
 	end
@@ -1727,7 +1727,7 @@ end
 % Data Export %
 Macro1_Output(1:data_count+1,1:22) = {0}; % Preallocate
 Macro1_Output(1,1:end) = {'spotname', 'serial', 'Mode', '177 cps', '204 cps', '206 cps', '207 cps', '208 cps', '232 cps', '235 cps', '238 cps', '206/238', ...
-	'68 ± %', 'slope', '206/207', '67 ± %', '206/204', '64 ± %', '208/232', '82 ± %', '208/204', '84 ± %'};
+	'68 1s %', 'slope', '206/207', '67 1s %', '206/204', '64 1s %', '208/232', '82 1s %', '208/204', '84 1s %'};
 Macro1_Output(2:end,1) = sample;
 Macro1_Output(2:end,2) = serial;
 Macro1_Output(2:end,3) = mode;
@@ -2178,7 +2178,7 @@ end
 
 for i = 1:data_count
 	ratio68(i,1) = fcbc68(i,1) -((0.000000000155/0.0000092)*(((1/UTh(i,1))/2.3)-1)); % BE 6/8 ratio
-	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.82; %col BC
+	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.818; %col BC
 	ratio75err(i,1) = sqrt(merr68(i,1)*merr68(i,1) + re67(i,1)*re67(i,1)); %col BD
 	Age68(i,1) = abs(log(ratio68(i,1)+1)/0.000155125); %BH 6/8 age
 	Age68err(i,1) = abs((log((ratio68(i,1)+ratio68(i,1)*(merr68(i,1)/100))+1)/0.000155125-log((ratio68(i,1)-ratio68(i,1)*merr68(i,1)/100)+1)/0.000155125)/2); %col BI
@@ -2196,7 +2196,7 @@ for i = 1:data_count %col BL
 	elseif 1/fcbc67(i,1) >= .556 %older than Earth
 		Age67{i,1} = 'NA';
 	else
-		Age67{i,1} = MyAge76_E2(1/fcbc67(i,1));
+		Age67{i,1} = MyAge76(1/fcbc67(i,1));
 	end
 end
 
@@ -2204,7 +2204,7 @@ for i = 1:data_count %col BM
 	%if fcbc67(i,1) > 2 && fcbc67(i,1) < 30 && re67(i,1) < 50
 	if 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) < .556 && ...
 			1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) < .556
-		Age67err{i,1} = abs((MyAge76_E2(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76_E2(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
+		Age67err{i,1} = abs((MyAge76(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
 	else
 		Age67err{i,1} = 'NA';
 	end
@@ -2285,7 +2285,7 @@ waitbar(10/waitnum, h, 'Reducing U-Th-Pb! Please wait...'); %%%%%%%%%%%%%%%%%% w
 %% CONCATENATE DATA FOR EXPORT AND PLOTTING %%
 
 AGES_OUT{data_count+1, 6} = [];
-AGES_OUT(1,:) = {'6/8 age', '± (Ma)', '6/7 age', '± (Ma)', '8/2 age', '± (Ma)'};
+AGES_OUT(1,:) = {'6/8 age', '1s (Ma)', '6/7 age', '1s (Ma)', '8/2 age', '1s (Ma)'};
 AGES_OUT(2:end,:) = Ages;
 
 REJECTED{data_count+1, 3} = [];
@@ -2301,7 +2301,7 @@ for i = 1:data_count
 end
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'errcorr', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'errcorr', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)', 'BEST AGE', '1s(Ma)', '8/2 age', '1s(Ma)'};
 for i = 1:data_count
 if STD1a_idx(i,1) == 0 && STD1b_idx(i,1) == 0 && STD2_idx(i,1) == 0 && isempty(comment{i,1}) == 1 
 SAMPLE_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75err(i,:)), num2cell(ratio68(i,:)), num2cell(merr68(i,:)), num2cell(errcorr(i,:)), ...
@@ -2310,14 +2310,14 @@ end
 end
 
 CORRECTED_CONC_RATIOS{data_count+1, 15} = [];
-CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '±(%)', '8/2 ratio', '±(%)', ...
-	'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'errcorr'};
+CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '1s(%)', '8/2 ratio', '1s(%)', ...
+	'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'errcorr'};
 CORRECTED_CONC_RATIOS(2:end,:) = [sample, num2cell(Uppm), num2cell(Thppm), num2cell(CY), num2cell(UPB_reduced(:,17)), ...
 	num2cell(UTh), num2cell(fcbc67), num2cell(re67), num2cell(fcbc82), num2cell(re82), num2cell(ratio75), num2cell(ratio75err), num2cell(ratio68), ...
 	num2cell(merr68), num2cell(errcorr)];
 
 AGES_1SD_RANDOM_ERRORS{data_count+1, 10} = [];
-AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '±(Ma)', '7/5 age', '±(Ma)', '6/7 age', '±(Ma)', '8/2 age', '±(Ma)', 'BEST AGE', '±(Ma)'};
+AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '1s(Ma)', '7/5 age', '1s(Ma)', '6/7 age', '1s(Ma)', '8/2 age', '1s(Ma)', 'BEST AGE', '1s(Ma)'};
 AGES_1SD_RANDOM_ERRORS(2:end,:) = [num2cell(Age68), num2cell(Age68err), num2cell(Age75), num2cell(Age75err), Age67, Age67err, num2cell(Age82), num2cell(Age82err), ...
 	num2cell(Best_Age), num2cell(Best_Age_err)];
 
@@ -3235,7 +3235,7 @@ if H.reduced == 1
 			get(H.plottype,'Value') == 10 || get(H.plottype,'Value') == 11 || get(H.plottype,'Value') == 12
 		sigmarule1s=1.5;
 		if get(H.plottype,'Value') == 4 || get(H.plottype,'Value') == 10
-			FC75 = STD_FC_68*137.82*(1/STD_FC_67);
+			FC75 = STD_FC_68*137.818*(1/STD_FC_67);
 			age_labelSTD_x = FC75;
 			age_labelSTD_y = STD_FC_68;
 			age_labelSTD = {'1098.1'};
@@ -3254,7 +3254,7 @@ if H.reduced == 1
 			end
 		end
 		if get(H.plottype,'Value') == 5 || get(H.plottype,'Value') == 11
-			SL75 = STD_SL_68*137.82*(1/STD_SL_67);
+			SL75 = STD_SL_68*137.818*(1/STD_SL_67);
 			age_labelSTD_x = SL75;
 			age_labelSTD_y = STD_SL_68;
 			age_labelSTD = {'558.0'};			
@@ -3273,7 +3273,7 @@ if H.reduced == 1
 			end
 		end
 		if get(H.plottype,'Value') == 6 || get(H.plottype,'Value') == 12
-			R3375 = STD_R33_68*137.82*(1/STD_R33_67);
+			R3375 = STD_R33_68*137.818*(1/STD_R33_67);
 			age_labelSTD_x = R3375;
 			age_labelSTD_y = STD_R33_68;
 			age_labelSTD = {'419.3'};
@@ -3425,7 +3425,7 @@ if H.reduced == 1
 		sigmarule2s=2.5;
 		scaling = 2^9;
 		if get(H.plottype,'Value') == 13 || get(H.plottype,'Value') == 16 || get(H.plottype,'Value') == 19
-			FC75 = STD_FC_68*137.82*(1/STD_FC_67);
+			FC75 = STD_FC_68*137.818*(1/STD_FC_67);
 			age_labelSTD_x = FC75;
 			age_labelSTD_y = STD_FC_68;
 			age_labelSTD = {'1098.1'};
@@ -3444,7 +3444,7 @@ if H.reduced == 1
 			end
 		end
 		if get(H.plottype,'Value') == 14 || get(H.plottype,'Value') == 17 || get(H.plottype,'Value') == 20
-			SL75 = STD_SL_68*137.82*(1/STD_SL_67);
+			SL75 = STD_SL_68*137.818*(1/STD_SL_67);
 			age_labelSTD_x = SL75;
 			age_labelSTD_y = STD_SL_68;
 			age_labelSTD = {'558.0'};			
@@ -3463,7 +3463,7 @@ if H.reduced == 1
 			end
 		end
 		if get(H.plottype,'Value') == 15 || get(H.plottype,'Value') == 18 || get(H.plottype,'Value') == 21
-			R3375 = STD_R33_68*137.82*(1/STD_R33_67);
+			R3375 = STD_R33_68*137.818*(1/STD_R33_67);
 			age_labelSTD_x = R3375;
 			age_labelSTD_y = STD_R33_68;
 			age_labelSTD = {'419.3'};
@@ -3533,7 +3533,7 @@ if H.reduced == 1
 		[X,Y] = meshgrid(xF,yF);
 
 		if get(H.plottype,'Value') == 13 || get(H.plottype,'Value') == 16 || get(H.plottype,'Value') == 19 
-			FC75 = STD_FC_68*137.82*(1/STD_FC_67);
+			FC75 = STD_FC_68*137.818*(1/STD_FC_67);
 			age_labelSTD_x = FC75;
 			age_labelSTD_y = STD_FC_68;
 			age_labelSTD = {'1098.1'};
@@ -3553,7 +3553,7 @@ if H.reduced == 1
 			end
 		end
 		if get(H.plottype,'Value') == 14 || get(H.plottype,'Value') == 17 || get(H.plottype,'Value') == 20 
-			SL75 = STD_SL_68*137.82*(1/STD_SL_67);
+			SL75 = STD_SL_68*137.818*(1/STD_SL_67);
 			age_labelSTD_x = SL75;
 			age_labelSTD_y = STD_SL_68;
 			age_labelSTD = {'558.0'};	
@@ -3573,7 +3573,7 @@ if H.reduced == 1
 			end		
 		end
 		if get(H.plottype,'Value') == 15 || get(H.plottype,'Value') == 18 || get(H.plottype,'Value') == 21 
-			R3375 = STD_R33_68*137.82*(1/STD_R33_67);
+			R3375 = STD_R33_68*137.818*(1/STD_R33_67);
 			age_labelSTD_x = R3375;
 			age_labelSTD_y = STD_R33_68;
 			age_labelSTD = {'419.3'};
@@ -3696,11 +3696,11 @@ if H.reduced == 1
 			th = nonzeros(th);
 			bestage = nonzeros(bestage);
 			for i = 1:length(u)
-				raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.82)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
+				raddos(i,1) = 8*u(i,1)*(exp(0.000000000155*bestage(i,1)*1000000)-1)+7*(u(i,1)/137.818)*(exp(0.000000000985*bestage(i,1)*1000000)-1)...
 					+6*th(i,1)*(exp(0.0000000000495*bestage(i,1)*1000000)-1);
 			end
 			s1 = scatter(raddos, bestage, 100, 'filled', 'b', 'd', 'LineWidth', 1.25, 'MarkerEdgeColor', 'k');
-			xlabel('Radiation Dosage (alpha decays/µg)')
+			xlabel('Radiation Dosage (alpha decays/�g)')
 			ylabel('Best Age (Ma)')
 		end
 
@@ -4404,7 +4404,7 @@ cla(H.axes_current_concordia,'reset');
 
 p3 = scatter(ratio75(name_idx,1), ratio68(name_idx,1), 40, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', 'g', 'LineWidth', 1.5);
 hold on
-bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age(name_idx,1))}, {' ± '},  {sprintf('%.1f',Best_Age_err(name_idx,1))}, {' Ma'});
+bestage = strcat('Best Age', {' = '}, {sprintf('%.1f',Best_Age(name_idx,1))}, {' � '},  {sprintf('%.1f',Best_Age_err(name_idx,1))}, {' Ma'});
 
 concordia_data = [ratio75(name_idx,1), ratio75err(name_idx,1), ratio68(name_idx,1), merr68(name_idx,1)];
 center = [concordia_data(:,1),concordia_data(:,3)];
@@ -4554,7 +4554,7 @@ set(H.listbox1,'ListBoxTop',currView)
 clear SAMPLE_CONCORDIA
 
 H.SAMPLE_CONCORDIA{H.data_count+1, 13} = [];
-H.SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'errcorr', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+H.SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'errcorr', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)', 'BEST AGE', '1s(Ma)', '8/2 age', '1s(Ma)'};
 
 for i = 1:H.data_count
 	if H.STD1a_idx(i,1) == 0 && H.STD1b_idx(i,1) == 0 && H.STD2_idx(i,1) == 0 && H.current_status_num(i,1) == 1 && H.sample_idx(i,1) == 1
@@ -5161,7 +5161,7 @@ geochron_out(13,2) = [{'Arizona LaserChron Center'}];
 geochron_out(16,2) = [{'LA-ICPMS'}];
 geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
 	'Gehrels, G. and Pecha, M., 2014, Detrital zircon U-Pb geochronology and Hf isotope geochemistry of Paleozoic and Triassic passive margin strata of western North America: Geosphere, v. 10 (1), p. 49-65.'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','1s','207Pb*','1s','206Pb*','1s','error','206Pb*','1s','207Pb*','1s','206Pb*','1s','Best age','1s','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
@@ -5176,7 +5176,7 @@ geochron_out(27:end,1) = geochron_out_temp(:,1);
 geochron_out(27:end,2) = geochron_out_temp(:,46);
 geochron_out(27:end,3) = geochron_out_temp(:,48);
 geochron_out(27:end,4) = geochron_out_temp(:,50);
-geochron_out(27:end,5:6) = geochron_out_temp(:,15:16);
+geochron_out(27:end,5:6) = geochron_out_temp(:,51:52);
 geochron_out(27:end,7:11) = geochron_out_temp(:,32:36);
 geochron_out(27:end,12:17) = geochron_out_temp(:,60:65);
 geochron_out(27:end,18:19) = geochron_out_temp(:,68:69);
@@ -5342,7 +5342,7 @@ geochron_out(13,2) = [{'Arizona LaserChron Center'}];
 geochron_out(16,2) = [{'LA-ICPMS'}];
 geochron_out(17:18,2) = [{'Gehrels, G.E., Valencia, V., Ruiz, J., 2008, Enhanced precision, accuracy, efficiency, and spatial resolution of U-Pb ages by laser ablation-multicollector-inductively coupled plasma-mass spectrometry: Geochemistry, Geophysics, Geosystems, v. 9, Q03017, doi:10.1029/2007GC001805.'; ...
 	'Gehrels, G. and Pecha, M., 2014, Detrital zircon U-Pb geochronology and Hf isotope geochemistry of Paleozoic and Triassic passive margin strata of western North America: Geosphere, v. 10 (1), p. 49-65.'}];
-geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','±','207Pb*','±','206Pb*','±','error','206Pb*','±','207Pb*','±','206Pb*','±','Best age','±','Conc'}];
+geochron_out(23,1:20) = [{'Analysis','U','206Pb','U/Th','206Pb*','1s','207Pb*','1s','206Pb*','1s','error','206Pb*','1s','207Pb*','1s','206Pb*','1s','Best age','1s','Conc'}];
 geochron_out(24,2:20) = [{'(ppm)','204Pb',' ','207Pb*','(%)','235U','(%)','238U','(%)','corr.','238U','(Ma)','235U','(Ma)','207Pb*','(Ma)','(Ma)','(Ma)','(%)'}];
 geochron_out(21,8) = [{'Isotope ratios'}];
 geochron_out(21,14) = [{'Apparent ages (Ma)'}];
@@ -5360,7 +5360,7 @@ geochron_out(27:end,1) = geochron_out_temp(:,1);
 geochron_out(27:end,2) = geochron_out_temp(:,46);
 geochron_out(27:end,3) = geochron_out_temp(:,48);
 geochron_out(27:end,4) = geochron_out_temp(:,50);
-geochron_out(27:end,5:6) = geochron_out_temp(:,15:16);
+geochron_out(27:end,5:6) = geochron_out_temp(:,51:52);
 geochron_out(27:end,7:11) = geochron_out_temp(:,32:36);
 geochron_out(27:end,12:17) = geochron_out_temp(:,60:65);
 geochron_out(27:end,18:19) = geochron_out_temp(:,68:69);
@@ -5926,10 +5926,10 @@ for i = 1:data_count
 		%UPBdata2(j,5,i) = (values_all(j+16,5,i)-UPB_pre(i,5))/(1-(values_all(j+16,5,i)-UPB_pre(i,5))*deadtime/1000000000);
 		%UPBdata2(j,6,i) = (values_all(j+16,6,i)-UPB_pre(i,6))/(1-(values_all(j+16,6,i)-UPB_pre(i,6))*deadtime/1000000000);
 		%UPBdata2(j,7,i) = (values_all(j+16,7,i)-UPB_pre(i,7))/(1-(values_all(j+16,7,i)-UPB_pre(i,7))*deadtime/1000000000);
-		if UPBdata2(j,7,i)*137.82 > 5000000
-			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+(0.3*lin68*((137.82*UPBdata2(j,7,i))^1.5)/100000000000));
+		if UPBdata2(j,7,i)*137.818 > 5000000
+			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+(0.3*lin68*((137.818*UPBdata2(j,7,i))^1.5)/100000000000));
 		else
-			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata2(j,7,i)*137.82)));
+			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata2(j,7,i)*137.818)));
 		end
 		%UPBdata2(j,9,i) = (values_all(j+16,8,i)-UPB_pre(i,8))/(1-(values_all(j+16,8,i)-UPB_pre(i,8))*deadtime/1000000000);
 		if UPBdata2(j,9,i) > 5000000
@@ -5970,7 +5970,7 @@ for i = 1:data_count
 		elseif strcmp(mode{i,1}, 'IC') == 1
 			UPBdata2(j,11,i) = UPBdata2(j,3,i)/UPBdata2(j,10,i);
 		else
-			UPBdata2(j,11,i) = UPBdata2(j,3,i)/(UPBdata2(j,8,i)*137.82);
+			UPBdata2(j,11,i) = UPBdata2(j,3,i)/(UPBdata2(j,8,i)*137.818);
 		end
 	end
 end
@@ -6036,7 +6036,7 @@ for i = 1:data_count
 	if strcmp(mode{i,1}, 'bad') == 1
 		UPB_reduced(i,8) = 1.3;
 	elseif use_235 == 1
-		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./(137.82*sum(UPBdata2(:,8,i)));
+		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./(137.818*sum(UPBdata2(:,8,i)));
 	else
 		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./sum(UPBdata2(:,10,i));
 	end
@@ -6431,7 +6431,7 @@ end
 
 for i = 1:data_count
 	ratio68(i,1) = fcbc68(i,1) -((0.000000000155/0.0000092)*(((1/UTh(i,1))/2.3)-1)); % BE 6/8 ratio
-	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.82; %col BC
+	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.818; %col BC
 	ratio75err(i,1) = sqrt(merr68(i,1)*merr68(i,1) + re67(i,1)*re67(i,1)); %col BD
 	Age68(i,1) = abs(log(ratio68(i,1)+1)/0.000155125); %BH 6/8 age
 	Age68err(i,1) = abs((log((ratio68(i,1)+ratio68(i,1)*(merr68(i,1)/100))+1)/0.000155125-log((ratio68(i,1)-ratio68(i,1)*merr68(i,1)/100)+1)/0.000155125)/2); %col BI
@@ -6449,7 +6449,7 @@ for i = 1:data_count %col BL
 	elseif 1/fcbc67(i,1) >= .556 %older than Earth
 		Age67{i,1} = 'NA';
 	else
-		Age67{i,1} = MyAge76_E2(1/fcbc67(i,1));
+		Age67{i,1} = MyAge76(1/fcbc67(i,1));
 	end
 end
 
@@ -6457,7 +6457,7 @@ for i = 1:data_count %col BM
 	%if fcbc67(i,1) > 2 && fcbc67(i,1) < 30 && re67(i,1) < 50
 	if 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) < .556 && ...
 			1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) < .556
-		Age67err{i,1} = abs((MyAge76_E2(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76_E2(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
+		Age67err{i,1} = abs((MyAge76(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
 	else
 		Age67err{i,1} = 'NA';
 	end
@@ -7174,10 +7174,10 @@ for i = 1:data_count
 		%UPBdata2(j,5,i) = (values_all(j+16,5,i)-UPB_pre(i,5))/(1-(values_all(j+16,5,i)-UPB_pre(i,5))*deadtime/1000000000);
 		%UPBdata2(j,6,i) = (values_all(j+16,6,i)-UPB_pre(i,6))/(1-(values_all(j+16,6,i)-UPB_pre(i,6))*deadtime/1000000000);
 		%UPBdata2(j,7,i) = (values_all(j+16,7,i)-UPB_pre(i,7))/(1-(values_all(j+16,7,i)-UPB_pre(i,7))*deadtime/1000000000);
-		if UPBdata2(j,7,i)*137.82 > 5000000
-			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+(0.3*lin68*((137.82*UPBdata2(j,7,i))^1.5)/100000000000));
+		if UPBdata2(j,7,i)*137.818 > 5000000
+			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+(0.3*lin68*((137.818*UPBdata2(j,7,i))^1.5)/100000000000));
 		else
-			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata2(j,7,i)*137.82)));
+			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata2(j,7,i)*137.818)));
 		end
 		%UPBdata2(j,9,i) = (values_all(j+16,8,i)-UPB_pre(i,8))/(1-(values_all(j+16,8,i)-UPB_pre(i,8))*deadtime/1000000000);
 		if UPBdata2(j,9,i) > 5000000
@@ -7218,7 +7218,7 @@ for i = 1:data_count
 		elseif strcmp(mode{i,1}, 'IC') == 1
 			UPBdata2(j,11,i) = UPBdata2(j,3,i)/UPBdata2(j,10,i);
 		else
-			UPBdata2(j,11,i) = UPBdata2(j,3,i)/(UPBdata2(j,8,i)*137.82);
+			UPBdata2(j,11,i) = UPBdata2(j,3,i)/(UPBdata2(j,8,i)*137.818);
 		end
 	end
 end
@@ -7284,7 +7284,7 @@ for i = 1:data_count
 	if strcmp(mode{i,1}, 'bad') == 1
 		UPB_reduced(i,8) = 1.3;
 	elseif use_235 == 1
-		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./(137.82*sum(UPBdata2(:,8,i)));
+		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./(137.818*sum(UPBdata2(:,8,i)));
 	else
 		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./sum(UPBdata2(:,10,i));
 	end
@@ -7679,7 +7679,7 @@ end
 
 for i = 1:data_count
 	ratio68(i,1) = fcbc68(i,1) -((0.000000000155/0.0000092)*(((1/UTh(i,1))/2.3)-1)); % BE 6/8 ratio
-	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.82; %col BC
+	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.818; %col BC
 	ratio75err(i,1) = sqrt(merr68(i,1)*merr68(i,1) + re67(i,1)*re67(i,1)); %col BD
 	Age68(i,1) = abs(log(ratio68(i,1)+1)/0.000155125); %BH 6/8 age
 	Age68err(i,1) = abs((log((ratio68(i,1)+ratio68(i,1)*(merr68(i,1)/100))+1)/0.000155125-log((ratio68(i,1)-ratio68(i,1)*merr68(i,1)/100)+1)/0.000155125)/2); %col BI
@@ -7697,7 +7697,7 @@ for i = 1:data_count %col BL
 	elseif 1/fcbc67(i,1) >= .556 %older than Earth
 		Age67{i,1} = 'NA';
 	else
-		Age67{i,1} = MyAge76_E2(1/fcbc67(i,1));
+		Age67{i,1} = MyAge76(1/fcbc67(i,1));
 	end
 end
 
@@ -7705,7 +7705,7 @@ for i = 1:data_count %col BM
 	%if fcbc67(i,1) > 2 && fcbc67(i,1) < 30 && re67(i,1) < 50
 	if 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) < .556 && ...
 			1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) < .556
-		Age67err{i,1} = abs((MyAge76_E2(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76_E2(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
+		Age67err{i,1} = abs((MyAge76(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
 	else
 		Age67err{i,1} = 'NA';
 	end
@@ -8215,10 +8215,10 @@ for i = 1:data_count
 		%UPBdata2(j,5,i) = (values_all(j+16,5,i)-UPB_pre(i,5))/(1-(values_all(j+16,5,i)-UPB_pre(i,5))*deadtime/1000000000);
 		%UPBdata2(j,6,i) = (values_all(j+16,6,i)-UPB_pre(i,6))/(1-(values_all(j+16,6,i)-UPB_pre(i,6))*deadtime/1000000000);
 		%UPBdata2(j,7,i) = (values_all(j+16,7,i)-UPB_pre(i,7))/(1-(values_all(j+16,7,i)-UPB_pre(i,7))*deadtime/1000000000);
-		if UPBdata2(j,7,i)*137.82 > 5000000
-			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+(0.3*lin68*((137.82*UPBdata2(j,7,i))^1.5)/100000000000));
+		if UPBdata2(j,7,i)*137.818 > 5000000
+			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+(0.3*lin68*((137.818*UPBdata2(j,7,i))^1.5)/100000000000));
 		else
-			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata2(j,7,i)*137.82)));
+			UPBdata2(j,8,i) = UPBdata2(j,7,i)*(1+0.2*lowint68*exp(-0.000001*(UPBdata2(j,7,i)*137.818)));
 		end
 		%UPBdata2(j,9,i) = (values_all(j+16,8,i)-UPB_pre(i,8))/(1-(values_all(j+16,8,i)-UPB_pre(i,8))*deadtime/1000000000);
 		if UPBdata2(j,9,i) > 5000000
@@ -8259,7 +8259,7 @@ for i = 1:data_count
 		elseif strcmp(mode{i,1}, 'IC') == 1
 			UPBdata2(j,11,i) = UPBdata2(j,3,i)/UPBdata2(j,10,i);
 		else
-			UPBdata2(j,11,i) = UPBdata2(j,3,i)/(UPBdata2(j,8,i)*137.82);
+			UPBdata2(j,11,i) = UPBdata2(j,3,i)/(UPBdata2(j,8,i)*137.818);
 		end
 	end
 end
@@ -8325,7 +8325,7 @@ for i = 1:data_count
 	if strcmp(mode{i,1}, 'bad') == 1
 		UPB_reduced(i,8) = 1.3;
 	elseif use_235 == 1
-		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./(137.82*sum(UPBdata2(:,8,i)));
+		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./(137.818*sum(UPBdata2(:,8,i)));
 	else
 		UPB_reduced(i,8) = sum(UPBdata2(:,3,i))./sum(UPBdata2(:,10,i));
 	end
@@ -8720,7 +8720,7 @@ end
 
 for i = 1:data_count
 	ratio68(i,1) = fcbc68(i,1) -((0.000000000155/0.0000092)*(((1/UTh(i,1))/2.3)-1)); % BE 6/8 ratio
-	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.82; %col BC
+	ratio75(i,1) = (ratio68(i,1)/fcbc67(i,1))*137.818; %col BC
 	ratio75err(i,1) = sqrt(merr68(i,1)*merr68(i,1) + re67(i,1)*re67(i,1)); %col BD
 	Age68(i,1) = abs(log(ratio68(i,1)+1)/0.000155125); %BH 6/8 age
 	Age68err(i,1) = abs((log((ratio68(i,1)+ratio68(i,1)*(merr68(i,1)/100))+1)/0.000155125-log((ratio68(i,1)-ratio68(i,1)*merr68(i,1)/100)+1)/0.000155125)/2); %col BI
@@ -8738,7 +8738,7 @@ for i = 1:data_count %col BL
 	elseif 1/fcbc67(i,1) >= .556 %older than Earth
 		Age67{i,1} = 'NA';
 	else
-		Age67{i,1} = MyAge76_E2(1/fcbc67(i,1));
+		Age67{i,1} = MyAge76(1/fcbc67(i,1));
 	end
 end
 
@@ -8746,7 +8746,7 @@ for i = 1:data_count %col BM
 	%if fcbc67(i,1) > 2 && fcbc67(i,1) < 30 && re67(i,1) < 50
 	if 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100) < .556 && ...
 			1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) > .04604504 && 1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100) < .556
-		Age67err{i,1} = abs((MyAge76_E2(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76_E2(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
+		Age67err{i,1} = abs((MyAge76(1/(fcbc67(i,1)-fcbc67(i,1)*re67(i,1)/100)) - MyAge76(1/(fcbc67(i,1)+fcbc67(i,1)*re67(i,1)/100)))/2);
 	else
 		Age67err{i,1} = 'NA';
 	end

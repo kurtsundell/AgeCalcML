@@ -658,8 +658,8 @@ end
 
 % Data Export %
 Macro1_Output(1:data_count+1,1:20) = {0}; % Preallocate
-Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 ± %', 'm68', ...
-	'206207', '67 ± %', '206204', '64 ± %', '208232', '82 ± %', '208204', '84 ± %'};
+Macro1_Output(1,1:end) = {'sample', 'serial', '202 (cps)', '204 (cps)', '206 (cps)', '207 (cps)', '208 (cps)', '232 (cps)', '238 (cps)', '206238', '68 1s %', 'm68', ...
+	'206207', '67 1s %', '206204', '64 1s %', '208232', '82 1s %', '208204', '84 1s %'};
 Macro1_Output(2:end,1) = sample;
 Macro1_Output(2:end,2) = serial;
 if FAR == 1
@@ -1118,11 +1118,11 @@ comment = strcat(comment1, comment2, comment3, comment4, comment5, comment6);
 %% CONCATENATE DATA FOR EXPORT AND PLOTTING %%
 
 AGES_OUT{data_count+1, 6} = [];
-AGES_OUT(1,:) = {'6/8 age', '± (Ma)', '6/7 age', '± (Ma)', '8/2 age', '± (Ma)'};
+AGES_OUT(1,:) = {'6/8 age', '1s (Ma)', '6/7 age', '1s (Ma)', '8/2 age', '1s (Ma)'};
 AGES_OUT(2:end,:) = [Age68, Age68_err, Age67, Age67_err, Age82, Age82_err];
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)', 'BEST AGE', '1s(Ma)', '8/2 age', '1s(Ma)'};
 for i = 1:data_count
 if sample_idx(i,1) == 1 && isempty(comment{i,1}) == 1 
 	SAMPLE_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1134,7 +1134,7 @@ end
 end
 
 STD_CONCORDIA{data_count+1, 9} = [];
-STD_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)'};
+STD_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)'};
 for i = 1:data_count
 if STD1_idx(i,1) == 1
 STD_CONCORDIA(i+1,:) = [num2cell(ratio75(i,:)), num2cell(ratio75_err(i,:)), num2cell(ratio68(i,:)), num2cell(err68m(i,:)), num2cell(rho(i,:)), ...
@@ -1143,14 +1143,14 @@ end
 end
 
 CORRECTED_CONC_RATIOS{data_count+1, 15} = [];
-CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '±(%)', '8/2 ratio', '±(%)', ...
-	'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho'};
+CORRECTED_CONC_RATIOS(1,:) = {'sample', 'U (ppm)', 'Th(ppm)', '6/4c', '8/4 ratio', 'U/Th', '6/7 ratio', '1s(%)', '8/2 ratio', '1s(%)', ...
+	'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho'};
 CORRECTED_CONC_RATIOS(2:end,:) = [sample, num2cell(ppm238), num2cell(ppm232), num2cell(BLS_64_sort_mean.*factor64), num2cell(BLS_84_sort_mean), ...
 	num2cell(UTh), num2cell(fcbc67), num2cell(re67), num2cell(fcbc82), num2cell(re82), num2cell(ratio75), num2cell(ratio75_err), num2cell(ratio68), ...
 	num2cell(err68m), num2cell(rho)];
 
 AGES_1SD_RANDOM_ERRORS{data_count+1, 10} = [];
-AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '±(Ma)', '7/5 age', '±(Ma)', '6/7 age', '±(Ma)', '8/2 age', '±(Ma)', 'BEST AGE', '±(Ma)'};
+AGES_1SD_RANDOM_ERRORS(1,:) = {'6/8 age', '1s(Ma)', '7/5 age', '1s(Ma)', '6/7 age', '1s(Ma)', '8/2 age', '1s(Ma)', 'BEST AGE', '1s(Ma)'};
 AGES_1SD_RANDOM_ERRORS(2:end,:) = [Age68, Age68_err, Age75, Age75_err, Age67, Age67_err, Age82, Age82_err, Best_Age, Best_Age_err];
 
 Macro_1_2_Output = [Macro1_Output, AGES_OUT, [{'comment'};comment], SAMPLE_CONCORDIA, STD_CONCORDIA, CORRECTED_CONC_RATIOS, AGES_1SD_RANDOM_ERRORS];
@@ -1417,18 +1417,18 @@ axes(H.axes_session);
 set(H.axes_session,'FontSize',8);
 %set(H.primary_reference,'String',STD1);
 
-for i = 1:length(sigx_sq_STD1)
-covmat_STD1=[sigx_sq_STD1(i,1),rho_sigx_sigy_STD1(i,1);rho_sigx_sigy_STD1(i,1),sigy_sq_STD1(i,1)];
-[PD_STD1,PV_STD1]=eig(covmat_STD1);
-PV_STD1 = diag(PV_STD1).^.5;
-theta_STD1 = linspace(0,2.*pi,numpoints)';
-elpt_STD1 = [cos(theta_STD1),sin(theta_STD1)]*diag(PV_STD1)*PD_STD1';
-numsigma = length(sigmarule);
-elpt_STD1 = repmat(elpt_STD1,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
-elpt_STD1_out(:,:,i) = elpt_STD1 + repmat(center_STD1(i,1:2),numpoints,numsigma);
-p1 = plot(elpt_STD1_out(:,1:2:end,i),elpt_STD1_out(:,2:2:end,i),'b','LineWidth',1.2);
-hold on
-end
+% for i = 1:length(sigx_sq_STD1)
+% covmat_STD1=[sigx_sq_STD1(i,1),rho_sigx_sigy_STD1(i,1);rho_sigx_sigy_STD1(i,1),sigy_sq_STD1(i,1)];
+% [PD_STD1,PV_STD1]=eig(covmat_STD1);
+% PV_STD1 = diag(PV_STD1).^.5;
+% theta_STD1 = linspace(0,2.*pi,numpoints)';
+% elpt_STD1 = [cos(theta_STD1),sin(theta_STD1)]*diag(PV_STD1)*PD_STD1';
+% numsigma = length(sigmarule);
+% elpt_STD1 = repmat(elpt_STD1,1,numsigma).*repmat(sigmarule(floor(1:.5:numsigma+.5)),numpoints,1);
+% elpt_STD1_out(:,:,i) = elpt_STD1 + repmat(center_STD1(i,1:2),numpoints,numsigma);
+% p1 = plot(elpt_STD1_out(:,1:2:end,i),elpt_STD1_out(:,2:2:end,i),'b','LineWidth',1.2);
+% hold on
+% end
 
 %age_label2_x = 0.742701185586296;
 age_label2_x = STD1_68*(1/STD1_67)*137.818;
@@ -1460,8 +1460,8 @@ hold on
 p1 = scatter(age_label2_x, age_label2_y,50,'MarkerEdgeColor','k','MarkerFaceColor','g','LineWidth',1.5);
 labelpoints (age_label2_x, age_label2_y, age_label2, 'SE', .002);
 legend(p1,'Accepted Age','Location','northwest');
-axis([min(min(elpt_STD1_out(:,1,:))) - min(min(elpt_STD1_out(:,1,:)))*.01 max(max(elpt_STD1_out(:,1,:))) + max(max(elpt_STD1_out(:,1,:)))*.01 ...
-	min(min(elpt_STD1_out(:,2,:))) - min(min(elpt_STD1_out(:,2,:)))*.01 max(max(elpt_STD1_out(:,2,:))) + max(max(elpt_STD1_out(:,2,:)))*.01]);
+%axis([min(min(elpt_STD1_out(:,1,:))) - min(min(elpt_STD1_out(:,1,:)))*.01 max(max(elpt_STD1_out(:,1,:))) + max(max(elpt_STD1_out(:,1,:)))*.01 ...
+%	min(min(elpt_STD1_out(:,2,:))) - min(min(elpt_STD1_out(:,2,:)))*.01 max(max(elpt_STD1_out(:,2,:))) + max(max(elpt_STD1_out(:,2,:)))*.01]);
 xlabel('207Pb/235U', 'FontSize', 8);
 ylabel('206Pb/238U', 'FontSize', 8);
 end
@@ -2991,7 +2991,7 @@ set(H.listbox1,'ListBoxTop',currView)
 clear SAMPLE_CONCORDIA
 
 SAMPLE_CONCORDIA{data_count+1, 13} = [];
-SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '±(%)', '6/8 ratio', '±(%)', 'rho', '6/8 age', '±(Ma)', '6/7 age', '±(Ma)', 'BEST AGE', '±(Ma)', '8/2 age', '±(Ma)'};
+SAMPLE_CONCORDIA(1,:) = {'7/5 ratio', '1s(%)', '6/8 ratio', '1s(%)', 'rho', '6/8 age', '1s(Ma)', '6/7 age', '1s(Ma)', 'BEST AGE', '1s(Ma)', '8/2 age', '1s(Ma)'};
 
 for i = 1:data_count
 if current_status_num(i,1) == 1 && sample_idx(i,1) == 1
