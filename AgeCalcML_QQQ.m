@@ -191,14 +191,16 @@ mean232BL = mean(BL232);
 mean235BL = mean(BL235);
 mean238BL = mean(BL238);
 
-BL202(BL202 > mean202BL + 2*std(BL202) | BL202 < mean202BL - 2*std(BL202) ) = [];
-BL204(BL204 > mean204BL + 2*std(BL204) | BL204 < mean204BL - 2*std(BL204) ) = [];
-BL206(BL206 > mean206BL + 2*std(BL206) | BL206 < mean206BL - 2*std(BL206) ) = [];
-BL207(BL207 > mean207BL + 2*std(BL207) | BL207 < mean207BL - 2*std(BL207) ) = [];
-BL208(BL208 > mean208BL + 2*std(BL208) | BL208 < mean208BL - 2*std(BL208) ) = [];
-BL232(BL232 > mean232BL + 2*std(BL232) | BL232 < mean232BL - 2*std(BL232) ) = [];
-BL235(BL235 > mean235BL + 2*std(BL235) | BL235 < mean235BL - 2*std(BL235) ) = [];
-BL238(BL238 > mean238BL + 2*std(BL238) | BL238 < mean238BL - 2*std(BL238) ) = [];
+
+% BL202(BL202 > mean202BL + 2*std(BL202) | BL202 < mean202BL - 2*std(BL202) ) = [];
+% BL204(BL204 > mean204BL + 2*std(BL204) | BL204 < mean204BL - 2*std(BL204) ) = [];
+% BL206(BL206 > mean206BL + 2*std(BL206) | BL206 < mean206BL - 2*std(BL206) ) = [];
+% BL207(BL207 > mean207BL + 2*std(BL207) | BL207 < mean207BL - 2*std(BL207) ) = [];
+% BL208(BL208 > mean208BL + 2*std(BL208) | BL208 < mean208BL - 2*std(BL208) ) = [];
+% BL232(BL232 > mean232BL + 2*std(BL232) | BL232 < mean232BL - 2*std(BL232) ) = [];
+% BL235(BL235 > mean235BL + 2*std(BL235) | BL235 < mean235BL - 2*std(BL235) ) = [];
+% BL238(BL238 > mean238BL + 2*std(BL238) | BL238 < mean238BL - 2*std(BL238) ) = [];
+
 
 std202BL = std(BL202);
 std204BL = std(BL204);
@@ -226,6 +228,13 @@ SE208BL = std(BL208)./sqrt(length(BL208))./abs(mean208BL).*100;
 SE232BL = std(BL232)./sqrt(length(BL232))./abs(mean232BL).*100;
 SE235BL = std(BL235)./sqrt(length(BL235))./abs(mean235BL).*100;
 SE238BL = std(BL238)./sqrt(length(BL238))./abs(mean238BL).*100;
+
+
+
+
+
+
+
 
 for i = 1:data_count
 	BLS_202(:,i) = integration(:,1,i) - mean202BL;
@@ -536,7 +545,7 @@ end
 
 
 
-%Total Counts
+%Total Counts (ratio of the means)
 if get(H.totalcounts, 'Value') == 1
 	if get(H.downhole,'Value') == 0
 		for i = 1:data_count
@@ -604,7 +613,7 @@ if get(H.totalcounts, 'Value') == 1
 end
 
 
-%Mean ratios
+%Mean of the ratios
 if get(H.meanratios, 'Value') == 1
 	if get(H.downhole,'Value') == 0
 		for i = 1:data_count
@@ -679,7 +688,6 @@ end
 
 
 %Log ratios
-%Mean ratios
 if get(H.logratios, 'Value') == 1
 	if get(H.downhole,'Value') == 0
 		for i = 1:data_count
@@ -705,23 +713,25 @@ if get(H.logratios, 'Value') == 1
 			BLS_68_slope(i,1) = 0;
 		end
 	end
-
 	
 	for i = 1:data_count
-		BLS_67_ratios(:,i) = BLS_67_tmp(:,1,i)./BLS_67_tmp(:,2,i);
-		BLS_Ratios_tmp = nonzeros(BLS_67_ratios(:,i));
-		BLS_Ratios_tmp(isnan(BLS_Ratios_tmp(:,1)),:) = [];
-			for j = 1:length(BLS_Ratios_tmp)
-				if BLS_Ratios_tmp(j,1) > mean(BLS_Ratios_tmp) + 2*std(BLS_Ratios_tmp) || ...
-						BLS_Ratios_tmp(j,1) < mean(BLS_Ratios_tmp) - 2*std(BLS_Ratios_tmp)
-					BLS_Ratios_tmp(j,1) = 0;
-				end
+		BLS_67_ratios(:,i) = log( BLS_67_tmp(:,1,i)./BLS_67_tmp(:,2,i) );
+	end
+	for i = 1:length(BLS_67_ratios(1,:))
+		BLS_Ratios_tmp = BLS_67_ratios(:,i);
+		for j = 1:length(BLS_Ratios_tmp)
+			if BLS_Ratios_tmp(j,1) > mean(BLS_Ratios_tmp) + 2*std(BLS_Ratios_tmp) || ...
+					BLS_Ratios_tmp(j,1) < mean(BLS_Ratios_tmp) - 2*std(BLS_Ratios_tmp)
+				BLS_Ratios_tmp(j,1) = 0;
 			end
+		end
 		BLS_Ratios_tmp(BLS_Ratios_tmp == 0) = [];
-		BLS_67_corr(i,1) = mean(BLS_Ratios_tmp);
-		BLS_67_err(i,1) = (std(BLS_Ratios_tmp)/sqrt(length(BLS_Ratios_tmp))) / BLS_67_corr(i,1) .* 100; % 1 sigma SE in %
+		BLS_67_corr_tmp = mean(BLS_Ratios_tmp);
+		BLS_67_corr(i,1) = exp(BLS_67_corr_tmp);
+		BLS_Ratios_tmp_exp = exp(BLS_Ratios_tmp);
+		BLS_67_err(i,1) = (std(BLS_Ratios_tmp_exp)/sqrt(length(BLS_Ratios_tmp_exp))) / BLS_67_corr(i,1) .* 100; % 1 sigma SE in %
 		n = length(BLS_Ratios_tmp)
-		clear BLS_Ratios_tmp
+		clear BLS_Ratios_tmp BLS_68_corr_tmp BLS_Ratios_tmp_exp
 	end
 	
 	for i = 1:data_count
@@ -787,7 +797,7 @@ end
 
 
 
-
+%{
 % unc propagated from bulk BLS rmv
 for i = 1:data_count
 	BLS_68_err(i,1) = sqrt( BLS_68_err(i,1)*BLS_68_err(i,1) );
@@ -796,9 +806,10 @@ for i = 1:data_count
 	BLS_82_err(i,1) = sqrt( BLS_82_err(i,1)*BLS_82_err(i,1) );
 	BLS_84_err(i,1) = sqrt( BLS_84_err(i,1)*BLS_84_err(i,1) );
 end
+%}
 
-% unc propagated from bulk BLS
 %{
+% unc propagated from ind BLS
 for i = 1:data_count
 	BLS_68_err(i,1) = sqrt( BLS_68_err(i,1)*BLS_68_err(i,1) + SE206BL(i,1)*SE206BL(i,1) + SE238BL(i,1)*SE238BL(i,1) );
 	BLS_67_err(i,1) = sqrt( BLS_67_err(i,1)*BLS_67_err(i,1) + SE206BL(i,1)*SE206BL(i,1) + SE207BL(i,1)*SE207BL(i,1) );
@@ -807,6 +818,18 @@ for i = 1:data_count
 	BLS_84_err(i,1) = sqrt( BLS_84_err(i,1)*BLS_84_err(i,1) + SE208BL(i,1)*SE208BL(i,1) + SE204BL(i,1)*SE204BL(i,1) );
 end
 %}
+
+%{
+% unc propagated from bulk BLS
+for i = 1:data_count
+	BLS_68_err(i,1) = sqrt( BLS_68_err(i,1)*BLS_68_err(i,1) + SE206BL*SE206BL + SE238BL*SE238BL );
+	BLS_67_err(i,1) = sqrt( BLS_67_err(i,1)*BLS_67_err(i,1) + SE206BL*SE206BL + SE207BL*SE207BL );
+	BLS_64_err(i,1) = sqrt( BLS_64_err(i,1)*BLS_64_err(i,1) + SE206BL*SE206BL + SE204BL*SE204BL );
+	BLS_82_err(i,1) = sqrt( BLS_82_err(i,1)*BLS_82_err(i,1) + SE208BL*SE208BL + SE232BL*SE232BL );
+	BLS_84_err(i,1) = sqrt( BLS_84_err(i,1)*BLS_84_err(i,1) + SE208BL*SE208BL + SE204BL*SE204BL );
+end
+%}
+
 
 waitbar(7/waitnum,h,'Calculating. Please wait...');
 
@@ -2954,6 +2977,7 @@ set(H.wmTertiary, 'Value', 0)
 set(H.wmSecondary, 'Value', 0)
 set(H.ptype_Primary_STDs, 'Value', 0)
 set(H.ptype_Secondary_STDs, 'Value', 0)
+set(H.ptype_Tertiary_STDs, 'Value', 0)
 set(H.ptype_Unknowns, 'Value', 0)
 set(H.ptype_Unknowns_acc, 'Value', 0)
 set(H.ptype_Unknowns_rej, 'Value', 0)
@@ -3062,6 +3086,7 @@ set(H.wmTertiary, 'Value', 0)
 set(H.wmSecondary, 'Value', 1)
 set(H.ptype_Primary_STDs, 'Value', 0)
 set(H.ptype_Secondary_STDs, 'Value', 0)
+set(H.ptype_Tertiary_STDs, 'Value', 0)
 set(H.ptype_Unknowns, 'Value', 0)
 set(H.ptype_Unknowns_acc, 'Value', 0)
 set(H.ptype_Unknowns_rej, 'Value', 0)
@@ -3170,6 +3195,7 @@ set(H.wmTertiary, 'Value', 1)
 set(H.wmSecondary, 'Value', 0)
 set(H.ptype_Primary_STDs, 'Value', 0)
 set(H.ptype_Secondary_STDs, 'Value', 0)
+set(H.ptype_Tertiary_STDs, 'Value', 0)
 set(H.ptype_Unknowns, 'Value', 0)
 set(H.ptype_Unknowns_acc, 'Value', 0)
 set(H.ptype_Unknowns_rej, 'Value', 0)
@@ -4542,7 +4568,14 @@ hold on
 
 
 
+ints = str2num(get(H.intstart,'String'));
+inte = str2num(get(H.intend,'String'));
 
+base1s = str2num(get(H.base1start,'String'));
+base1e = str2num(get(H.base1end,'String'));
+
+base2s = str2num(get(H.base2start,'String'));
+base2e = str2num(get(H.base2end,'String'));
 
 
 
@@ -4570,7 +4603,7 @@ end
 if get(H.chk_Pb206_U238,'Value')==1
 	hold on
 	
-	tbl68 = table(Ablate(5:20),plot_vals(5:20,9));
+	tbl68 = table(Ablate(ints:inte),plot_vals(ints:inte,9));
 	mdl = fitlm(tbl68);
 	plot(mdl);
 	
