@@ -1,6 +1,8 @@
 # AgeCalcML
 The University of Arizona LaserChron Center data reduction software
 
+Reference: Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U‐Pb geochronology by laser ablation multi‐collector ICP‐MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.
+
 ### Run with MATLAB
 To run AgeCalcML in MATLAB open the AgeCalcML.m file and run the file directly from the code. 
 
