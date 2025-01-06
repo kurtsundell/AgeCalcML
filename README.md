@@ -1,5 +1,5 @@
 # AgeCalcML
-The University of Arizona LaserChron Center data reduction software
+The University of Arizona LaserChron Center data reduction and visualization software.
 
 Reference: Sundell, K.E., Gehrels, G.E. and Pecha, M.E., 2021. Rapid U‐Pb geochronology by laser ablation multi‐collector ICP‐MS. Geostandards and Geoanalytical Research, 45(1), pp.37-57.
 
